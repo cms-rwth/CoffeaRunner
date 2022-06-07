@@ -12,6 +12,9 @@ from coffea import processor
 
 from BTVNanoCommissioning.workflows import workflows
 
+# This would crash if the ExampleWorkflow does not exist
+from ExampleWorkflow.workflows import workflows
+# Should come up with a smarter way to import all worflows from subdirectories of ./src/
 
 def validate(file):
     try:
