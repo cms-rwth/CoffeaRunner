@@ -38,6 +38,13 @@ def check_port(port):
     sock.close()
     return available
 
+def retry_handler(exception, task_record):
+    from parsl.executors.high_throughput.interchange import ManagerLost
+    if isinstance(exception, ManagerLost):
+            return 0.1
+    else:
+        return 1
+
 
 def get_main_parser():
     parser = argparse.ArgumentParser(
@@ -80,6 +87,7 @@ def get_main_parser():
             "futures",
             "parsl/slurm",
             "parsl/condor",
+            "parsl/condor/naf_lite",
             "dask/condor",
             "dask/slurm",
             "dask/lpc",
@@ -91,6 +99,7 @@ def get_main_parser():
         "For example see https://parsl.readthedocs.io/en/stable/userguide/configuring.html"
         "- `parsl/slurm` - tested at DESY/Maxwell"
         "- `parsl/condor` - tested at DESY, RWTH"
+        "- `parsl/condor/naf_lite` - tested at DESY"
         "- `dask/slurm` - tested at DESY/Maxwell"
         "- `dask/condor` - tested at DESY, RWTH"
         "- `dask/lpc` - custom lpc/condor setup (due to write access restrictions)"
@@ -227,6 +236,8 @@ if __name__ == "__main__":
 
     # load workflow
     processor_instance = workflows[args.workflow](args.year, args.campaign)
+    # AS: not all workflows will have these two parameter, so probably
+    #     we want to avoid always calling it like that in the future
 
     if args.executor not in ["futures", "iterative", "dask/lpc", "dask/casa"]:
         """
@@ -260,6 +271,7 @@ if __name__ == "__main__":
             f"export PYTHONPATH=$PYTHONPATH:{os.getcwd()}",
         ]
         condor_extra = [
+            f'cd {os.getcwd()}',
             f'source {os.environ["HOME"]}/.bashrc',
             f'conda activate {os.environ["CONDA_PREFIX"]}',
         ]
@@ -314,23 +326,47 @@ if __name__ == "__main__":
                 retries=args.retries,
             )
         elif "condor" in args.executor:
-            htex_config = Config(
-                executors=[
-                    HighThroughputExecutor(
-                        label="coffea_parsl_condor",
-                        address=address_by_query(),
-                        max_workers=1,
-                        provider=CondorProvider(
-                            nodes_per_block=1,
-                            init_blocks=args.workers,
-                            max_blocks=(args.workers) + 1,
-                            worker_init="\n".join(env_extra + condor_extra),
-                            walltime="00:20:00",
-                        ),
-                    )
-                ],
-                retries=args.retries,
-            )
+            if "naf_lite" in args.executor:
+                htex_config = Config(
+                    executors=[
+                        HighThroughputExecutor(
+                            label='coffea_parsl_condor',
+                            address=address_by_query(),
+                            max_workers=1,
+                            worker_debug=True,
+
+                            provider=CondorProvider(
+                                nodes_per_block=1,
+                                cores_per_slot=args.workers,
+                                mem_per_slot = 2, # lite job / opportunistic can only use this much                           
+                                init_blocks=args.scaleout,
+                                max_blocks=(args.scaleout)+2,
+                                worker_init="\n".join(env_extra + condor_extra),
+                                walltime="00:03:00", # lite / short queue requirement
+                            ),
+                        )
+                    ],
+                    retries=20,
+                    retry_handler=retry_handler,
+                )
+            else:
+                htex_config = Config(
+                    executors=[
+                        HighThroughputExecutor(
+                            label="coffea_parsl_condor",
+                            address=address_by_query(),
+                            max_workers=1,
+                            provider=CondorProvider(
+                                nodes_per_block=1,
+                                init_blocks=args.workers,
+                                max_blocks=(args.workers) + 1,
+                                worker_init="\n".join(env_extra + condor_extra),
+                                walltime="00:20:00",
+                            ),
+                        )
+                    ],
+                    retries=args.retries,
+                )
         else:
             raise NotImplementedError
 
