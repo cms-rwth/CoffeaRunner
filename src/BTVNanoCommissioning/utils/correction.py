@@ -31,7 +31,98 @@ with importlib.resources.path(
     "Cert_314472-325175_13TeV_17SeptEarlyReReco2018ABC_PromptEraD_Collisions18_JSON.txt",
 ) as filename:
     lumiMasks["2018"] = LumiMask(filename)
-
+with importlib.resources.path(
+    _lumi_path,
+    "Cert_271036-284044_13TeV_Legacy2016_Collisions16_JSON.txt",
+) as filename:
+    lumiMasks["UL16"] = LumiMask(filename)
+with importlib.resources.path(
+    _lumi_path,
+    "Cert_294927-306462_13TeV_UL2017_Collisions17_GoldenJSON.txt",
+) as filename:
+    lumiMasks["UL17"] = LumiMask(filename)
+with importlib.resources.path(
+    _lumi_path,
+    "Cert_314472-325175_13TeV_Legacy2018_Collisions18_JSON.txt",
+) as filename:
+    lumiMasks["UL18"] = LumiMask(filename)
+## MET filters
+met_filters = {
+    "UL16": {
+        "data": [
+            "goodVertices",
+            "globalSuperTightHaloUL16Filter",
+            "HBHENoiseFilter",
+            "HBHENoiseIsoFilter",
+            "EcalDeadCellTriggerPrimitiveFilter",
+            "BadPFMuonFilter",
+            "BadPFMuonDzFilter",
+            "eeBadScFilter",
+        ],
+        "mc": [
+            "goodVertices",
+            "globalSuperTightHalo2016Filter",
+            "HBHENoiseFilter",
+            "HBHENoiseIsoFilter",
+            "EcalDeadCellTriggerPrimitiveFilter",
+            "BadPFMuonFilter",
+            "BadPFMuonDzFilter",
+            "eeBadScFilter",
+        ],
+    },
+    "UL17": {
+        "data": [
+            "goodVertices",
+            "globalSuperTightHalo2016Filter",
+            "HBHENoiseFilter",
+            "HBHENoiseIsoFilter",
+            "EcalDeadCellTriggerPrimitiveFilter",
+            "BadPFMuonFilter",
+            "BadPFMuonDzFilter",
+            "hfNoisyHitsFilter",
+            "eeBadScFilter",
+            "ecalBadCalibFilter",
+        ],
+        "mc": [
+            "goodVertices",
+            "globalSuperTightHalo2016Filter",
+            "HBHENoiseFilter",
+            "HBHENoiseIsoFilter",
+            "EcalDeadCellTriggerPrimitiveFilter",
+            "BadPFMuonFilter",
+            "BadPFMuonDzFilter",
+            "hfNoisyHitsFilter",
+            "eeBadScFilter",
+            "ecalBadCalibFilter",
+        ],
+    },
+    "UL18": {
+        "data": [
+            "goodVertices",
+            "globalSuperTightHalo2016Filter",
+            "HBHENoiseFilter",
+            "HBHENoiseIsoFilter",
+            "EcalDeadCellTriggerPrimitiveFilter",
+            "BadPFMuonFilter",
+            "BadPFMuonDzFilter",
+            "hfNoisyHitsFilter",
+            "eeBadScFilter",
+            "ecalBadCalibFilter",
+        ],
+        "mc": [
+            "goodVertices",
+            "globalSuperTightHalo2016Filter",
+            "HBHENoiseFilter",
+            "HBHENoiseIsoFilter",
+            "EcalDeadCellTriggerPrimitiveFilter",
+            "BadPFMuonFilter",
+            "BadPFMuonDzFilter",
+            "hfNoisyHitsFilter",
+            "eeBadScFilter",
+            "ecalBadCalibFilter",
+        ],
+    },
+}
 ##JEC
 def load_jetfactory(campaign, path):
     _jet_path = f"BTVNanoCommissioning.data.JME.{campaign}"
@@ -58,8 +149,15 @@ def add_jec_variables(jets, event_rho):
 def load_pu(campaign, path):
     _pu_path = f"BTVNanoCommissioning.data.PU.{campaign}"
     with importlib.resources.path(_pu_path, path) as filename:
-        with gzip.open(filename) as fin:
-            compiled = cloudpickle.load(fin)
+       
+        if str(filename).endswith(".pkl.gz"):
+            with gzip.open(filename) as fin:
+                compiled = cloudpickle.load(fin)
+        elif str(filename).endswith(".histo.root"):
+            ext = extractor()
+            ext.add_weight_sets([f"* * {filename}"])            
+            ext.finalize()
+            compiled = ext.make_evaluator()
     return compiled
 
 
@@ -87,15 +185,7 @@ def load_BTV(campaign, path):
 
 ### Lepton SFs
 
-# ext = extractor()
-# ele_sf_mapping = {
-#     "ele_Trig TrigSF": "Ele32_L1DoubleEG_TrigSF_vhcc.histo.root",
-#     "ele_ID EGamma_SF2D": "ElectronIDSF_94X_MVA80WP.histo.root",
-#     "ele_Rereco EGamma_SF2D": "ElectronRecoSF_94X.histo.root",
-#     "mu_ID NUM_TightID_DEN_genTracks_pt_abseta": "RunBCDEF_SF_ID.histo.root",
-#     "mu_ID_low NUM_TightID_DEN_genTracks_pt_abseta": "RunBCDEF_SF_MuID_lowpT.histo.root",
-#     "mu_Iso NUM_TightRelIso_DEN_TightIDandIPCut_pt_abseta": "RunBCDEF_SF_ISO.histo.root",
-# }
+
 
 # with contextlib.ExitStack() as stack:
 #     # this would work even in zipballs but since extractor keys on file extension and
@@ -127,7 +217,9 @@ def eleSFs(ele, campaign, path):
     weight = 1.0
     for paths in path.keys():
         if "ele" in paths:
-            weight = weight * evaluator[paths[: paths.find(" ")]](ele_eta, ele_pt)
+            if "above20" in paths : weight = weight * np.where(ele_pt<20.,1.,evaluator[paths[: paths.find(" ")]](ele_eta, ele_pt))
+            elif "below20" in paths : weight = weight * np.where(ele_pt>20.,1.,evaluator[paths[: paths.find(" ")]](ele_eta, ele_pt))
+            else: weight = weight * evaluator[paths[: paths.find(" ")]](ele_eta, ele_pt)
     return weight
 
 
