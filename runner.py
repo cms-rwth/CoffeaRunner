@@ -13,8 +13,9 @@ from coffea import processor
 from BTVNanoCommissioning.workflows import workflows
 
 # This would crash if the ExampleWorkflow does not exist
-from ExampleWorkflow.workflows import workflows
-from VHcc.workflows import workflows
+# from ExampleWorkflow.workflows import workflows
+# from VHcc.workflows import workflows
+from Hpluscharm.workflows import workflows
 # Should come up with a smarter way to import all worflows from subdirectories of ./src/
 
 def validate(file):
@@ -165,6 +166,7 @@ def get_main_parser():
         metavar="N",
         help="Max number of chunks to run in total",
     )
+    parser.add_argument('--export_array', action='store_true',default=False, help='stored selected events to np.arrays')
     return parser
 
 
@@ -236,6 +238,7 @@ if __name__ == "__main__":
 
     # load workflow
     processor_instance = workflows[args.workflow](args.year, args.campaign)
+    if args.export_array is not None:processor_instance = workflows[args.workflow](year=args.year,campaign=args.campaign,export_array=args.export_array)
     # AS: not all workflows will have these two parameter, so probably
     #     we want to avoid always calling it like that in the future
 
@@ -358,8 +361,9 @@ if __name__ == "__main__":
                             max_workers=1,
                             provider=CondorProvider(
                                 nodes_per_block=1,
-                                init_blocks=args.workers,
-                                max_blocks=(args.workers) + 1,
+                                cores_per_slot=args.workers,
+                                init_blocks=args.scaleout,
+                                max_blocks=(args.scaleout) + 2,
                                 worker_init="\n".join(env_extra + condor_extra),
                                 walltime="00:20:00",
                             ),
