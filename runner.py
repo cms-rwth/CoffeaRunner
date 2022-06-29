@@ -16,7 +16,9 @@ from BTVNanoCommissioning.workflows import workflows
 # from ExampleWorkflow.workflows import workflows
 # from VHcc.workflows import workflows
 from Hpluscharm.workflows import workflows
+
 # Should come up with a smarter way to import all worflows from subdirectories of ./src/
+
 
 def validate(file):
     try:
@@ -39,10 +41,12 @@ def check_port(port):
     sock.close()
     return available
 
+
 def retry_handler(exception, task_record):
     from parsl.executors.high_throughput.interchange import ManagerLost
+
     if isinstance(exception, ManagerLost):
-            return 0.1
+        return 0.1
     else:
         return 1
 
@@ -166,7 +170,18 @@ def get_main_parser():
         metavar="N",
         help="Max number of chunks to run in total",
     )
-    parser.add_argument('--export_array', action='store_true',default=False, help='stored selected events to np.arrays')
+    parser.add_argument(
+        "--export_array",
+        action="store_true",
+        default=False,
+        help="stored selected events to np.arrays",
+    )
+    parser.add_argument(
+        "--systematics",
+        action="store_true",
+        default=False,
+        help="process systematics",
+    )
     return parser
 
 
@@ -238,7 +253,11 @@ if __name__ == "__main__":
 
     # load workflow
     processor_instance = workflows[args.workflow](args.year, args.campaign)
-    if args.export_array is not None:processor_instance = workflows[args.workflow](year=args.year,campaign=args.campaign,export_array=args.export_array)
+    # if args.export_array is not None:
+    processor_instance = workflows[args.workflow](
+            year=args.year, campaign=args.campaign, export_array=args.export_array
+        ,systematics=args.systematics)
+    
     # AS: not all workflows will have these two parameter, so probably
     #     we want to avoid always calling it like that in the future
 
@@ -274,7 +293,7 @@ if __name__ == "__main__":
             f"export PYTHONPATH=$PYTHONPATH:{os.getcwd()}",
         ]
         condor_extra = [
-            f'cd {os.getcwd()}',
+            f"cd {os.getcwd()}",
             f'source {os.environ["HOME"]}/.bashrc',
             f'conda activate {os.environ["CONDA_PREFIX"]}',
         ]
@@ -333,19 +352,18 @@ if __name__ == "__main__":
                 htex_config = Config(
                     executors=[
                         HighThroughputExecutor(
-                            label='coffea_parsl_condor',
+                            label="coffea_parsl_condor",
                             address=address_by_query(),
                             max_workers=1,
                             worker_debug=True,
-
                             provider=CondorProvider(
                                 nodes_per_block=1,
                                 cores_per_slot=args.workers,
-                                mem_per_slot = 2, # lite job / opportunistic can only use this much                           
+                                mem_per_slot=2,  # lite job / opportunistic can only use this much
                                 init_blocks=args.scaleout,
-                                max_blocks=(args.scaleout)+2,
+                                max_blocks=(args.scaleout) + 2,
                                 worker_init="\n".join(env_extra + condor_extra),
-                                walltime="00:03:00", # lite / short queue requirement
+                                walltime="00:03:00",  # lite / short queue requirement
                             ),
                         )
                     ],

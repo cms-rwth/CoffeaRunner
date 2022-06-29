@@ -294,6 +294,22 @@
         "energy": "13",
         "comments": "Automatically computed"
     },
+    {
+        "id": "5f819e4ef368571e6ae3e83d",
+        "process_name": "VBFHToWWTo2L2Nu_M125_TuneCP5_13TeV_powheg2_JHUGenV714_pythia8",
+        "status": "new",
+        "cross_section": "0.0846",
+        "total_uncertainty": "0.01573",
+        "accuracy": "NLO",
+        "DAS": "/VBFHToWWTo2L2Nu_M125_TuneCP5_13TeV_powheg2_JHUGenV714_pythia8/RunIIAutumn18MiniAOD-102X_upgrade2018_realistic_v15-v1/MINIAODSIM",
+        "MCM": "HIG-RunIIAutumn18MiniAOD-02997",
+        "equivalent_lumi": "257.1",
+        "fraction_negative_weight": "0.00071",
+        "shower": "Pythia8",
+        "matrix_generator": "Powheg",
+        "energy": "13",
+        "comments": "Automatically computed"
+    },
     {     
         "id": "621f115e29461703023b3efb",
         "process_name": "HWplusJ_HToWWTo2L2Nu_WTo2L_M-125_TuneCP5_13TeV-powheg-pythia8",
