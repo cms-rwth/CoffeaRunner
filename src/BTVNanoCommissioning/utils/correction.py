@@ -133,6 +133,15 @@ def load_jetfactory(campaign, path):
     jet_factory = jmestuff["jet_factory"]
     return jet_factory
 
+def load_jmefactory(campaign, path):
+    _jet_path = f"BTVNanoCommissioning.data.JME.{campaign}"
+    with importlib.resources.path(_jet_path, path) as filename:
+        with gzip.open(filename) as fin:
+            jmestuff = cloudpickle.load(fin)
+
+        #jet_factory = jmestuff["jet_factory"]
+    return jmestuff
+
 
 def add_jec_variables(jets, event_rho):
     jets["pt_raw"] = (1 - jets.rawFactor) * jets.pt

@@ -253,10 +253,10 @@ if __name__ == "__main__":
 
     # load workflow
     processor_instance = workflows[args.workflow](args.year, args.campaign)
-    # if args.export_array is not None:
+    if args.export_array is not None:
     processor_instance = workflows[args.workflow](
-            year=args.year, campaign=args.campaign, export_array=args.export_array
-        ,systematics=args.systematics)
+           year=args.year, campaign=args.campaign, export_array=args.export_array
+       ,systematics=args.systematics,isData=args.isData)
     
     # AS: not all workflows will have these two parameter, so probably
     #     we want to avoid always calling it like that in the future
@@ -363,7 +363,7 @@ if __name__ == "__main__":
                                 init_blocks=args.scaleout,
                                 max_blocks=(args.scaleout) + 2,
                                 worker_init="\n".join(env_extra + condor_extra),
-                                walltime="00:03:00",  # lite / short queue requirement
+                                walltime="03:00:00",  # lite / short queue requirement
                             ),
                         )
                     ],

@@ -3,14 +3,14 @@ import matplotlib.pyplot as plt
 import mplhep as hep
 import argparse
 from matplotlib.offsetbox import AnchoredText
-from BTVNanoCommissioning.utils.xs_scaler import getSumW,collate,scaleSumW
+from BTVNanoCommissioning.utils.xs_scaler import getSumW,collate,scaleSumW,additional_scale
 from coffea.util import load
 from coffea.hist import plot
-from coffea import hist
-from hist import hist2
+# from coffea import hist
+import hist
 import os, math, re, json, shutil, arrow
-
-time = arrow.now().format("YYYY_MM_DD")
+from Hpluscharm.dylist import dylist
+time = arrow.now().format("YY_MM_DD")
 ### style settings
 plt.style.use(hep.style.ROOT)
 
@@ -30,7 +30,7 @@ parser.add_argument(
     "-an",
     "--analysis",
     help="Which analysis run on (analysis directory)",
-    required=True,
+    # required=True,
     default="Hpluscharm",
 )
 parser.add_argument(
@@ -65,18 +65,21 @@ parser.add_argument(
     "-ch",
     "--channel",
     type=str,
+    required=True,
     help="channel_name, which channel",
 )
 parser.add_argument(
     "-r",
     "--region",
     type=str,
+    required=True,
     help="region_name, which region",
 )
 parser.add_argument(
     "-v",
     "--version",
     type=str,
+    required=True,
     help="version",
 )
 parser.add_argument(
@@ -114,8 +117,10 @@ with open(f"../src/{args.analysis}/metadata/{args.plot_map}") as pltf:
 with open(f"../src/{args.analysis}/metadata/{args.input}") as inputs:
     input_map = json.load(inputs)
 
-
-output = {i: load(input_map[args.version][i]) for i in input_map[args.version].keys()}
+output = {
+        i: load(f"{input_map[args.version][i]}")
+        for i in input_map[args.version].keys()
+    }
 
 ### set year info and luminosity info
 if "16" in args.campaign:
@@ -133,24 +138,21 @@ elif "18" in args.campaign:
 if not os.path.isdir(f"plot/{args.analysis}_{args.campaign}_{args.version}_{time}/"):
     os.makedirs(f"plot/{args.analysis}_{args.campaign}_{args.version}_{time}/")
 
-
+for out in output.keys():
+    ## Scale XS for each hist
+    if 'data'  in out: continue
+    output[out] = scaleSumW(output[out],lumis,getSumW(output[out]))
+    
+    output[out] = additional_scale(output[out],0.5,dylist)# multiple Z+jets
+collated = collate(output,merge_map[args.version])
 for var in plot_map["var_map"].keys():
     if var == "array" or var == "sumw" or var == "cutflow":
         continue
     if args.dataMC:
+        
         scales = args.scalesig
-        for out in output.keys():
-            ## Scale XS for each hist
+        for region in args.region.split(","):
             
-            if out == "data":
-                output[out] = collate(output[out],merge_map["data"])
-            else:
-                output[out] = scaleSumW(output[out],lumis,getSumw(output[out]),"../metadata/xsection.json")
-                output[out] = collate(output[out],merge_map[args.version])
-                
-
-        for region in args.region.split(",")[1:]:
-
             if not os.path.isdir(
                 f"plot/{args.analysis}_{args.campaign}_{args.version}_{time}/{region}"
             ):
@@ -158,19 +160,7 @@ for var in plot_map["var_map"].keys():
                     f"plot/{args.analysis}_{args.campaign}_{args.version}_{time}/{region}"
                 )
 
-            if "SR" not in region and (
-                "lep1_" not in var
-                and "lep2_" not in var
-                and "jetflav_" not in var
-                and "nj" not in var
-                and "nele" != var
-                and "nmu" != var
-                and "mT" not in var
-                and "METTkMETdphi" != var
-            ):
-                continue
-            print(region, var)
-            for chs in args.channel.split(",")[1:]:
+            for chs in args.channel.split(","):
                 if args.disable_ratio:
                     fig, ax = plt.subplots(figsize=(12, 12))
                 else:
@@ -191,56 +181,54 @@ for var in plot_map["var_map"].keys():
                     ax=ax,
                 )
 
-                for i in output.keys():
                 hbkglist = []
                 labels = []
+                vhist_axes={'lepflav':chs,'flav':sum,'region':region}
                 if args.splitflav is not None:
                     for sample in plot_map["order"]:
                         if sample == "signal":
                             continue
                         if sample == args.splitflav:
                             hbkglist.append(
-                                output[sample][var][{'lepflav':chs,'region':region,'flav':0}].project(output[sample][var].axes[-1])+output[sample][var][{'lepflav':chs,'region':region,'flav':1}].project(output[sample][var].axes[-1])
+                                collated[sample][var][{'lepflav':chs,'region':region,'flav':0}].project(collated[sample][var].axes[-1])+collated[sample][var][{'lepflav':chs,'region':region,'flav':1}].project(collated[sample][var].axes[-1])
                             )
                             hbkglist.append(
-                                output[sample][var][{'lepflav':chs,'region':region,'flav':4}].project(output[sample][var].axes[-1])
+                                collated[sample][var][{'lepflav':chs,'region':region,'flav':2}].project(collated[sample][var].axes[-1])
                             )
                             hbkglist.append(
-                                output[sample][var][{'lepflav':chs,'region':region,'flav':5}].project(output[sample][var].axes[-1])
+                                collated[sample][var][{'lepflav':chs,'region':region,'flav':3}].project(collated[sample][var].axes[-1])
                             )
                             labels.append("Z+l")
                             labels.append("Z+c")
                             labels.append("Z+b")
                         else:
                             hbkglist.append(
-                                output[sample][var][{'lepflav':chs,'region':region,'flav':sum}].project(output[sample][var].axes[-1])
+                                collated[sample][var][vhist_axes]
                             )
                             labels.append(sample)
 
                 else:
                     hbkglist = [
-                        output[sample][var][{'lepflav':chs,'region':region,'flav':sum}].project(output[sample][var].axes[-1])
-                        for sample in plot_map["order"]
-                        if sample != "signal"
+                    collated[sample][var][vhist_axes]
+                        for sample in plot_map["order"] if 'data' not in sample and sample!="hc"
                     ]
-                    labels = plot_map["order"]
                 hep.histplot(
                     hbkglist,
                     stack=True,
                     histtype="fill",
                     ax=ax,
-                    label=labels,
+                    label=["V+jets","ttbar","Single Top", "Diboson","Higgs"],
                     color=plot_map["color_map"][:-1],
                 )
 
-                hdata = output[f'data_{chs}'][var][{'lepflav':chs,'region':region,'flav':sum}].project(output[f'data_{chs}'][var].axes[-1])
+                hdata = collated[f'data_{chs}'][var][vhist_axes]
                     
                 
                 hscales = scales / 100
                 if chs == "emu":
                     hscales = hscales / 5
                 hep.histplot(
-                    output['Higgs'][var][{'lepflav':chs,'region':region,'flav':sum}].project(output['Higgs'][var].axes[-1])*hscales,
+                    collated['higgs'][var][vhist_axes]*hscales,
                     color=plot_map["color_map"][-2],
                     linewidth=2,
                     label=f"Higgsx{int(hscales)}",
@@ -248,7 +236,7 @@ for var in plot_map["var_map"].keys():
                     ax=ax,
                 )
                 hep.histplot(
-                    output['signal'][var][{'lepflav':chs,'region':region,'flav':sum}].project(output['signal'][var].axes[-1])*scales,
+                    collated['hc'][var][vhist_axes]*scales,
                     color=plot_map["color_map"][-1],
                     linewidth=2,
                     label=f"signalx{scales}",
@@ -264,19 +252,27 @@ for var in plot_map["var_map"].keys():
                     yerr=True,
                     ax=ax,
                 )
-                
-                for sample in output.keys():
-                    if 'data' not in sample: hmc=output[sample][var][{'lepflav':chs,'region':region,'flav':sum}].project(output[sample][var].axes[-1]) +hmc 
+        
+                i=0
+                for sample in collated.keys():
+                    if 'data'  in sample : continue
+                    if i==0: hmc = collated[sample][var][vhist_axes]
+                    else: hmc = collated[sample][var][vhist_axes] + hmc
+                    i = i+1
                 if not args.disable_ratio:
-                    ax, rax = hdata.plotratio(
-                        num=hdata,
-                        denom=hmc,
-                        ax=rax,
-                        error_opts=data_err_opts,
-                        denom_fill_opts={},
-                        unc="num",
-                        clear=False,
-                    )
+                    from hist.intervals import ratio_uncertainty
+                    rax.errorbar(
+                    x= hdata.axes[0].centers,
+                    y= hdata.values() / hmc.values(),
+                    yerr=ratio_uncertainty(hdata.values(), hmc.values()),
+                    color="k",
+                    linestyle="none",
+                    marker="o",
+                    elinewidth=1,
+                    )   
+                    
+                    rax.axhline(y=1.0, linestyle="dashed", color="gray")
+
                     rax.set_ylim(0.5, 1.5)
                     rax.set_ylabel("Data/MC")
                     rax.set_xlabel(plot_map["var_map"][var])
@@ -315,44 +311,44 @@ for var in plot_map["var_map"].keys():
                     f"plot/{args.analysis}_{args.campaign}_{args.version}_{time}/{region}/{chl}_{region}_{var}.png"
                 )
                 plt.clf()
-    else:
-        fig, ((ax), (rax)) = plt.subplots(
-            2,
-            1,
-            figsize=(6, 6),
-            gridspec_kw={"height_ratios": (3, 1)},
-            sharex=True,
-        )
-        fig.subplots_adjust(hspace=0.07)
-        hep.cms.label(
-            "Work in progress", data=True, lumi=lumis / 1000.0, year=year, loc=0, ax=ax
-        )
-        ax = plot.plot1d(
-            output[args.version][var],
-            overlay="dataset",
-            ax=ax,
-            density=True,
-        )
-        rax = plot.plotratio(
-            num=output[args.version][var].integrate("dataset", "gchcWW2L2Nu_4f"),
-            denom=output[args.version][var].integrate("dataset", args.referance),
-            ax=rax,
-            error_opts=data_err_opts,
-            denom_fill_opts={},
-            #
-            unc="num",
-            clear=False,
-        )
+    # else:
+    #     fig, ((ax), (rax)) = plt.subplots(
+    #         2,
+    #         1,
+    #         figsize=(6, 6),
+    #         gridspec_kw={"height_ratios": (3, 1)},
+    #         sharex=True,
+    #     )
+    #     fig.subplots_adjust(hspace=0.07)
+    #     hep.cms.label(
+    #         "Work in progress", data=True, lumi=lumis / 1000.0, year=year, loc=0, ax=ax
+    #     )
+    #     ax = plot.plot1d(
+    #         collated[args.ref][var],
+    #         overlay="dataset",
+    #         ax=ax,
+    #         density=True,
+    #     )
+    #     rax = plot.plotratio(
+    #         num=collated[args.version][var].integrate("dataset", "gchcWW2L2Nu_4f"),
+    #         denom=collated[args.version][var].integrate("dataset", args.referance),
+    #         ax=rax,
+    #         error_opts=data_err_opts,
+    #         denom_fill_opts={},
+    #         #
+    #         unc="num",
+    #         clear=False,
+    #     )
 
-        rax.set_ylim(0.5, 1.5)
-        rax.set_ylabel("New/Old")
-        rax.set_xlabel(plot_map["var_map"][var])
-        ax.set_xlabel("")
-        ax.legend(fontsize=25, labels=["Old", "New"])
-        # at = AnchoredText("GEN",loc="upper left")
-        # ax.add_artist(at)
-        # hep.mpl_magic(ax=ax)
+    #     rax.set_ylim(0.5, 1.5)
+    #     rax.set_ylabel("New/Old")
+    #     rax.set_xlabel(plot_map["var_map"][var])
+    #     ax.set_xlabel("")
+    #     ax.legend(fontsize=25, labels=["Old", "New"])
+    #     # at = AnchoredText("GEN",loc="upper left")
+    #     # ax.add_artist(at)
+    #     # hep.mpl_magic(ax=ax)
 
-        fig.savefig(
-            f"plot/{args.analysis}_{args.campaign}_{args.version}_{time}/{var}.png"
-        )
+    #     fig.savefig(
+    #         f"plot/{args.analysis}_{args.campaign}_{args.version}_{time}/{var}.png"
+    #     )
