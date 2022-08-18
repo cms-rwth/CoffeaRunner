@@ -50,6 +50,16 @@ conda install -c anaconda bokeh
 conda install -c conda-forge 'fsspec>=0.3.3'
 conda install dask
 ```
+<details><summary>Not necessary to run framework, but helpful when identifying corrupted files and tracking the progress during said task:</summary>
+<p>
+
+```
+conda install -c conda-forge p-tqdm
+```
+    
+</p>
+</details>
+<br>
 
 Once the environment is set up, compile the python package:
 ```
