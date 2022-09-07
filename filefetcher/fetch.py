@@ -15,8 +15,12 @@ parser.add_argument(
     "-s", "--site", default=r"global", help="Site (default: %(default)s)"
 )
 parser.add_argument(
-    "-o", "--output", default=r"singlemuon", help="Site (default: %(default)s)"
+    "-o", "--output", default=r"test_my_samples", help="Site (default: %(default)s)"
 )
+parser.add_argument(
+    "--xrd", default="root://xrootd-cms.infn.it//", type=str, help="xrootd prefix string (default: %(default)s)"
+)
+
 args = parser.parse_args()
 fset = []
 
@@ -30,10 +34,15 @@ fdict = {}
 instance = "prod/" + args.site
 
 
-xrd = "root://xrootd-cms.infn.it//"
-
 for dataset in fset:
-    print(fset)
+    if dataset.startswith('#') or dataset.strip()=="":
+        #print("we skip this line:", line)
+        continue
+    print('Creating list of files for dataset', dataset)
+    Tier = dataset.split("/")[3] # NANOAODSIM for regular samples, USER for provate
+    instance="prod/global"
+    if Tier=="USER":
+        instance="prod/phys03"
     flist = (
         os.popen(
             (
@@ -45,9 +54,9 @@ for dataset in fset:
     )
     dictname = dataset.rstrip()
     if dictname not in fdict:
-        fdict[dictname] = [xrd + f for f in flist if len(f) > 1]
+        fdict[dictname] = [args.xrd + f for f in flist if len(f) > 1]
     else:  # needed to collect all data samples into one common key "Data" (using append() would introduce a new element for the key)
-        fdict[dictname].extend([xrd + f for f in flist if len(f) > 1])
+        fdict[dictname].extend([args.xrd + f for f in flist if len(f) > 1])
 
 # pprint.pprint(fdict, depth=1)
 
