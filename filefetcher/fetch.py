@@ -39,7 +39,7 @@ for dataset in fset:
         #print("we skip this line:", line)
         continue
     print('Creating list of files for dataset', dataset)
-    Tier = dataset.split("/")[3] # NANOAODSIM for regular samples, USER for provate
+    Tier = dataset.split("/")[3] # NANOAODSIM for regular samples, USER for private
     instance="prod/global"
     if Tier=="USER":
         instance="prod/phys03"
