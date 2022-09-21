@@ -31,25 +31,25 @@ def jet_factory_factory(files):
 
 def jet_factories(campaign):
     jet_factory = {
-        # "Rereco17_94X": {
-        #     "mc": jet_factory_factory(
-        #         files=[
-        #             ""data/JME/Rereco17_94X/MC/Fall17_V3b_MC_PtResolution_AK4PFchs.jr.txt",",
-        #             ""data/JME/Rereco17_94X/MC/Fall17_V3b_MC_SF_AK4PFchs.jersf.txt",",
-        #             ""data/JME/Rereco17_94X/MC/Fall17_17Nov2017_V32_MC_L1FastJet_AK4PFchs.jec.txt",",
-        #             ""data/JME/Rereco17_94X/MC/Fall17_17Nov2017_V32_MC_L2Relative_AK4PFchs.jec.txt",",
-        #             ""data/JME/Rereco17_94X/MC/Fall17_17Nov2017_V32_MC_L3Absolute_AK4PFchs.jec.txt",",
-        #             ""data/JME/Rereco17_94X/MC/Fall17_17Nov2017_V32_MC_L2L3Residual_AK4PFchs.jec.txt",",
-        #         ]
-        #     ),
-        #     "data": jet_factory_factory(
-        #         files=[
-        #             ""data/JME/Rereco17_94X/RunDE/Fall17_17Nov2017DE_V32_DATA_L1FastJet_AK4PFchs.jec.txt",",
-        #             ""data/JME/Rereco17_94X/RunDE/Fall17_17Nov2017DE_V32_DATA_L2Relative_AK4PFchs.jec.txt",",
-        #             ""data/JME/Rereco17_94X/RunDE/Fall17_17Nov2017DE_V32_DATA_L3Absolute_AK4PFchs.jec.txt",",
-        #         ]
-        #     ),
-        # },
+        "Rereco17_94X": {
+            "mc": jet_factory_factory(
+                files=[
+                    "data/JME/Rereco17_94X/MC/Fall17_V3b_MC_PtResolution_AK4PFchs.jr.txt",
+                    "data/JME/Rereco17_94X/MC/Fall17_V3b_MC_SF_AK4PFchs.jersf.txt",
+                    "data/JME/Rereco17_94X/MC/Fall17_17Nov2017_V32_MC_L1FastJet_AK4PFchs.jec.txt",
+                    "data/JME/Rereco17_94X/MC/Fall17_17Nov2017_V32_MC_L2Relative_AK4PFchs.jec.txt",
+                    "data/JME/Rereco17_94X/MC/Fall17_17Nov2017_V32_MC_L3Absolute_AK4PFchs.jec.txt",
+                    "data/JME/Rereco17_94X/MC/Fall17_17Nov2017_V32_MC_L2L3Residual_AK4PFchs.jec.txt",
+                ]
+            ),
+            "data": jet_factory_factory(
+                files=[
+                    "data/JME/Rereco17_94X/RunDE/Fall17_17Nov2017DE_V32_DATA_L1FastJet_AK4PFchs.jec.txt",
+                    "data/JME/Rereco17_94X/RunDE/Fall17_17Nov2017DE_V32_DATA_L2Relative_AK4PFchs.jec.txt",
+                    "data/JME/Rereco17_94X/RunDE/Fall17_17Nov2017DE_V32_DATA_L3Absolute_AK4PFchs.jec.txt",
+                ]
+            ),
+        },
         "UL16_preAPV": {
             "mc": jet_factory_factory(
                 files=[
@@ -124,56 +124,6 @@ def jet_factories(campaign):
                     "data/JME/UL17/Summer19UL17_V5_MC_Uncertainty_AK4PFchs.junc.txt",
                 ]
             ),
-            # "dataB": jet_factory_factory(
-            #     files=[
-            #         "data/JME/UL17/Summer19UL17_RunB_V5_DATA_L1FastJet_AK4PFchs.jec.txt",
-            #         "data/JME/UL17/Summer19UL17_RunB_V5_DATA_L2L3Residual_AK4PFchs.jec.txt",
-            #         "data/JME/UL17/Summer19UL17_RunB_V5_DATA_L2Relative_AK4PFchs.jec.txt",
-            #         "data/JME/UL17/Summer19UL17_RunB_V5_DATA_L3Absolute_AK4PFchs.jec.txt",
-            #         # "data/JME/UL17/Summer19UL17_RunB_V5_DATA_Uncertainty_AK4PFchs.junc.txt",
-            #         # "data/JME/UL17/Summer19UL17_RunB_V5_DATA_UncertaintySources_AK4PFchs.junc.txt",
-            #     ]
-            # ),
-            # "dataC": jet_factory_factory(
-            #     files=[
-            #         "data/JME/UL17/Summer19UL17_RunC_V5_DATA_L1FastJet_AK4PFchs.jec.txt",
-            #         "data/JME/UL17/Summer19UL17_RunC_V5_DATA_L2L3Residual_AK4PFchs.jec.txt",
-            #         "data/JME/UL17/Summer19UL17_RunC_V5_DATA_L2Relative_AK4PFchs.jec.txt",
-            #         "data/JME/UL17/Summer19UL17_RunC_V5_DATA_L3Absolute_AK4PFchs.jec.txt",
-            #         # "data/JME/UL17/Summer19UL17_RunC_V5_DATA_Uncertainty_AK4PFchs.junc.txt",
-            #         # "data/JME/UL17/Summer19UL17_RunC_V5_DATA_UncertaintySources_AK4PFchs.junc.txt",
-            #     ]
-            # ),
-            # "dataD": jet_factory_factory(
-            #     files=[
-            #         "data/JME/UL17/Summer19UL17_RunD_V5_DATA_L1FastJet_AK4PFchs.jec.txt",
-            #         "data/JME/UL17/Summer19UL17_RunD_V5_DATA_L2L3Residual_AK4PFchs.jec.txt",
-            #         "data/JME/UL17/Summer19UL17_RunD_V5_DATA_L2Relative_AK4PFchs.jec.txt",
-            #         "data/JME/UL17/Summer19UL17_RunD_V5_DATA_L3Absolute_AK4PFchs.jec.txt",
-            #         # "data/JME/UL17/Summer19UL17_RunD_V5_DATA_Uncertainty_AK4PFchs.junc.txt",
-            #         # "data/JME/UL17/Summer19UL17_RunD_V5_DATA_UncertaintySources_AK4PFchs.junc.txt",
-            #     ]
-            # ),
-            # "dataE": jet_factory_factory(
-            #     files=[
-            #         "data/JME/UL17/Summer19UL17_RunE_V5_DATA_L1FastJet_AK4PFchs.jec.txt",
-            #         "data/JME/UL17/Summer19UL17_RunE_V5_DATA_L2L3Residual_AK4PFchs.jec.txt",
-            #         "data/JME/UL17/Summer19UL17_RunE_V5_DATA_L2Relative_AK4PFchs.jec.txt",
-            #         "data/JME/UL17/Summer19UL17_RunE_V5_DATA_L3Absolute_AK4PFchs.jec.txt",
-            #         # "data/JME/UL17/Summer19UL17_RunE_V5_DATA_Uncertainty_AK4PFchs.junc.txt",
-            #         # "data/JME/UL17/Summer19UL17_RunE_V5_DATA_UncertaintySources_AK4PFchs.junc.txt",
-            #     ]
-            # ),
-            # "dataF": jet_factory_factory(
-            #     files=[
-            #         "data/JME/UL17/Summer19UL17_RunF_V5_DATA_L1FastJet_AK4PFchs.jec.txt",
-            #         "data/JME/UL17/Summer19UL17_RunF_V5_DATA_L2L3Residual_AK4PFchs.jec.txt",
-            #         "data/JME/UL17/Summer19UL17_RunF_V5_DATA_L2Relative_AK4PFchs.jec.txt",
-            #         "data/JME/UL17/Summer19UL17_RunF_V5_DATA_L3Absolute_AK4PFchs.jec.txt",
-            #         # "data/JME/UL17/Summer19UL17_RunF_V5_DATA_Uncertainty_AK4PFchs.junc.txt",
-            #         # "data/JME/UL17/Summer19UL17_RunF_V5_DATA_UncertaintySources_AK4PFchs.junc.txt",
-            #     ]
-            # ),
         },
         "UL18": {
             "mc": jet_factory_factory(

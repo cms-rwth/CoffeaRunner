@@ -53,7 +53,7 @@ if len(arg.input.split(","))>1:
         }
 else:
     output = load(arg.input)
-    # output = scaleSumW(output,arg.lumi,getSumW(output))
+    output = scaleSumW(output,arg.lumi,getSumW(output))
 mergemap = {}
 for f in output.keys():
     

@@ -26,7 +26,7 @@ from BTVNanoCommissioning.utils.histogrammer import histogrammer
 
 class NanoProcessor(processor.ProcessorABC):
     # Define histograms
-    def __init__(self, year="2017", campaign="Rereco17_94X", isCorr=True, isJERC= False):
+    def __init__(self, year="2017", campaign="Rereco17_94X", isCorr=True, isJERC= True):
         self._year = year
         self._campaign = campaign
         self.isCorr = isCorr
@@ -66,7 +66,7 @@ class NanoProcessor(processor.ProcessorABC):
             output["sumw"] = len(events)
         else:
             output["sumw"] = ak.sum(events.genWeight)
-            if self.isJERC:events.Jet = self._jet_factory[jetfac_name].build(
+            if self.isJERC:events.Jet = self._jet_factory["mc"].build(
             add_jec_variables(events.Jet, events.fixedGridRhoFastjetAll), lazy_cache=events.caches[0]
         )
         req_lumi = np.ones(len(events), dtype="bool")
@@ -78,7 +78,8 @@ class NanoProcessor(processor.ProcessorABC):
             if self.isCorr:weights.add(
                 "puweight", self._pu[f"{self._year}_pileupweight"](events.Pileup.nPU)
             )
-        if not hasattr(events, "btagDeepFlavCvL"):
+        
+        if not hasattr(events.Jet, "btagDeepFlavCvL"):
             events.Jet["btagDeepFlavCvL"] = np.maximum(
                 np.minimum(
                     np.where(
@@ -168,6 +169,12 @@ class NanoProcessor(processor.ProcessorABC):
 
         # ## Electron cuts
         # # electron twiki: https://twiki.cern.ch/twiki/bin/viewauth/CMS/CutBasedElectronIdentificationRun2
+     
+        # events.Electron = events.Electron[
+        #     (events.Electron.pt > 30)
+        #     & (abs(events.Electron.eta) < 2.4)
+        #     & (events.Electron.cutBased > 3)
+        # ]
         events.Electron = events.Electron[
             (events.Electron.pt > 30)
             & (abs(events.Electron.eta) < 2.4)

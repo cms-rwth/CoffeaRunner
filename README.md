@@ -83,6 +83,8 @@ jupyter notebook --ip=127.0.0.1 --port 8800 --no-browser
 
 
 ## Structure
+
+### Test 
 Example worfkflow for ttbar is included. 
 
 Each workflow can be a separate "processor" file, creating the mapping from NanoAOD to
@@ -102,74 +104,6 @@ To test a small set of files to see whether the workflows run smoothly, run:
 ```
 python runner.py --workflow ${workflow} --json metadata/test.json 
 ```
-
-### b-SFs 
-
-<details><summary>details</summary>
-<p>
-
-- Dileptonic ttbar phase space : check performance for btag SFs, muon channel
-
-```
-python runner.py --workflow (e)ttdilep_sf --json metadata/94X_doublemu_PFNano.json
-```
-
-- Semileptonic ttbar phase space : check performance for btag SFs, muon channel
-
-```
-python runner.py --workflow (e)ttsemilep_sf --json metadata/94X_singlemu_PFNano.json
-```
-
-</p>
-</details>
-
-### c-SFs
-<details><summary>details</summary>
-<p>
-
-- Dileptonic ttbar phase space : check performance for charm SFs, bjets enriched SFs, muon channel
-
-```
-python runner.py --workflow (e)ctag_ttdilep_sf --json metadata/94X_doublemu_PFNano.json
-```
-
-
-- Semileptonic ttbar phase space : check performance for charm SFs, bjets enriched SFs, muon channel
-
-```
-python runner.py --workflow (e)ctag_ttsemilep_sf --json metadata/94X_singlemu_PFNano.json
-```
-
-- W+c phase space : check performance for charm SFs, cjets enriched SFs, muon  channel
-
-```
-python runner.py --workflow (e)ctag_Wc_sf --json metadata/94X_singlemu_PFNano.json
-```
-
-- DY phase space : check performance for charm SFs, light jets enriched SFs, muon channel
-
-```
-python runner.py --workflow (e)ctag_DY_sf --json ctag_DY_mu_PFNano.json
-```
-
-</p>
-</details>
-
-### Validation - check different campaigns
-
-<details><summary>details</summary>
-<p>
-
-Only basic jet selections(PUID, ID, pT, $\eta$) applied. Put the json files with different campaigns
-
-```
-python runner.py --workflow valid --json {}
-```
-
-</p>
-</details>
-
-
 
 ## Scale-out (Sites)
 
@@ -229,6 +163,37 @@ Compile correction pickle files for a specific JEC campaign by changing the dict
 ```
 python -m utils.compile_jec UL17_106X data/JME/UL17_106X/jec_compiled.pkl.gz
 ```
+## Config file
+The config file in `.py` format is passed as the argument `--cfg` of the `runner.py` script. The file has the following structure:
+
+| Parameter name    | Allowed values               | Description
+| :-----:           | :---:                        | :------------------------------------------
+| `dataset`         | string                       | Path of .txt file with list of DAS datasets
+| `json`            | string                       | Path of .json file to create with NanoAOD files
+| `storage_prefix`  | string                       | Path of storage folder to save datasets
+| `workflow`        | 'base', 'mem'                | Workflow to run
+| `input`           | string                       | Path of .json file, input to the workflow
+| `output`          | string                       | Path of output folder
+| `executor`        | 'futures', 'parsl/slurm'     | Executor
+| `workers`         | int                          | Number of parallel threads (with futures)
+| `scaleout`        | int                          | Number of jobs to submit (with parsl/slurm)
+| `chunk`           | int                          | Chunk size
+| `max`             | int                          | Maximum number of chunks to process
+| `skipbadfiles`    | bool                         | Skip bad files
+| `voms`            | string                       | Voms parameters (with condor)
+| `limit`           | int                          | Maximum number of files per sample to process
+| `finalstate`      | 'dilepton'                   | Final state of ttHbb process
+| `preselections`   | list                         | List of preselection cuts
+| `categories`      | dict                         | Dictionary of categories with cuts to apply
+| `variables`       | $VARNAME : {$PARAMETERS}     | Dictionary of variables in 1-D histograms and plotting parameters
+| `variables2d`     | n.o.                         | __To be implemented__
+| `scale`           | 'linear', 'log'              | y-axis scale to apply to plots
+
+The variables' names can be chosen among those reported in `parameters.allhistograms.histogram_settings`, which contains also the default values of the plotting parameters. If no plotting parameters are specified, the default ones will be used.
+
+The plotting parameters can be customized for plotting, for example to rebin the histograms. In case of rebinning, the binning used in the plots has to be compatible with the one of the input histograms.
+
+The `Cut` objects listed in `preselections` and `categories` have to be defined in `parameters.cuts.baseline_cuts`. A library of pre-defined functions for event is available in `lib.cut_functions`, but custom functions can be defined in a separate file.
 
 
 

@@ -1,8 +1,5 @@
-import os
-import sys
-import json
-import argparse
-import time
+import os, sys, json, argparse, time, pickle
+
 
 import numpy as np
 
@@ -10,16 +7,9 @@ import uproot
 from coffea.util import load, save
 from coffea import processor
 
-# from BTVNanoCommissioning.workflows import workflows
-
-# This would crash if the ExampleWorkflow does not exist
-# from ExampleWorkflow.workflows import workflows
-# from VHcc.workflows import workflows
-from Hpluscharm.workflows import workflows
+from BTVNanoCommissioning.utils.Configurator import Configurator
 
 # Should come up with a smarter way to import all worflows from subdirectories of ./src/
-
-
 def validate(file):
     try:
         fin = uproot.open(file)
@@ -44,195 +34,45 @@ def check_port(port):
 
 def retry_handler(exception, task_record):
     from parsl.executors.high_throughput.interchange import ManagerLost
-
     if isinstance(exception, ManagerLost):
         return 0.1
     else:
         return 1
 
 
-def get_main_parser():
+if __name__ == "__main__":
     parser = argparse.ArgumentParser(
         description="Run analysis on baconbits files using processor coffea files"
     )
     # Inputs
-    parser.add_argument(
-        "--wf",
-        "--workflow",
-        dest="workflow",
-        choices=list(workflows.keys()),
-        help="Which processor to run",
-        required=True,
-    )
-    parser.add_argument(
-        "-o",
-        "--output",
-        default=r"hists.coffea",
-        help="Output histogram filename (default: %(default)s)",
-    )
-    parser.add_argument(
-        "--samples",
-        "--json",
-        dest="samplejson",
-        default="dummy_samples.json",
-        help="JSON file containing dataset and file locations (default: %(default)s)",
-    )
-    parser.add_argument("--year", default="2017", help="Year")
-    parser.add_argument(
-        "--campaign",
-        default="Rereco17_94X",
-        help="Dataset campaign, change the corresponding correction files",
-    )
-
-    # Scale out
-    parser.add_argument(
-        "--executor",
-        choices=[
-            "iterative",
-            "futures",
-            "parsl/slurm",
-            "parsl/condor",
-            "parsl/condor/naf_lite",
-            "dask/condor",
-            "dask/slurm",
-            "dask/lpc",
-            "dask/lxplus",
-            "dask/casa",
-        ],
-        default="futures",
-        help="The type of executor to use (default: %(default)s). Other options can be implemented. "
-        "For example see https://parsl.readthedocs.io/en/stable/userguide/configuring.html"
-        "- `parsl/slurm` - tested at DESY/Maxwell"
-        "- `parsl/condor` - tested at DESY, RWTH"
-        "- `parsl/condor/naf_lite` - tested at DESY"
-        "- `dask/slurm` - tested at DESY/Maxwell"
-        "- `dask/condor` - tested at DESY, RWTH"
-        "- `dask/lpc` - custom lpc/condor setup (due to write access restrictions)"
-        "- `dask/lxplus` - custom lxplus/condor setup (due to port restrictions)",
-    )
-    parser.add_argument(
-        "-j",
-        "--workers",
-        type=int,
-        default=12,
-        help="Number of workers (cores/threads) to use for multi-worker executors "
-        "(e.g. futures or condor) (default: %(default)s)",
-    )
-    parser.add_argument(
-        "-s",
-        "--scaleout",
-        type=int,
-        default=6,
-        help="Number of nodes to scale out to if using slurm/condor. Total number of "
-        "concurrent threads is ``workers x scaleout`` (default: %(default)s)",
-    )
-    parser.add_argument(
-        "--voms",
-        default=None,
-        type=str,
-        help="Path to voms proxy, made accessible to worker nodes. By default a copy will be made to $HOME.",
-    )
-    # Debugging
+    parser.add_argument('--cfg', default=os.getcwd() + "/config/example.py", required=True, type=str,
+                        help='Config file with parameters specific to the current run')
+    parser.add_argument("-o", "--overwrite_file", required=False, type=str,
+                        help="Overwrite the output in the configuration")
     parser.add_argument(
         "--validate",
         action="store_true",
         help="Do not process, just check all files are accessible",
     )
-    parser.add_argument("--skipbadfiles", action="store_true", help="Skip bad files.")
-    parser.add_argument(
-        "--only", type=str, default=None, help="Only process specific dataset or file"
-    )
-    parser.add_argument(
-        "--limit",
-        type=int,
-        default=None,
-        metavar="N",
-        help="Limit to the first N files of each dataset in sample JSON",
-    )
-    parser.add_argument(
-        "--chunk",
-        type=int,
-        default=50000000,
-        metavar="N",
-        help="Number of events per process chunk",
-    )
-    parser.add_argument(
-        "--retries",
-        type=int,
-        default=3,
-        metavar="N",
-        help="Number of retries for coffea processor",
-    )
-    parser.add_argument(
-        "--max",
-        type=int,
-        default=None,
-        metavar="N",
-        help="Max number of chunks to run in total",
-    )
-    parser.add_argument(
-        "--export_array",
-        action="store_true",
-        default=False,
-        help="stored selected events to np.arrays",
-    )
-    parser.add_argument(
-        "--systematics",
-        action="store_true",
-        default=False,
-        help="process systematics",
-    )
-    return parser
-
-
-if __name__ == "__main__":
-    parser = get_main_parser()
-    args = parser.parse_args()
-    if args.output == parser.get_default("output"):
-        index = args.samplejson.rfind("/") + 1
-        sample_json = args.samplejson[index:]
-        args.output = f'hists_{args.workflow}_{(sample_json).rstrip(".json")}.coffea'
-
-        # load dataset
-    with open(args.samplejson) as f:
-        sample_dict = json.load(f)
-    for key in sample_dict.keys():
-        sample_dict[key] = sample_dict[key][: args.limit]
-    if args.executor == "dask/casa":
-        for key in sample_dict.keys():
-            sample_dict[key] = [
-                path.replace("xrootd-cms.infn.it/", "xcache")
-                for path in sample_dict[key]
-            ]
-
-    # For debugging
-    if args.only is not None:
-        if args.only in sample_dict.keys():  # is dataset
-            sample_dict = dict([(args.only, sample_dict[args.only])])
-        if "*" in args.only:  # wildcard for datasets
-            _new_dict = {}
-            print("Will only proces the following datasets:")
-            for k, v in sample_dict.items():
-                if k.lstrip("/").startswith(args.only.rstrip("*")):
-                    print("    ", k)
-                    _new_dict[k] = v
-            sample_dict = _new_dict
-        else:  # is file
-            for key in sample_dict.keys():
-                if args.only in sample_dict[key]:
-                    sample_dict = dict([(key, [args.only])])
-
+    args = parser.parse_args()   
+    if args.cfg[-3:] == ".py":
+        config = Configurator(args.cfg, overwrite_output_dir=args.overwrite_file)
+    elif args.cfg[-4:] == ".pkl":
+        config = pickle.load(open(args.cfg,"rb"))
+    else:
+        raise sys.exit("Please provide a .py configuration file") 
+    
     # Scan if files can be opened
     if args.validate:
         start = time.time()
         from p_tqdm import p_map
 
         all_invalid = []
-        for sample in sample_dict.keys():
+        for sample in config.fileset.keys():
             _rmap = p_map(
                 validate,
-                sample_dict[sample],
-                num_cpus=args.workers,
+                config.fileset[sample],
+                num_cpus=config.run_options['workers'],
                 desc=f"Validating {sample[:20]}...",
             )
             _results = list(_rmap)
@@ -251,22 +91,15 @@ if __name__ == "__main__":
                 os.system(f"rm {fi}")
         sys.exit(0)
 
-    # load workflow
     
-    if args.systematics is not None:
-        processor_instance = workflows[args.workflow](
-           year=args.year, campaign=args.campaign, export_array=args.export_array,systematics=args.systematics,isData=args.isData)
-    else:processor_instance = workflows[args.workflow](args.year, args.campaign)
-    # AS: not all workflows will have these two parameter, so probably
-    #     we want to avoid always calling it like that in the future
 
-    if args.executor not in ["futures", "iterative", "dask/lpc", "dask/casa"]:
+    if config.run_options['executor'] not in ["futures", "iterative", "dask/lpc", "dask/casa"]:
         """
         dask/parsl needs to export x509 to read over xrootd
         dask/lpc uses custom jobqueue provider that handles x509
         """
-        if args.voms is not None:
-            _x509_path = args.voms
+        if config.run_options['voms'] is not None:
+            _x509_path = config.run_options['voms']
         else:
             try:
                 _x509_localpath = (
@@ -299,25 +132,25 @@ if __name__ == "__main__":
 
     #########
     # Execute
-    if args.executor in ["futures", "iterative"]:
-        if args.executor == "iterative":
+    if config.run_options['executor'] in ["futures", "iterative"]:
+        if config.run_options['executor'] == "iterative":
             _exec = processor.iterative_executor
         else:
             _exec = processor.futures_executor
         output = processor.run_uproot_job(
-            sample_dict,
+            config.fileset,
             treename="Events",
-            processor_instance=processor_instance,
+            processor_instance=config.processor_instance,
             executor=_exec,
             executor_args={
-                "skipbadfiles": args.skipbadfiles,
+                "skipbadfiles": config.run_options['skipbadfiles'],
                 "schema": processor.NanoAODSchema,
-                "workers": args.workers,
+                "workers": config.run_options['workers'],
             },
-            chunksize=args.chunk,
-            maxchunks=args.max,
+            chunksize=config.run_options['chunk'],
+            maxchunks=config.run_options['max'],
         )
-    elif "parsl" in args.executor:
+    elif "parsl" in config.run_options['executor']:
         import parsl
         from parsl.providers import LocalProvider, CondorProvider, SlurmProvider
         from parsl.channels import LocalChannel
@@ -326,7 +159,7 @@ if __name__ == "__main__":
         from parsl.launchers import SrunLauncher
         from parsl.addresses import address_by_hostname, address_by_query
 
-        if "slurm" in args.executor:
+        if "slurm" in config.run_options['executor']:
             htex_config = Config(
                 executors=[
                     HighThroughputExecutor(
@@ -336,18 +169,18 @@ if __name__ == "__main__":
                         provider=SlurmProvider(
                             channel=LocalChannel(script_dir="logs_parsl"),
                             launcher=SrunLauncher(),
-                            max_blocks=(args.scaleout) + 10,
-                            init_blocks=args.scaleout,
+                            max_blocks=(config.run_options['scaleout']) + 10,
+                            init_blocks=config.run_options['scaleout'],
                             partition="all",
                             worker_init="\n".join(env_extra),
                             walltime="00:120:00",
                         ),
                     )
                 ],
-                retries=args.retries,
+                retries=config.run_options['retries'],
             )
-        elif "condor" in args.executor:
-            if "naf_lite" in args.executor:
+        elif "condor" in config.run_options['executor']:
+            if "naf_lite" in config.run_options['executor']:
                 htex_config = Config(
                     executors=[
                         HighThroughputExecutor(
@@ -357,16 +190,16 @@ if __name__ == "__main__":
                             worker_debug=True,
                             provider=CondorProvider(
                                 nodes_per_block=1,
-                                cores_per_slot=args.workers,
+                                cores_per_slot=config.run_options['workers'],
                                 mem_per_slot=2,  # lite job / opportunistic can only use this much
-                                init_blocks=args.scaleout,
-                                max_blocks=(args.scaleout) + 2,
+                                init_blocks=config.run_options['scaleout'],
+                                max_blocks=(config.run_options['scaleout']) + 2,
                                 worker_init="\n".join(env_extra + condor_extra),
                                 walltime="03:00:00",  # lite / short queue requirement
                             ),
                         )
                     ],
-                    retries=20,
+                    retries=config.run_options['retries'],
                     retry_handler=retry_handler,
                 )
             else:
@@ -378,15 +211,15 @@ if __name__ == "__main__":
                             max_workers=1,
                             provider=CondorProvider(
                                 nodes_per_block=1,
-                                cores_per_slot=args.workers,
-                                init_blocks=args.scaleout,
-                                max_blocks=(args.scaleout) + 2,
+                                cores_per_slot=config.run_options['workers'],
+                                init_blocks=config.run_options['scaleout'],
+                                max_blocks=(config.run_options['scaleout']) + 2,
                                 worker_init="\n".join(env_extra + condor_extra),
-                                walltime="00:20:00",
+                                walltime="00:60:00",
                             ),
                         )
                     ],
-                    retries=args.retries,
+                    retries=config.run_options['retries'],
                 )
         else:
             raise NotImplementedError
@@ -394,25 +227,25 @@ if __name__ == "__main__":
         dfk = parsl.load(htex_config)
 
         output = processor.run_uproot_job(
-            sample_dict,
+            config.fileset,
             treename="Events",
-            processor_instance=processor_instance,
+            processor_instance=config.processor_instance,
             executor=processor.parsl_executor,
             executor_args={
-                "skipbadfiles": args.skipbadfiles,
+                "skipbadfiles": config.run_options['skipbadfiles'],
                 "schema": processor.NanoAODSchema,
                 "config": None,
             },
-            chunksize=args.chunk,
-            maxchunks=args.max,
+            chunksize=config.run_options['chunk'],
+            maxchunks=config.run_options['max'],
         )
 
-    elif "dask" in args.executor:
+    elif "dask" in config.run_options['executor']:
         from dask_jobqueue import SLURMCluster, HTCondorCluster
         from distributed import Client
         from dask.distributed import performance_report
 
-        if "lpc" in args.executor:
+        if "lpc" in config.run_options['executor']:
             env_extra = [
                 f"export PYTHONPATH=$PYTHONPATH:{os.getcwd()}",
             ]
@@ -423,7 +256,7 @@ if __name__ == "__main__":
                 ship_env=True,
                 env_extra=env_extra,
             )
-        elif "lxplus" in args.executor:
+        elif "lxplus" in config.run_options['executor']:
             n_port = 8786
             if not check_port(8786):
                 raise RuntimeError(
@@ -449,52 +282,52 @@ if __name__ == "__main__":
                 extra=["--worker-port {}".format(n_port)],
                 env_extra=env_extra,
             )
-        elif "slurm" in args.executor:
+        elif "slurm" in config.run_options['executor']:
             cluster = SLURMCluster(
                 queue="all",
-                cores=args.workers,
-                processes=args.workers,
+                cores=config.run_options['workers'],
+                processes=config.run_options['workers'],
                 memory="200 GB",
-                retries=args.retries,
+                retries=config.run_options['retries'],
                 walltime="00:30:00",
                 env_extra=env_extra,
             )
-        elif "condor" in args.executor:
+        elif "condor" in config.run_options['executor']:
             cluster = HTCondorCluster(
-                cores=args.workers,
+                cores=config.run_options['workers'],
                 memory="4GB",
                 disk="4GB",
                 env_extra=env_extra,
             )
 
-        if args.executor == "dask/casa":
+        if config.run_options['executor'] == "dask/casa":
             client = Client("tls://localhost:8786")
             import shutil
 
             shutil.make_archive("workflows", "zip", base_dir="workflows")
             client.upload_file("workflows.zip")
         else:
-            cluster.adapt(minimum=args.scaleout)
+            cluster.adapt(minimum=config.run_options['scaleout'])
             client = Client(cluster)
             print("Waiting for at least one worker...")
             client.wait_for_workers(1)
         with performance_report(filename="dask-report.html"):
             output = processor.run_uproot_job(
-                sample_dict,
+                config.fileset,
                 treename="Events",
-                processor_instance=processor_instance,
+                processor_instance=config.processor_instance,
                 executor=processor.dask_executor,
                 executor_args={
                     "client": client,
-                    "skipbadfiles": args.skipbadfiles,
+                    "skipbadfiles": config.run_options['skipbadfiles'],
                     "schema": processor.NanoAODSchema,
-                    "retries": args.retries,
+                    "retries": config.run_options['retries'],
                 },
-                chunksize=args.chunk,
-                maxchunks=args.max,
+                chunksize=config.run_options['chunk'],
+                maxchunks=config.run_options['max'],
             )
 
-    save(output, args.output)
+    save(output, config.outfile)
 
     print(output)
-    print(f"Saving output to {args.output}")
+    print(f"Saving output to {config.outfile}")
