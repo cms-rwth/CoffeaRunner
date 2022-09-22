@@ -5,10 +5,10 @@ cfg =  {
         "jsons": ["src/Hpluscharm/input_json/higgs_UL17.json"],
         "campaign" :"UL17",
         "year" : "2017",
-        # "filter": {
-        #     "samples":["gchcWW2L2Nu_4f"],
-        #     "samples_exclude" : []
-        # }
+        "filter": {
+            "samples":["gchcWW2L2Nu_4f"],
+            "samples_exclude" : []
+        }
     },
 
     # Input and output files
