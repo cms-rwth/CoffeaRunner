@@ -284,8 +284,6 @@ def linear_func(coeff, cov, eigen_decomp=False):
         return nom
 
 
-
-
 def mT(obj1, obj2):
     return np.sqrt(2.0 * obj1.pt * obj2.pt * (1.0 - np.cos(obj1.phi - obj2.phi)))
 

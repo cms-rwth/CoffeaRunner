@@ -133,13 +133,14 @@ def load_jetfactory(campaign, path):
     jet_factory = jmestuff["jet_factory"]
     return jet_factory
 
+
 def load_jmefactory(campaign, path):
     _jet_path = f"BTVNanoCommissioning.data.JME.{campaign}"
     with importlib.resources.path(_jet_path, path) as filename:
         with gzip.open(filename) as fin:
             jmestuff = cloudpickle.load(fin)
 
-        #jet_factory = jmestuff["jet_factory"]
+        # jet_factory = jmestuff["jet_factory"]
     return jmestuff
 
 
@@ -416,8 +417,8 @@ def add_ps_weight(weights, ps_weights):
             down_isr = ps_weights[:, 2]
             up_fsr = ps_weights[:, 1]
             down_fsr = ps_weights[:, 3]
-        else:
-            warnings.warn(f"PS weight vector has length {len(ps_weights[0])}")
+        # else:
+        #   warnings.warn(f"PS weight vector has length {len(ps_weights[0])}")
 
     weights.add("UEPS_ISR", nom, up_isr, down_isr)
     weights.add("UEPS_FSR", nom, up_fsr, down_fsr)

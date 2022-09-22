@@ -34,6 +34,7 @@ def check_port(port):
 
 def retry_handler(exception, task_record):
     from parsl.executors.high_throughput.interchange import ManagerLost
+
     if isinstance(exception, ManagerLost):
         return 0.1
     else:
@@ -45,23 +46,33 @@ if __name__ == "__main__":
         description="Run analysis on baconbits files using processor coffea files"
     )
     # Inputs
-    parser.add_argument('--cfg', default=os.getcwd() + "/config/example.py", required=True, type=str,
-                        help='Config file with parameters specific to the current run')
-    parser.add_argument("-o", "--overwrite_file", required=False, type=str,
-                        help="Overwrite the output in the configuration")
+    parser.add_argument(
+        "--cfg",
+        default=os.getcwd() + "/config/example.py",
+        required=True,
+        type=str,
+        help="Config file with parameters specific to the current run",
+    )
+    parser.add_argument(
+        "-o",
+        "--overwrite_file",
+        required=False,
+        type=str,
+        help="Overwrite the output in the configuration",
+    )
     parser.add_argument(
         "--validate",
         action="store_true",
         help="Do not process, just check all files are accessible",
     )
-    args = parser.parse_args()   
+    args = parser.parse_args()
     if args.cfg[-3:] == ".py":
         config = Configurator(args.cfg, overwrite_output_dir=args.overwrite_file)
     elif args.cfg[-4:] == ".pkl":
-        config = pickle.load(open(args.cfg,"rb"))
+        config = pickle.load(open(args.cfg, "rb"))
     else:
-        raise sys.exit("Please provide a .py configuration file") 
-    
+        raise sys.exit("Please provide a .py configuration file")
+
     # Scan if files can be opened
     if args.validate:
         start = time.time()
@@ -72,7 +83,7 @@ if __name__ == "__main__":
             _rmap = p_map(
                 validate,
                 config.fileset[sample],
-                num_cpus=config.run_options['workers'],
+                num_cpus=config.run_options["workers"],
                 desc=f"Validating {sample[:20]}...",
             )
             _results = list(_rmap)
@@ -91,15 +102,18 @@ if __name__ == "__main__":
                 os.system(f"rm {fi}")
         sys.exit(0)
 
-    
-
-    if config.run_options['executor'] not in ["futures", "iterative", "dask/lpc", "dask/casa"]:
+    if config.run_options["executor"] not in [
+        "futures",
+        "iterative",
+        "dask/lpc",
+        "dask/casa",
+    ]:
         """
         dask/parsl needs to export x509 to read over xrootd
         dask/lpc uses custom jobqueue provider that handles x509
         """
-        if config.run_options['voms'] is not None:
-            _x509_path = config.run_options['voms']
+        if config.run_options["voms"] is not None:
+            _x509_path = config.run_options["voms"]
         else:
             try:
                 _x509_localpath = (
@@ -132,8 +146,8 @@ if __name__ == "__main__":
 
     #########
     # Execute
-    if config.run_options['executor'] in ["futures", "iterative"]:
-        if config.run_options['executor'] == "iterative":
+    if config.run_options["executor"] in ["futures", "iterative"]:
+        if config.run_options["executor"] == "iterative":
             _exec = processor.iterative_executor
         else:
             _exec = processor.futures_executor
@@ -143,14 +157,14 @@ if __name__ == "__main__":
             processor_instance=config.processor_instance,
             executor=_exec,
             executor_args={
-                "skipbadfiles": config.run_options['skipbadfiles'],
+                "skipbadfiles": config.run_options["skipbadfiles"],
                 "schema": processor.NanoAODSchema,
-                "workers": config.run_options['workers'],
+                "workers": config.run_options["workers"],
             },
-            chunksize=config.run_options['chunk'],
-            maxchunks=config.run_options['max'],
+            chunksize=config.run_options["chunk"],
+            maxchunks=config.run_options["max"],
         )
-    elif "parsl" in config.run_options['executor']:
+    elif "parsl" in config.run_options["executor"]:
         import parsl
         from parsl.providers import LocalProvider, CondorProvider, SlurmProvider
         from parsl.channels import LocalChannel
@@ -159,7 +173,7 @@ if __name__ == "__main__":
         from parsl.launchers import SrunLauncher
         from parsl.addresses import address_by_hostname, address_by_query
 
-        if "slurm" in config.run_options['executor']:
+        if "slurm" in config.run_options["executor"]:
             htex_config = Config(
                 executors=[
                     HighThroughputExecutor(
@@ -169,18 +183,18 @@ if __name__ == "__main__":
                         provider=SlurmProvider(
                             channel=LocalChannel(script_dir="logs_parsl"),
                             launcher=SrunLauncher(),
-                            max_blocks=(config.run_options['scaleout']) + 10,
-                            init_blocks=config.run_options['scaleout'],
+                            max_blocks=(config.run_options["scaleout"]) + 10,
+                            init_blocks=config.run_options["scaleout"],
                             partition="all",
                             worker_init="\n".join(env_extra),
                             walltime="00:120:00",
                         ),
                     )
                 ],
-                retries=config.run_options['retries'],
+                retries=config.run_options["retries"],
             )
-        elif "condor" in config.run_options['executor']:
-            if "naf_lite" in config.run_options['executor']:
+        elif "condor" in config.run_options["executor"]:
+            if "naf_lite" in config.run_options["executor"]:
                 htex_config = Config(
                     executors=[
                         HighThroughputExecutor(
@@ -190,16 +204,16 @@ if __name__ == "__main__":
                             worker_debug=True,
                             provider=CondorProvider(
                                 nodes_per_block=1,
-                                cores_per_slot=config.run_options['workers'],
+                                cores_per_slot=config.run_options["workers"],
                                 mem_per_slot=2,  # lite job / opportunistic can only use this much
-                                init_blocks=config.run_options['scaleout'],
-                                max_blocks=(config.run_options['scaleout']) + 2,
+                                init_blocks=config.run_options["scaleout"],
+                                max_blocks=(config.run_options["scaleout"]) + 2,
                                 worker_init="\n".join(env_extra + condor_extra),
                                 walltime="03:00:00",  # lite / short queue requirement
                             ),
                         )
                     ],
-                    retries=config.run_options['retries'],
+                    retries=config.run_options["retries"],
                     retry_handler=retry_handler,
                 )
             else:
@@ -211,15 +225,15 @@ if __name__ == "__main__":
                             max_workers=1,
                             provider=CondorProvider(
                                 nodes_per_block=1,
-                                cores_per_slot=config.run_options['workers'],
-                                init_blocks=config.run_options['scaleout'],
-                                max_blocks=(config.run_options['scaleout']) + 2,
+                                cores_per_slot=config.run_options["workers"],
+                                init_blocks=config.run_options["scaleout"],
+                                max_blocks=(config.run_options["scaleout"]) + 2,
                                 worker_init="\n".join(env_extra + condor_extra),
                                 walltime="00:60:00",
                             ),
                         )
                     ],
-                    retries=config.run_options['retries'],
+                    retries=config.run_options["retries"],
                 )
         else:
             raise NotImplementedError
@@ -232,20 +246,20 @@ if __name__ == "__main__":
             processor_instance=config.processor_instance,
             executor=processor.parsl_executor,
             executor_args={
-                "skipbadfiles": config.run_options['skipbadfiles'],
+                "skipbadfiles": config.run_options["skipbadfiles"],
                 "schema": processor.NanoAODSchema,
                 "config": None,
             },
-            chunksize=config.run_options['chunk'],
-            maxchunks=config.run_options['max'],
+            chunksize=config.run_options["chunk"],
+            maxchunks=config.run_options["max"],
         )
 
-    elif "dask" in config.run_options['executor']:
+    elif "dask" in config.run_options["executor"]:
         from dask_jobqueue import SLURMCluster, HTCondorCluster
         from distributed import Client
         from dask.distributed import performance_report
 
-        if "lpc" in config.run_options['executor']:
+        if "lpc" in config.run_options["executor"]:
             env_extra = [
                 f"export PYTHONPATH=$PYTHONPATH:{os.getcwd()}",
             ]
@@ -256,7 +270,7 @@ if __name__ == "__main__":
                 ship_env=True,
                 env_extra=env_extra,
             )
-        elif "lxplus" in config.run_options['executor']:
+        elif "lxplus" in config.run_options["executor"]:
             n_port = 8786
             if not check_port(8786):
                 raise RuntimeError(
@@ -282,32 +296,32 @@ if __name__ == "__main__":
                 extra=["--worker-port {}".format(n_port)],
                 env_extra=env_extra,
             )
-        elif "slurm" in config.run_options['executor']:
+        elif "slurm" in config.run_options["executor"]:
             cluster = SLURMCluster(
                 queue="all",
-                cores=config.run_options['workers'],
-                processes=config.run_options['workers'],
+                cores=config.run_options["workers"],
+                processes=config.run_options["workers"],
                 memory="200 GB",
-                retries=config.run_options['retries'],
+                retries=config.run_options["retries"],
                 walltime="00:30:00",
                 env_extra=env_extra,
             )
-        elif "condor" in config.run_options['executor']:
+        elif "condor" in config.run_options["executor"]:
             cluster = HTCondorCluster(
-                cores=config.run_options['workers'],
+                cores=config.run_options["workers"],
                 memory="4GB",
                 disk="4GB",
                 env_extra=env_extra,
             )
 
-        if config.run_options['executor'] == "dask/casa":
+        if config.run_options["executor"] == "dask/casa":
             client = Client("tls://localhost:8786")
             import shutil
 
             shutil.make_archive("workflows", "zip", base_dir="workflows")
             client.upload_file("workflows.zip")
         else:
-            cluster.adapt(minimum=config.run_options['scaleout'])
+            cluster.adapt(minimum=config.run_options["scaleout"])
             client = Client(cluster)
             print("Waiting for at least one worker...")
             client.wait_for_workers(1)
@@ -319,12 +333,12 @@ if __name__ == "__main__":
                 executor=processor.dask_executor,
                 executor_args={
                     "client": client,
-                    "skipbadfiles": config.run_options['skipbadfiles'],
+                    "skipbadfiles": config.run_options["skipbadfiles"],
                     "schema": processor.NanoAODSchema,
-                    "retries": config.run_options['retries'],
+                    "retries": config.run_options["retries"],
                 },
-                chunksize=config.run_options['chunk'],
-                maxchunks=config.run_options['max'],
+                chunksize=config.run_options["chunk"],
+                maxchunks=config.run_options["max"],
             )
 
     save(output, config.outfile)

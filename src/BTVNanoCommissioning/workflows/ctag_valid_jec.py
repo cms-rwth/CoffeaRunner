@@ -1,4 +1,4 @@
-from coffea import processor
+from coffea import hist, processor
 import numpy as np
 import awkward as ak
 from coffea.analysis_tools import Weights
@@ -189,9 +189,9 @@ class NanoProcessor(processor.ProcessorABC):
         isRealData = not hasattr(events, "genWeight")
 
         if isRealData:
-            output["sumw"] += len(events)
+            output["sumw"][dataset] += len(events)
         else:
-            output["sumw"] += ak.sum(events.genWeight)
+            output["sumw"][dataset] += ak.sum(events.genWeight)
         req_lumi = np.ones(len(events), dtype="bool")
         if isRealData:
             req_lumi = lumiMasks[self._year](events.run, events.luminosityBlock)

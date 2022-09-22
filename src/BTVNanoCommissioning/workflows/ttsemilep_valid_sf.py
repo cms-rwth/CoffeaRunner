@@ -10,19 +10,18 @@ from BTVNanoCommissioning.utils.correction import (
     load_pu,
     load_BTV,
     load_jetfactory,
-    add_jec_variables
+    add_jec_variables,
 )
 import gc
-from BTVNanoCommissioning.helpers.func  import flatten
+from BTVNanoCommissioning.helpers.func import flatten
 from BTVNanoCommissioning.helpers.cTagSFReader import getSF
 from BTVNanoCommissioning.utils.AK4_parameters import correction_config
 from BTVNanoCommissioning.utils.histogrammer import histogrammer
 
 
-
 class NanoProcessor(processor.ProcessorABC):
     # Define histograms
-    def __init__(self, year="2017", campaign="Rereco17_94X", isCorr=True, isJERC= False):
+    def __init__(self, year="2017", campaign="Rereco17_94X", isCorr=True, isJERC=False):
         self._year = year
         self._campaign = campaign
         self.isCorr = isCorr
@@ -30,29 +29,34 @@ class NanoProcessor(processor.ProcessorABC):
         ## Load corrections
         if isCorr:
             self._deepjetc_sf = load_BTV(
-                    self._campaign, correction_config[self._campaign]["BTV"], "DeepJetC"
-                )
+                self._campaign, correction_config[self._campaign]["BTV"], "DeepJetC"
+            )
             self._deepjetb_sf = load_BTV(
-                            self._campaign, correction_config[self._campaign]["BTV"], "DeepJetB"
-                        )
+                self._campaign, correction_config[self._campaign]["BTV"], "DeepJetB"
+            )
             self._deepcsvc_sf = load_BTV(
-                            self._campaign, correction_config[self._campaign]["BTV"], "DeepCSVC"
-                        )
+                self._campaign, correction_config[self._campaign]["BTV"], "DeepCSVC"
+            )
             self._deepcsvb_sf = load_BTV(
-                            self._campaign, correction_config[self._campaign]["BTV"], "DeepCSVB"
-                        )
+                self._campaign, correction_config[self._campaign]["BTV"], "DeepCSVB"
+            )
             self._pu = load_pu(self._campaign, correction_config[self._campaign]["PU"])
         if isJERC:
             self._jet_factory = load_jetfactory(
                 self._campaign, correction_config[self._campaign]["JME"]
             )
-        _hist_event_dict = histogrammer("ttsemilep_sf")   
-        self.make_output =  lambda:{'sumw': processor.defaultdict_accumulator(float),**_hist_event_dict}
+        _hist_event_dict = histogrammer("ttsemilep_sf")
+        self.make_output = lambda: {
+            "sumw": processor.defaultdict_accumulator(float),
+            **_hist_event_dict,
+        }
+
     @property
     def accumulator(self):
         return self._accumulator
 
     def process(self, events):
+
         output = self.make_output()
 
         dataset = events.metadata["dataset"]
@@ -62,9 +66,12 @@ class NanoProcessor(processor.ProcessorABC):
             output["sumw"] = len(events)
         else:
             output["sumw"] = ak.sum(events.genWeight)
-            if self.isJERC:events.Jet = self._jet_factory[jetfac_name].build(
-            add_jec_variables(events.Jet, events.fixedGridRhoFastjetAll), lazy_cache=events.caches[0]
-        )
+            if self.isJERC:
+                events.Jet = self._jet_factory["mc"].build(
+                    add_jec_variables(events.Jet, events.fixedGridRhoFastjetAll),
+                    lazy_cache=events.caches[0],
+                )
+
         req_lumi = np.ones(len(events), dtype="bool")
         if isRealData:
             req_lumi = lumiMasks[self._year](events.run, events.luminosityBlock)
@@ -136,9 +143,11 @@ class NanoProcessor(processor.ProcessorABC):
             )
         if not isRealData:
             weights.add("genweight", events.genWeight)
-            if self.isCorr:weights.add(
-                "puweight", self._pu[f"{self._year}_pileupweight"](events.Pileup.nPU)
-            )
+            if self.isCorr:
+                weights.add(
+                    "puweight",
+                    self._pu[f"{self._year}_pileupweight"](events.Pileup.nPU),
+                )
         ##############
         # Trigger level
         triggers = [
@@ -160,7 +169,7 @@ class NanoProcessor(processor.ProcessorABC):
             & (abs(events.Muon.eta) < 2.4)
             & (events.Muon.tightId > 0.5)
             & (events.Muon.pfRelIso04_all < 0.12)
-        ]  
+        ]
 
         event_muon = ak.pad_none(events.Muon, 1, axis=1)
 
@@ -244,6 +253,7 @@ class NanoProcessor(processor.ProcessorABC):
             jetsfs_b = collections.defaultdict(dict)
             csvsfs_c = collections.defaultdict(dict)
             csvsfs_b = collections.defaultdict(dict)
+
             if self.isCorr:
                 for i in range(4):
                     jetsfs_c[i]["SF"] = getSF(
@@ -330,44 +340,88 @@ class NanoProcessor(processor.ProcessorABC):
                     )
 
                 disc_list = {
-                "btagDeepB": csvsfs_b,
-                "btagDeepC": csvsfs_b,
-                "btagDeepFlavB": jetsfs_b,
-                "btagDeepFlavC": jetsfs_b,
-                "btagDeepCvL": csvsfs_c,
-                "btagDeepCvB": csvsfs_c,
-                "btagDeepFlavCvL": jetsfs_c,
-                "btagDeepFlavCvB": jetsfs_c,
-             }
+                    "btagDeepB": csvsfs_b,
+                    "btagDeepC": csvsfs_b,
+                    "btagDeepFlavB": jetsfs_b,
+                    "btagDeepFlavC": jetsfs_b,
+                    "btagDeepCvL": csvsfs_c,
+                    "btagDeepCvB": csvsfs_c,
+                    "btagDeepFlavCvL": jetsfs_c,
+                    "btagDeepFlavCvB": jetsfs_c,
+                }
         for histname, h in output.items():
             if "Deep" in histname and "btag" not in histname:
-                h.fill(flatten(genflavor),flatten(sjets[histname]),weight=flatten(ak.broadcast_arrays(weights.weight()[event_level], sjets["pt"])[0]))
+                h.fill(
+                    flatten(genflavor),
+                    flatten(sjets[histname]),
+                    weight=flatten(
+                        ak.broadcast_arrays(weights.weight()[event_level], sjets["pt"])[
+                            0
+                        ]
+                    ),
+                )
             elif "btagDeep" in histname:
                 for i in range(4):
                     sel_jet = sjets[:, i]
                     if str(i) in histname:
-                        h.fill(flav=genflavor[:, i], syst="noSF", discr=np.where(sel_jet[histname.replace(f"_{i}","")] < 0, -0.2, sel_jet[histname.replace(f"_{i}","")]),weight=weights.weight()[event_level])
+                        h.fill(
+                            flav=genflavor[:, i],
+                            syst="noSF",
+                            discr=np.where(
+                                sel_jet[histname.replace(f"_{i}", "")] < 0,
+                                -0.2,
+                                sel_jet[histname.replace(f"_{i}", "")],
+                            ),
+                            weight=weights.weight()[event_level],
+                        )
                         if not isRealData and self.isCorr:
-                            for syst in disc_list[histname.replace(f"_{i}", "")][i].keys():
+                            for syst in disc_list[histname.replace(f"_{i}", "")][
+                                i
+                            ].keys():
                                 h.fill(
                                     flav=genflavor[:, i],
                                     syst=syst,
-                                    discr=np.where(sel_jet[histname.replace(f"_{i}","")] < 0, -0.2, sel_jet[histname.replace(f"_{i}","")]),
+                                    discr=np.where(
+                                        sel_jet[histname.replace(f"_{i}", "")] < 0,
+                                        -0.2,
+                                        sel_jet[histname.replace(f"_{i}", "")],
+                                    ),
                                     weight=weights.weight()[event_level]
                                     * disc_list[histname.replace(f"_{i}", "")][i][syst],
                                 )
-            elif "mu_" in histname and histname.replace("mu_","")  in smu.fields:
-                h.fill(flatten(smu[histname.replace("mu_","")]),weight=weights.weight()[event_level])
-            elif "MET_" in histname and histname.replace("MET_","")  in selev.METFixEE2017.fields:
-                h.fill(flatten(selev.METFixEE2017[histname.replace("MET_","")]),weight=weights.weight()[event_level])
-            elif "jet" in histname and "dr" not in histname and "njet"!= histname :
+            elif "mu_" in histname and histname.replace("mu_", "") in smu.fields:
+                h.fill(
+                    flatten(smu[histname.replace("mu_", "")]),
+                    weight=weights.weight()[event_level],
+                )
+            elif (
+                "MET_" in histname
+                and histname.replace("MET_", "") in selev.METFixEE2017.fields
+            ):
+                h.fill(
+                    flatten(selev.METFixEE2017[histname.replace("MET_", "")]),
+                    weight=weights.weight()[event_level],
+                )
+            elif "jet" in histname and "dr" not in histname and "njet" != histname:
                 for i in range(4):
                     sel_jet = sjets[:, i]
-                    if str(i) in histname:h.fill(flatten(genflavor[:, i]),flatten(sel_jet[histname.replace(f"jet{i}_","")]),weight=weights.weight()[event_level])
-                    
-        for i in range(4):output[f"dr_mujet{i}"].fill(flav=flatten(genflavor[:,i]),dr=flatten(smu.delta_r(sjets[:,i])),weight=weights.weight()[event_level])
-        output["njet"].fill(ak.count(sjets.pt, axis=1),weight=weights.weight()[event_level])
-        return {dataset:output}
+                    if str(i) in histname:
+                        h.fill(
+                            flatten(genflavor[:, i]),
+                            flatten(sel_jet[histname.replace(f"jet{i}_", "")]),
+                            weight=weights.weight()[event_level],
+                        )
+
+        for i in range(4):
+            output[f"dr_mujet{i}"].fill(
+                flav=flatten(genflavor[:, i]),
+                dr=flatten(smu.delta_r(sjets[:, i])),
+                weight=weights.weight()[event_level],
+            )
+        output["njet"].fill(
+            ak.count(sjets.pt, axis=1), weight=weights.weight()[event_level]
+        )
+        return {dataset: output}
 
     def postprocess(self, accumulator):
         return accumulator

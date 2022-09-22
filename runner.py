@@ -10,12 +10,12 @@ import uproot
 from coffea.util import load, save
 from coffea import processor
 
-# from BTVNanoCommissioning.workflows import workflows
+from BTVNanoCommissioning.workflows import workflows
 
 # This would crash if the ExampleWorkflow does not exist
 # from ExampleWorkflow.workflows import workflows
 # from VHcc.workflows import workflows
-from Hpluscharm.workflows import workflows
+#from Hpluscharm.workflows import workflows
 
 # Should come up with a smarter way to import all worflows from subdirectories of ./src/
 
@@ -252,11 +252,17 @@ if __name__ == "__main__":
         sys.exit(0)
 
     # load workflow
-    
-    if args.systematics is not None:
-        processor_instance = workflows[args.workflow](
-           year=args.year, campaign=args.campaign, export_array=args.export_array,systematics=args.systematics,isData=args.isData)
-    else:processor_instance = workflows[args.workflow](args.year, args.campaign)
+
+    #if args.systematics is not None:
+    #    processor_instance = workflows[args.workflow](
+    #        year=args.year,
+    #        campaign=args.campaign,
+    #        export_array=args.export_array,
+    #        systematics=args.systematics,
+    #        isData=args.isData,
+    #    )
+    #else:
+    processor_instance = workflows[args.workflow](args.year, args.campaign)
     # AS: not all workflows will have these two parameter, so probably
     #     we want to avoid always calling it like that in the future
 
