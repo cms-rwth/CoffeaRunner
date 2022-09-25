@@ -5595,7 +5595,7 @@ def definitions():
             "format_unit": "2f",
             "format_unit_digits": 2,
             "bins": 100,
-            "manual_ranges": None,
+            "manual_ranges":[0, None],
             "inputVar_units": "",
         },
         "DeepJet_nNpfcand": {
@@ -5604,7 +5604,7 @@ def definitions():
             "format_unit": "2f",
             "format_unit_digits": 2,
             "bins": 100,
-            "manual_ranges": None,
+            "manual_ranges": [0, None],
             "inputVar_units": "",
         },
         "DeepJet_npv": {
@@ -5613,7 +5613,7 @@ def definitions():
             "format_unit": "2f",
             "format_unit_digits": 2,
             "bins": 100,
-            "manual_ranges": None,
+            "manual_ranges": [0, None],
             "inputVar_units": "",
         },
         "DeepJet_nsv": {
@@ -5622,7 +5622,7 @@ def definitions():
             "format_unit": "2f",
             "format_unit_digits": 2,
             "bins": 10,
-            "manual_ranges": None,
+            "manual_ranges": [0, 10],
             "inputVar_units": "",
         },
         "DeepJet_sv_chi2_0": {
@@ -5758,6 +5758,7 @@ def definitions():
             "format_unit_digits": 2,
             "bins": 100,
             "manual_ranges": [-1.0, 187.85],
+
             "inputVar_units": "cm",
         },
         "DeepJet_sv_d3dsig_3": {

@@ -3,6 +3,7 @@ import collections
 import re
 import coffea
 from coffea import processor
+
 import awkward as ak
 from coffea.analysis_tools import Weights
 
@@ -562,6 +563,7 @@ class NanoProcessor(processor.ProcessorABC):
                     weight=weights.weight()[event_level],
                 )
             elif "btagDeep" in histname and "0" in histname:
+
                 h.fill(
                     flav=smflav,
                     syst="noSF",
