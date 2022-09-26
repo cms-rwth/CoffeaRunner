@@ -123,7 +123,7 @@ class NanoProcessor(processor.ProcessorABC):
         output = self.accumulator.identity()
 
         dataset = events.metadata["dataset"]
-        output["sumw"][dataset] += ak.sum(events.genWeight)
+        output["sumw"] += ak.sum(events.genWeight)
 
         ##############
         # Trigger level

@@ -1,10 +1,11 @@
-name: Baseline Workflow
+name: Example Workflow
 
 on:
   push:
-    branches: [ master ]
+    branches: [ MY_dev ]
   pull_request_target:
-    branches: [ master ]
+    branches: [ MY_dev ]
+
   workflow_dispatch:
 
 jobs:
@@ -33,7 +34,7 @@ jobs:
         channels: conda-forge,defaults
         channel-priority: true
         auto-update-conda: true
-        activate-environment: btv_coffea
+        activate-environment: CoffeaRunner
         environment-file: test_env.yml
         auto-activate-base: false
 
@@ -70,7 +71,7 @@ jobs:
         
     - name: Test xrootd
       run: |
-        xrdcp root://eoscms.cern.ch//eos/cms/store/group/phys_btag/nano-commissioning/test_w_dj.root .
+        xrdcp root://xrootd-cms.infn.it///store/mc/RunIISummer20UL17NanoAODv9/GluGluHToWWTo2L2Nu_M-125_TuneCP5_13TeV-powheg-jhugen727-pythia8/NANOAODSIM/106X_mc2017_realistic_v9-v2/40000/702ED98F-6108-9945-BAD3-4F4DF1682C4E.root.
       
     - name: Install Repo
       run: |
@@ -78,4 +79,4 @@ jobs:
 
     - name: Run workflow
       run: |
-        python runner.py --workflow ttcom --json metadata/test_w_dj.json  --limit 1 --executor iterative
+        python runner_wconfig.py --cfg config/example.py
