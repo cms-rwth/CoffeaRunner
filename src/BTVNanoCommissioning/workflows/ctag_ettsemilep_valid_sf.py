@@ -463,7 +463,6 @@ class NanoProcessor(processor.ProcessorABC):
                     discr=smuon_jet.btagDeepB,
                 )
 
-
             disc_list = {
                 "btagDeepB": csvsfs_b,
                 "btagDeepC": csvsfs_b,

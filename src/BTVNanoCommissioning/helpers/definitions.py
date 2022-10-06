@@ -5595,7 +5595,7 @@ def definitions():
             "format_unit": "2f",
             "format_unit_digits": 2,
             "bins": 100,
-            "manual_ranges":[0, None],
+            "manual_ranges": [0, None],
             "inputVar_units": "",
         },
         "DeepJet_nNpfcand": {

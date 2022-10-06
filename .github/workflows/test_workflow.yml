@@ -1,9 +1,9 @@
 name: Test Workflow
 on:
   push:
-    branches: [ MY_dev ]
+    branches: [ master ]
   pull_request_target:
-    branches: [ MY_dev ]
+    branches: [ master ]
 
   workflow_dispatch:
 
@@ -70,7 +70,7 @@ jobs:
         
     - name: Test xrootd
       run: |
-        xrdcp root://xrootd-cms.infn.it///store/user/anovak/PFNano/106X_v2_17/TTTo2L2Nu_TuneCP5_13TeV-powheg-pythia8/RunIIFall17PFNanoAODv2-PU2017_12Apr2018_new_pmx_94X_mc2017_realistic_v14-v1PFNanoV2/210101_174413/0000/nano_mc2017_1-94.root" .
+        xrdcp root://xrootd-cms.infn.it///store/user/anovak/PFNano/106X_v2_17/TTTo2L2Nu_TuneCP5_13TeV-powheg-pythia8/RunIIFall17PFNanoAODv2-PU2017_12Apr2018_new_pmx_94X_mc2017_realistic_v14-v1PFNanoV2/210101_174413/0000/nano_mc2017_1-94.root .
       
     - name: Install Repo
       run: |

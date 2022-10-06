@@ -17,6 +17,7 @@ from BTVNanoCommissioning.workflows import workflows
 # from VHcc.workflows import workflows
 
 from Hpluscharm.workflows import workflows
+
 # Should come up with a smarter way to import all worflows from subdirectories of ./src/
 
 
@@ -255,7 +256,7 @@ if __name__ == "__main__":
 
     # load workflow
 
-    #if args.systematics is not None:
+    # if args.systematics is not None:
     #    processor_instance = workflows[args.workflow](
     #        year=args.year,
     #        campaign=args.campaign,
@@ -263,9 +264,12 @@ if __name__ == "__main__":
     #        systematics=args.systematics,
     #        isData=args.isData,
     #    )
-    #else:
+    # else:
     processor_instance = workflows[args.workflow](args.year, args.campaign)
-    if args.export_array is not None:processor_instance = workflows[args.workflow](year=args.year,campaign=args.campaign,export_array=args.export_array)
+    if args.export_array is not None:
+        processor_instance = workflows[args.workflow](
+            year=args.year, campaign=args.campaign, export_array=args.export_array
+        )
     # AS: not all workflows will have these two parameter, so probably
     #     we want to avoid always calling it like that in the future
 
