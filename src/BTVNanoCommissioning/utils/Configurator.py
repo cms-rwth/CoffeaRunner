@@ -271,45 +271,45 @@ class Configurator:
         self.outfile = os.path.join(self.output, "output.coffea")
 
     ## MY : not used in current developement
-    def load_histogram_settings(self):
-        if isinstance(self.cfg["variables"], list):
-            self.cfg["variables"] = {
-                var_name: None for var_name in self.cfg["variables"]
-            }
-        for var_name in self.cfg["variables"].keys():
-            if self.cfg["variables"][var_name] == None:
-                self.cfg["variables"][var_name] = histogram_settings["variables"][
-                    var_name
-                ]
-            elif not isinstance(self.cfg["variables"][var_name], dict):
-                sys.exit("Format non valid for histogram settings")
-            elif set(self.cfg["variables"][var_name].keys()) != {
-                "binning",
-                "xlim",
-                "xlabel",
-            }:
-                set_ctrl = {"binning", "xlim", "xlabel"}
-                sys.exit(
-                    f"{var_name}: missing keys in histogram settings. Required keys missing: {set_ctrl - set(self.cfg['variables'][var_name].keys())}"
-                )
-            elif "n_or_arr" not in set(
-                self.cfg["variables"][var_name]["binning"].keys()
-            ):
-                sys.exit(
-                    f"{var_name}: missing keys in histogram binning. Required keys missing: {'n_or_arr'}"
-                )
-            elif (
-                ("n_or_arr" in set(self.cfg["variables"][var_name]["binning"].keys()))
-                & (type(self.cfg["variables"][var_name]["binning"]["n_or_arr"]) == int)
-                & (
-                    set(self.cfg["variables"][var_name]["binning"].keys())
-                    != {"n_or_arr", "lo", "hi"}
-                )
-            ):
-                set_ctrl = {"n_or_arr", "lo", "hi"}
-                sys.exit(
-                    f"{var_name}: missing keys in histogram binning. Required keys missing: {set_ctrl - set(self.cfg['variables'][var_name]['binning'].keys())}"
-                )
+    # def load_histogram_settings(self):
+    #     if isinstance(self.cfg["variables"], list):
+    #         self.cfg["variables"] = {
+    #             var_name: None for var_name in self.cfg["variables"]
+    #         }
+    #     for var_name in self.cfg["variables"].keys():
+    #         if self.cfg["variables"][var_name] == None:
+    #             self.cfg["variables"][var_name] = histogram_settings["variables"][
+    #                 var_name
+    #             ]
+    #         elif not isinstance(self.cfg["variables"][var_name], dict):
+    #             sys.exit("Format non valid for histogram settings")
+    #         elif set(self.cfg["variables"][var_name].keys()) != {
+    #             "binning",
+    #             "xlim",
+    #             "xlabel",
+    #         }:
+    #             set_ctrl = {"binning", "xlim", "xlabel"}
+    #             sys.exit(
+    #                 f"{var_name}: missing keys in histogram settings. Required keys missing: {set_ctrl - set(self.cfg['variables'][var_name].keys())}"
+    #             )
+    #         elif "n_or_arr" not in set(
+    #             self.cfg["variables"][var_name]["binning"].keys()
+    #         ):
+    #             sys.exit(
+    #                 f"{var_name}: missing keys in histogram binning. Required keys missing: {'n_or_arr'}"
+    #             )
+    #         elif (
+    #             ("n_or_arr" in set(self.cfg["variables"][var_name]["binning"].keys()))
+    #             & (type(self.cfg["variables"][var_name]["binning"]["n_or_arr"]) == int)
+    #             & (
+    #                 set(self.cfg["variables"][var_name]["binning"].keys())
+    #                 != {"n_or_arr", "lo", "hi"}
+    #             )
+    #         ):
+    #             set_ctrl = {"n_or_arr", "lo", "hi"}
+    #             sys.exit(
+    #                 f"{var_name}: missing keys in histogram binning. Required keys missing: {set_ctrl - set(self.cfg['variables'][var_name]['binning'].keys())}"
+    #             )
 
     def load_workflow(self):
         self.processor_instance = self.workflow(cfg=self)

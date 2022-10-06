@@ -1,5 +1,4 @@
-name: Example Workflow
-
+name: Test Workflow
 on:
   push:
     branches: [ MY_dev ]
@@ -34,7 +33,7 @@ jobs:
         channel-priority: true
         auto-update-conda: true
         activate-environment: CoffeaRunner
-        environment-file: test_env.yml
+        environment-file: env.yml
         auto-activate-base: false
 
     - name: Verify environment
@@ -70,12 +69,16 @@ jobs:
         
     - name: Test xrootd
       run: |
-        xrdcp root://xrootd-cms.infn.it///store/mc/RunIISummer20UL17NanoAODv9/GluGluHToWWTo2L2Nu_M-125_TuneCP5_13TeV-powheg-jhugen727-pythia8/NANOAODSIM/106X_mc2017_realistic_v9-v2/40000/702ED98F-6108-9945-BAD3-4F4DF1682C4E.root.
+        xrdcp root://xrootd-cms.infn.it///store/user/anovak/PFNano/106X_v2_17/TTTo2L2Nu_TuneCP5_13TeV-powheg-pythia8/RunIIFall17PFNanoAODv2-PU2017_12Apr2018_new_pmx_94X_mc2017_realistic_v14-v1PFNanoV2/210101_174413/0000/nano_mc2017_1-94.root" .
       
     - name: Install Repo
       run: |
         pip install -e .
 
-    - name: Run workflow
+    
+    - name: Run test workflow
       run: |
         python runner_wconfig.py --cfg config/example.py
+    
+    
+    

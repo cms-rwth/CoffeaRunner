@@ -45,6 +45,12 @@ conda install dask
 pip install black==22.3.0 # use to format code
 ```
 
+Or install via `test_env.yml`
+
+create new environment with python 3.7, e.g. environment of name `CoffeaRunner`
+
+`conda create --name CoffeaRunner python=3.7`
+
 Once the environment is set up, compile the python package:
 ```
 pip install -e .

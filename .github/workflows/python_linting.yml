@@ -2,9 +2,9 @@ name: Linting
 
 on:
   push:
-    branches: [ master ]
+    branches: [ MY_dev ]
   pull_request:
-    branches: [ master ]
+    branches: [ MY_dev ]
 
 jobs:
   build:
