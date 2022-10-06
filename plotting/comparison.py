@@ -11,6 +11,7 @@ plt.style.use(hep.style.ROOT)
 from BTVNanoCommissioning.utils.xs_scaler import getSumW, collate, scaleSumW
 
 markers = [".", "o", "^", "s", "+", "x", "D", "*"]
+
 parser = argparse.ArgumentParser(description="hist plotter for commissioning")
 parser.add_argument(
     "-p",

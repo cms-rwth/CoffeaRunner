@@ -243,6 +243,7 @@ def eleSFs(ele, campaign, path):
                 )
             else:
                 weight = weight * evaluator[paths[: paths.find(" ")]](ele_eta, ele_pt)
+
     return weight
 
 

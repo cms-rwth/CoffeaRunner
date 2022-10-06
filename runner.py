@@ -15,8 +15,8 @@ from BTVNanoCommissioning.workflows import workflows
 # This would crash if the ExampleWorkflow does not exist
 # from ExampleWorkflow.workflows import workflows
 # from VHcc.workflows import workflows
-#from Hpluscharm.workflows import workflows
 
+from Hpluscharm.workflows import workflows
 # Should come up with a smarter way to import all worflows from subdirectories of ./src/
 
 
@@ -170,6 +170,7 @@ def get_main_parser():
         metavar="N",
         help="Max number of chunks to run in total",
     )
+
     parser.add_argument(
         "--export_array",
         action="store_true",
@@ -182,6 +183,7 @@ def get_main_parser():
         default=False,
         help="process systematics",
     )
+
     return parser
 
 
@@ -263,6 +265,7 @@ if __name__ == "__main__":
     #    )
     #else:
     processor_instance = workflows[args.workflow](args.year, args.campaign)
+    if args.export_array is not None:processor_instance = workflows[args.workflow](year=args.year,campaign=args.campaign,export_array=args.export_array)
     # AS: not all workflows will have these two parameter, so probably
     #     we want to avoid always calling it like that in the future
 
