@@ -28,8 +28,9 @@ parser.add_argument(
     dest="phase",
     help="which phase space",
 )
-# parser.add_argument('--ext', type=str, default='data', help='addional name')
-parser.add_argument("-i", "--input", required=True, type=str, help="files set")
+
+parser.add_argument("--ext", type=str, default="data", help="addional name")
+parser.add_argument("-o", "--output", required=True, type=str, help="files set")
 parser.add_argument("-r", "--ref", required=True, help="referance dataset")
 parser.add_argument(
     "-c",
@@ -56,48 +57,48 @@ parser.add_argument(
 )
 parser.add_argument("--ext", type=str, default="data", help="addional name")
 
+
 args = parser.parse_args()
 output = {}
-if len(args.input.split(",")) > 1:
-    output = {i: load({args.input.split(",")[i]}) for i in args.input.split(",")}
+if len(args.output.split(",")) > 1:
+    output = {i: load({args.output.split(",")[i]}) for i in args.output.split(",")}
 else:
-    output = load(args.input)
+    output = load(args.output)
 mergemap = {}
 time = arrow.now().format("YY_MM_DD")
 if not os.path.isdir(f"plot/BTV/{args.phase}_{args.ext}_{time}/"):
     os.makedirs(f"plot/BTV/{args.phase}_{args.ext}_{time}/")
-for f in output.keys():
-    if "sumw" not in output[f].keys():
-
-        mergemap[args.ref] = [m for m in output[f].keys() if args.ref == m]
+if "sumw" in output.keys():
+    mergemap[args.ref] = [m for m in output.keys() if args.ref == m]
+    for c in args.compared.split(","):
+        mergemap[c] = [m for m in output.keys() if c == m]
+else:
+    reflist = []
+    comparelist = []
+    for f in output.keys():
+        reflist.extend([m for m in output[f].keys() if args.ref == m])
         for c in args.compared.split(","):
-            mergemap[c] = [m for m in output[f].keys() if c == m]
-    else:
-        mergemap[args.ref] = [m for m in output.keys() if args.ref == m]
-        for c in args.compared.split(","):
-            mergemap[c] = [m for m in output.keys() if c == m]
+            comparelist.extend([m for m in output[f].keys() if c == m])
+    mergemap[args.ref] = reflist
+    mergemap[c] = comparelist
 collated = collate(output, mergemap)
 ### style settings
-if "Run" in args.ref:
+if "Run" in args.ref or "data" in args.ref or "Data" in args.ref:
     hist_type = "errorbar"
 else:
     hist_type = "step"
 
-if args.phase == "ttdilep":
+if "ttdilep" in args.phase:
     input_txt = "dilepton ttbar"
     nj = 2
-elif args.phase == "ttsemilep":
+elif "ttsemilep" in args.phase:
     input_txt = "semileptonic ttbar"
     nj = 4
 else:
-    if args.phase == "Wc":
+    if "Wc" in args.phase:
         input_txt = "W+c"
-    elif args.phase == "DY":
+    elif "DY" in args.phase:
         input_txt = "DY+jets"
-    elif args.phase == "ttsemilep":
-        input_txt = "semileptonic ttbar"
-    elif args.phase == "ttdilep":
-        input_txt = "dileptonic ttbar"
     nj = 1
 
 

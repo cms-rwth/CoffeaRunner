@@ -3,6 +3,7 @@ import argparse, sys, os, arrow
 from coffea.util import load
 import matplotlib.pyplot as plt
 from matplotlib.offsetbox import AnchoredText
+
 import mplhep as hep
 import hist
 from hist.intervals import ratio_uncertainty
@@ -12,6 +13,7 @@ from BTVNanoCommissioning.utils.xs_scaler import getSumW, collate, scaleSumW
 
 parser = argparse.ArgumentParser(description="hist plotter for commissioning")
 parser.add_argument("--lumi", required=True, type=float, help="luminosity in /pb")
+
 parser.add_argument(
     "-p",
     "--phase",
@@ -42,31 +44,46 @@ parser.add_argument(
 )
 parser.add_argument("--SF", action="store_true", default=False, help="SF comparisons")
 parser.add_argument("--ext", type=str, default="data", help="addional name")
-parser.add_argument("-i", "--input", type=str, default="", help="input coffea files")
+parser.add_argument("-o", "--output", type=str, default="", help="input coffea files")
 arg = parser.parse_args()
 time = arrow.now().format("YY_MM_DD")
 if not os.path.isdir(f"plot/BTV/{arg.phase}_{arg.ext}_{time}/"):
     os.makedirs(f"plot/BTV/{arg.phase}_{arg.ext}_{time}/")
-if len(arg.input.split(",")) > 1:
-    output = {i: load(arg.input.split(",")[i]) for i in arg.input.split(",")}
+if len(arg.output.split(",")) > 1:
+    output = {i.replace(".coffea", ""): load(i) for i in arg.output.split(",")}
+    for out in output.keys():
+        output[out] = scaleSumW(output[out], arg.lumi, getSumW(output[out]))
 else:
-    output = load(arg.input)
+    output = load(arg.output)
     output = scaleSumW(output, arg.lumi, getSumW(output))
 mergemap = {}
-for f in output.keys():
+if "sumw" in output.keys():
+    mergemap["data"] = [
+        m for m in output.keys() if "Run" in m or "data" in m or "Data" in m
+    ]
+    mergemap["mc"] = [
+        m
+        for m in output.keys()
+        if "Run" not in m and "data" not in m and "Data" not in m
+    ]
+else:
+    datalist = []
+    mclist = []
+    for f in output.keys():
+        datalist.extend(
+            [m for m in output[f].keys() if "Run" in m or "data" in m or "Data" in m]
+        )
+        mclist.extend(
+            [
+                m
+                for m in output[f].keys()
+                if "Run" not in m and "data" not in m and "Data" not in m
+            ]
+        )
+    mergemap["mc"] = mclist
+    mergemap["data"] = datalist
 
-    if "sumw" not in output[f].keys():
-        mergemap["data"] = [m for m in output[f].keys() if "Run" in m or "data" in m]
-        mergemap["mc"] = [
-            m for m in output[f].keys() if "Run" not in m and "data" not in m
-        ]
-    else:
-        mergemap["data"] = [m for m in output.keys() if "Run" in m or "data" in m]
-        mergemap["mc"] = [
-            m for m in output.keys() if "Run" not in m and "data" not in m
-        ]
 collated = collate(output, mergemap)
-print(collated["data"]["sumw"], collated["mc"]["sumw"])
 if "Wc" in arg.phase:
     input_txt = "W+c"
 elif "DY" in arg.phase:
@@ -231,15 +248,15 @@ for discr in arg.discr_list.split(","):
         ax.fill_between(
             hdata.axes.edges,
             np.ones(stat_denom_unc[0])
-            - numpy.r_[stat_denom_unc[0], stat_denom_unc[0, -1]],
+            - np.r_[stat_denom_unc[0], stat_denom_unc[0, -1]],
             np.ones(stat_denom_unc[0])
-            + numpy.r_[stat_denom_unc[1], stat_denom_unc[1, -1]],
+            + np.r_[stat_denom_unc[1], stat_denom_unc[1, -1]],
             {"facecolor": "tab:gray", "linewidth": 0},
         )
         ax.fill_between(
             hdata.axes.edges,
-            np.ones(stat_denom_unc[0]) - numpy.r_[err_dn, err_dn[-1]],
-            np.ones(stat_denom_unc[0]) + numpy.r_[err_up, err_up[-1]],
+            np.ones(stat_denom_unc[0]) - np.r_[err_dn, err_dn[-1]],
+            np.ones(stat_denom_unc[0]) + np.r_[err_up, err_up[-1]],
             {"facecolor": "tab:brown", "linewidth": 0},
         )
 
@@ -252,8 +269,7 @@ for discr in arg.discr_list.split(","):
             yerr=True,
             ax=ax,
         )
-        print(collated["mc"][discr][{"flav": sum}].values())
-        print(collated["data"][discr][{"flav": sum}].values())
+
         hep.histplot(
             collated["data"][discr][{"flav": sum}],
             histtype="errorbar",
@@ -295,7 +311,9 @@ for discr in arg.discr_list.split(","):
         rax.errorbar(
             x=collated["data"][discr].axes[0].centers,
             y=collated["data"][discr].values() / collated["mc"][discr].values(),
-            yerr=ratio_uncertainty(hdata.values(), collated["mc"][discr].values()),
+            yerr=ratio_uncertainty(
+                collated["data"][discr].values(), collated["mc"][discr].values()
+            ),
             color="k",
             linestyle="none",
             marker="o",
@@ -319,7 +337,7 @@ for discr in arg.discr_list.split(","):
     if arg.norm:
         scale = "_norm"
     name = "all"
-
+    # ax.set_ylim(0,500)
     # hep.mpl_magic(ax=ax)
     if arg.log:
         fig.savefig(

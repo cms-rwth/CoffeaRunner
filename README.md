@@ -1,6 +1,8 @@
 
 # CoffeaRunner
-
+[![Linting](https://github.com/cms-rwth/CoffeaRunner/blob/master/.github/workflows/python_linting.yml/badge.svg)](https://github.com/cms-rwth/CoffeaRunner/blob/master/.github/workflows/python_linting.yml)
+[![Test Workflow](https://github.com/cms-rwth/CoffeaRunner/blob/master/.github/workflows/test_workflow.yml/badge.svg)](https://github.com/cms-rwth/CoffeaRunner/blob/master/.github/workflows/test_workflow.yml)
+[![Code style: black](https://img.shields.io/badge/code%20style-black-000000.svg)](https://github.com/psf/black)
 Generalized framework columnar-based analysis with [coffea](https://coffeateam.github.io/coffea/) based on the developments from [BTVNanoCommissioning](https://github.com/cms-btv-pog/BTVNanoCommissioning) and some development from [PocketCoffea](https://github.com/PocketCoffea/PocketCoffea)
 
 ## Requirements
@@ -44,6 +46,12 @@ conda install -c conda-forge 'fsspec>=0.3.3'
 conda install dask
 pip install black==22.3.0 # use to format code
 ```
+
+Or install via `test_env.yml`
+
+create new environment with python 3.7, e.g. environment of name `CoffeaRunner`
+
+`conda create --name CoffeaRunner python=3.7`
 
 Once the environment is set up, compile the python package:
 ```
@@ -118,7 +126,7 @@ optional arguments:
     --validate        Do not process, just check all files are accessible
 ```
 
-- More complex usage with `config/HWW2l2nu.py` and the application to [workflow](https://github.com/Ming-Yan/Hpluscharm/blob/MY_dev/workflows/hplusc_HWW2l2nu_process_test.py) from [HplusCharm](https://github.com/Ming-Yan/Hpluscharm/tree/MY_dev) developement. 
+- More complex usage with `config/HWW2l2nu.py` and the application to [workflow](https://github.com/Ming-Yan/Hpluscharm/blob/master/workflows/hplusc_HWW2l2nu_process_test.py) from [HplusCharm](https://github.com/Ming-Yan/Hpluscharm/tree/master) developement. 
 See details in [Advance Usage](#advanced-usages)
 ```
 python runner_wconfig.py --cfg config/HWW2l2nu.py
@@ -166,7 +174,7 @@ Use `filter(option)` to specify samples want to processed in the json files
 ```
 ##### Weights
 Nested dictionary with weights. Notice the `category` need to be specify if you use `bycategory` in the weight list
-Example in [weight_splitcat.py](https://github.com/cms-rwth/CoffeaRunner/blob/MY_dev/config/weight_splitcat.py)
+Example in [weight_splitcat.py](https://github.com/cms-rwth/CoffeaRunner/blob/master/config/weight_splitcat.py)
 
 - In case you have correction depends on category, i.e. different ID/objects used in the different cateogries, use `"bycategory":{$category_name:$weight_dict}`
 
