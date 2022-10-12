@@ -147,14 +147,14 @@ def get_main_parser():
     parser.add_argument(
         "--chunk",
         type=int,
-        default=50000000,
+        default=100000,
         metavar="N",
         help="Number of events per process chunk",
     )
     parser.add_argument(
         "--retries",
         type=int,
-        default=3,
+        default=10,
         metavar="N",
         help="Number of retries for coffea processor",
     )
@@ -272,7 +272,9 @@ if __name__ == "__main__":
         ]
         condor_extra = [
             f'cd {os.getcwd()}',
+            f'ls {os.getcwd()}',
             f'source {os.environ["HOME"]}/.bashrc',
+            f'source {os.getcwd()}/CondaSetup.sh',
             f'conda activate {os.environ["CONDA_PREFIX"]}',
         ]
 
@@ -358,8 +360,8 @@ if __name__ == "__main__":
                             max_workers=1,
                             provider=CondorProvider(
                                 nodes_per_block=1,
-                                init_blocks=args.workers,
-                                max_blocks=(args.workers) + 1,
+                                init_blocks=20,
+                                max_blocks=args.scaleout,
                                 worker_init="\n".join(env_extra + condor_extra),
                                 walltime="00:20:00",
                             ),
