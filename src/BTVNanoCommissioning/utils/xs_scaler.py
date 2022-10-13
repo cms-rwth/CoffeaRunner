@@ -39,6 +39,7 @@ def scaleSumW(accumulator, lumi, sumw, dyscale=1.0, xsfile="xsection.json"):
     for obj in xsection:
         xs_dict[obj["process_name"]] = float(obj["cross_section"])
     for sample, accu in accumulator.items():
+        print('sample=',sample, 'accu=',accu)
         scaled[sample] = {}
         for key, h_obj in accu.items():
             scaled[sample]["sumw"] = sumw[sample]
