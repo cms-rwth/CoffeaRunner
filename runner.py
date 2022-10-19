@@ -14,8 +14,8 @@ from BTVNanoCommissioning.workflows import workflows
 
 # This would crash if the ExampleWorkflow does not exist
 # from ExampleWorkflow.workflows import workflows
-# from VHcc.workflows import workflows
-from Hpluscharm.workflows import workflows
+from VHcc.workflows import workflows
+#from Hpluscharm.workflows import workflows
 # Should come up with a smarter way to import all worflows from subdirectories of ./src/
 
 def validate(file):
@@ -89,6 +89,7 @@ def get_main_parser():
             "parsl/slurm",
             "parsl/condor",
             "parsl/condor/naf_lite",
+            "parsl/condor/naf_lite_merges",
             "dask/condor",
             "dask/slurm",
             "dask/lpc",
@@ -101,6 +102,7 @@ def get_main_parser():
         "- `parsl/slurm` - tested at DESY/Maxwell"
         "- `parsl/condor` - tested at DESY, RWTH"
         "- `parsl/condor/naf_lite` - tested at DESY"
+        "- `parsl/condor/naf_lite_merges` - tested at DESY"
         "- `dask/slurm` - tested at DESY/Maxwell"
         "- `dask/condor` - tested at DESY, RWTH"
         "- `dask/lpc` - custom lpc/condor setup (due to write access restrictions)"
@@ -110,7 +112,7 @@ def get_main_parser():
         "-j",
         "--workers",
         type=int,
-        default=6,
+        default=20,
         help="Number of workers (cores/threads) to use for multi-worker executors "
         "(e.g. futures or condor) (default: %(default)s)",
     )
@@ -134,7 +136,7 @@ def get_main_parser():
         action="store_true",
         help="Do not process, just check all files are accessible",
     )
-    parser.add_argument("--skipbadfiles", action="store_true", help="Skip bad files.")
+    parser.add_argument("--skipbadfiles", default=True, action="store_true", help="Skip bad files.")
     parser.add_argument(
         "--only", type=str, default=None, help="Only process specific dataset or file"
     )
@@ -148,14 +150,14 @@ def get_main_parser():
     parser.add_argument(
         "--chunk",
         type=int,
-        default=50000000,
+        default=1000000,#50000000,#500000
         metavar="N",
         help="Number of events per process chunk",
     )
     parser.add_argument(
         "--retries",
         type=int,
-        default=3,
+        default=50,
         metavar="N",
         help="Number of retries for coffea processor",
     )
@@ -166,7 +168,7 @@ def get_main_parser():
         metavar="N",
         help="Max number of chunks to run in total",
     )
-    parser.add_argument('--export_array', action='store_true',default=False, help='stored selected events to np.arrays')
+    parser.add_argument('--export_array', action='store_true',default=None, help='stored selected events to np.arrays')
     return parser
 
 
@@ -246,7 +248,8 @@ if __name__ == "__main__":
 
     # load workflow
     processor_instance = workflows[args.workflow](args.year, args.campaign)
-    if args.export_array is not None:processor_instance = workflows[args.workflow](year=args.year,campaign=args.campaign,export_array=args.export_array)
+    if args.export_array is not None:
+        processor_instance = workflows[args.workflow](year=args.year,campaign=args.campaign,export_array=args.export_array)
     # AS: not all workflows will have these two parameter, so probably
     #     we want to avoid always calling it like that in the future
 
@@ -337,7 +340,8 @@ if __name__ == "__main__":
                 retries=args.retries,
             )
         elif "condor" in args.executor:
-            if "naf_lite" in args.executor:
+            if "naf_lite" in args.executor and "_merges" not in args.executor:
+                print('naf_lite')
                 htex_config = Config(
                     executors=[
                         HighThroughputExecutor(
@@ -353,7 +357,7 @@ if __name__ == "__main__":
                                 init_blocks=args.scaleout,
                                 max_blocks=(args.scaleout)+2,
                                 worker_init="\n".join(env_extra + condor_extra),
-                                walltime="00:03:00", # lite / short queue requirement
+                                walltime="03:00:00", # lite / short queue requirement
                             ),
                         )
                     ],
@@ -361,41 +365,100 @@ if __name__ == "__main__":
                     retry_handler=retry_handler,
                 )
             else:
-                htex_config = Config(
-                    executors=[
-                        HighThroughputExecutor(
-                            label="coffea_parsl_condor",
-                            address=address_by_query(),
-                            max_workers=1,
-                            provider=CondorProvider(
-                                nodes_per_block=1,
-                                init_blocks=args.workers,
-                                max_blocks=(args.workers) + 1,
-                                worker_init="\n".join(env_extra + condor_extra),
-                                walltime="00:20:00",
+                if "naf_lite_merges" in args.executor:
+                    print('naf_lite_merges')
+                    htex_config = Config(
+                        executors=[
+                            HighThroughputExecutor(
+                                label='merges',
+                                address=address_by_query(),
+                                max_workers=1,
+                                worker_debug=True,
+
+                                provider=CondorProvider(
+                                    nodes_per_block=1,
+                                    cores_per_slot=args.workers,
+                                    mem_per_slot = 30, # though not anymore in opportunistic partition                            
+                                    init_blocks=min(4,int(args.scaleout / 2)),
+                                    max_blocks=(min(4,int(args.scaleout / 2)))+2,     
+                                    worker_init="\n".join(env_extra + condor_extra),
+                                    walltime="03:00:00", # lite / short queue requirement
+                                ),
                             ),
-                        )
-                    ],
-                    retries=args.retries,
-                )
+                            HighThroughputExecutor(
+                                label='jobs',
+                                address=address_by_query(),
+                                max_workers=1,
+                                worker_debug=True,
+
+                                provider=CondorProvider(
+                                    nodes_per_block=1,
+                                    cores_per_slot=args.workers,
+                                    mem_per_slot = 2, # lite job / opportunistic can only use this much                
+                                    init_blocks=args.scaleout,
+                                    max_blocks=(args.scaleout)+2, 
+                                    worker_init="\n".join(env_extra + condor_extra),
+                                    walltime="03:00:00", # lite / short queue requirement
+                                ),
+                            )
+                        ],
+                        retries=20,
+                        retry_handler=retry_handler,
+                    )
+                else:
+                    htex_config = Config(
+                        executors=[
+                            HighThroughputExecutor(
+                                label="coffea_parsl_condor",
+                                address=address_by_query(),
+                                max_workers=1,
+                                provider=CondorProvider(
+                                    nodes_per_block=1,
+                                    init_blocks=args.workers,
+                                    max_blocks=(args.workers) + 1,
+                                    worker_init="\n".join(env_extra + condor_extra),
+                                    walltime="00:20:00",
+                                ),
+                            )
+                        ],
+                        retries=args.retries,
+                    )
         else:
             raise NotImplementedError
 
         dfk = parsl.load(htex_config)
-
-        output = processor.run_uproot_job(
-            sample_dict,
-            treename="Events",
-            processor_instance=processor_instance,
-            executor=processor.parsl_executor,
-            executor_args={
-                "skipbadfiles": args.skipbadfiles,
-                "schema": processor.NanoAODSchema,
-                "config": None,
-            },
-            chunksize=args.chunk,
-            maxchunks=args.max,
-        )
+        if "naf_lite_merges" in args.executor:
+            output = processor.run_uproot_job(
+                sample_dict,
+                treename="Events",
+                processor_instance=processor_instance,
+                executor=processor.parsl_executor,
+                executor_args={
+                    "skipbadfiles": args.skipbadfiles,
+                    "schema": processor.NanoAODSchema,
+                    "config": None,
+                    "merging": True,
+                    "merges_executors": ["merges"],
+                    "jobs_executors": ["jobs"],
+                },
+                chunksize=args.chunk,
+                maxchunks=args.max,
+            )
+        else:
+            output = processor.run_uproot_job(
+                sample_dict,
+                treename="Events",
+                processor_instance=processor_instance,
+                executor=processor.parsl_executor,
+                executor_args={
+                    "skipbadfiles": args.skipbadfiles,
+                    "schema": processor.NanoAODSchema,
+                    "config": None,
+                },
+                chunksize=args.chunk,
+                maxchunks=args.max,
+            )
+            
 
     elif "dask" in args.executor:
         from dask_jobqueue import SLURMCluster, HTCondorCluster
