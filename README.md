@@ -35,8 +35,8 @@ conda activate CoffeaRunner
 ```
 
 Install manually for the required packages:
-```bash
-pip install coffea==0.7.14
+```
+pip install coffea
 conda install -c conda-forge xrootd
 conda install -c conda-forge ca-certificates
 conda install -c conda-forge ca-policy-lcg
@@ -44,10 +44,14 @@ conda install -c conda-forge dask-jobqueue
 conda install -c anaconda bokeh 
 conda install -c conda-forge 'fsspec>=0.3.3'
 conda install dask
-pip install black==22.3.0 # use to format code
+conda install -c conda-forge parsl
 ```
 
-Or install via `test_env.yml`
+You could simply create the environment through the existing `test_env.yml` under your conda environment
+```
+conda env create -f test_env.yml 
+```
+
 
 create new environment with python 3.7, e.g. environment of name `CoffeaRunner`
 
@@ -106,6 +110,8 @@ python fetch.py --input ${input_DAS_list} --output ${output_json_name} --site ${
 ```
 
 ### Create compiled corretions file(`pkl.gz`)
+
+:exclamation: In case existing correction file doesn't work for you due to the incompatibility of `cloudpickle` in different python versions. Please recompile the file to get new pickle file.
 
 Compile correction pickle files for a specific JEC campaign by changing the dict of jet_factory, and define the MC campaign and the output file name by passing it as arguments to the python script:
 
