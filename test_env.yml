@@ -1,4 +1,4 @@
-name: btv_coffea
+name: CoffeaRunner
 channels:
   - conda-forge
   - defaults
@@ -10,4 +10,11 @@ dependencies:
   - xrootd
   - openssl
   - fsspec[version='>=0.3.3']
-
+  - psutil
+  - dask
+  - parsl
+  - arrow
+  - dask-jobqueue
+  - pip
+  - pip: 
+    - coffea

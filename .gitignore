@@ -1,6 +1,6 @@
 *.coffea
 *.pyc
-*.py~
+*.*~
 .ipynb_checkpoints/
 \#*
 plotting/plot/
@@ -10,6 +10,7 @@ __pycache__
 src/Hpluscharm/
 workflows/__pycache__/
 .vscode/
+runinfo/
 dask-report.html
 dask-worker-space/
 .job_wrapper_failure
