@@ -7,11 +7,12 @@ Generalized framework columnar-based analysis with [coffea](https://coffeateam.g
 
 ## Requirements
 
-### Setup for python=3.7
+### Setup 
 
 :heavy_exclamation_mark: Install under `bash` environment
 
 Clone repository from git
+
 ```bash
 # only first time 
 git clone git@github.com:cms-rwth/CoffeaRunner.git
@@ -25,17 +26,20 @@ bash Miniconda3-latest-Linux-x86_64.sh
 ```
 NOTE: always make sure that conda, python, and pip point to local Miniconda installation (`which conda` etc.).
 
-You can either use the default environment `base` or create a new one:
+You could simply create the environment through the existing `test_env.yml` under your conda environment
+
+```
+conda env create -f test_env.yml 
+```
+
+Or you can either use the default environment `base` or create a new one:
 
 ```bash
-# create new environment with python 3.7, e.g. environment of name `CoffeaRunner`
-conda create --name CoffeaRunner python=3.7
+# create new environment with name `CoffeaRunner`
+conda create --name CoffeaRunner
 # activate environment `CoffeaRunner`
 conda activate CoffeaRunner
-```
-
-Install manually for the required packages:
-```
+#Install manually for the required packages:
 pip install coffea
 conda install -c conda-forge xrootd
 conda install -c conda-forge ca-certificates
@@ -47,45 +51,12 @@ conda install dask
 conda install -c conda-forge parsl
 ```
 
-You could simply create the environment through the existing `test_env.yml` under your conda environment
-```
-conda env create -f test_env.yml 
-```
-
-
-create new environment with python 3.7, e.g. environment of name `CoffeaRunner`
-
-`conda create --name CoffeaRunner python=3.7`
-
 Once the environment is set up, compile the python package:
 ```
 pip install -e .
 ```
 
-#### Other installation options for coffea
-See https://coffeateam.github.io/coffea/installation.html
 
-#### Running jupyter remotely
-See also https://hackmd.io/GkiNxag0TUmHnnCiqdND1Q#Remote-jupyter
-
-1. On your local machine, edit `.ssh/config`:
-```
-Host lxplus*
-  HostName lxplus7.cern.ch
-  User <your-user-name>
-  ForwardX11 yes
-  ForwardAgent yes
-  ForwardX11Trusted yes
-Host *_f
-  LocalForward localhost:8800 localhost:8800
-  ExitOnForwardFailure yes
-```
-2. Connect to remote with `ssh lxplus_f`
-3. Start a jupyter notebook:
-```
-jupyter notebook --ip=127.0.0.1 --port 8800 --no-browser
-```
-4. URL for notebook will be printed, copy and open in local browser
 
 
 
@@ -93,7 +64,7 @@ jupyter notebook --ip=127.0.0.1 --port 8800 --no-browser
 
 The development of the code is driven by user-friendliness, reproducibility and efficiency.
 
-## How to run
+## How to run 
 setup enviroment first
 ```bash
 # activate enviroement
@@ -101,7 +72,7 @@ conda activate CoffeaRunner
 # setup proxy
 voms-proxy-init --voms cms --vomses ~/.grid-security/vomses 
 ```
-### Make the dataset json files
+### Make the dataset json files (Optional)
 
 Use the `fetch.py` in `filefetcher`, the `$input_DAS_list` is the info extract from DAS, and output json files in `metadata/`. Default site is `prod/global`, use `prod/phys03` for personal productions.
 
@@ -109,7 +80,7 @@ Use the `fetch.py` in `filefetcher`, the `$input_DAS_list` is the info extract f
 python fetch.py --input ${input_DAS_list} --output ${output_json_name} --site ${site}
 ```
 
-### Create compiled corretions file(`pkl.gz`)
+### Create compiled corretions file, like JERC (Optional)
 
 :exclamation: In case existing correction file doesn't work for you due to the incompatibility of `cloudpickle` in different python versions. Please recompile the file to get new pickle file.
 
@@ -179,7 +150,17 @@ Use `filter(option)` to specify samples want to processed in the json files
     },
 ```
 ##### Weights
-Nested dictionary with weights. Notice the `category` need to be specify if you use `bycategory` in the weight list
+All the `lumiMask`, correction files (SFs, pileup weight), and JEC, JER files are under  `BTVNanoCommissioning/src/data/` following the substructure `${type}/${campaign}/${files}`(except `lumiMasks` and `Prescales`)
+
+| Type        | File type |  Comments|
+| :---:   | :---: | :---: | 
+| `lumiMasks` |`.json` | Masked good lumi-section used for physics analysis|
+| `Prescales` | `.txt` | HLT paths for prescaled triggers|
+| `PU`  | `.pkl.gz` or `.histo.root` | Pileup reweight files, matched MC to data| 
+| `LSF` | `.histo.root` | Lepton ID/Iso/Reco/Trigger SFs|
+| `BTV` | `.csv` or `.root` | b-tagger, c-tagger SFs|
+| `JME` | `.txt` | JER, JEC files|
+
 Example in [weight_splitcat.py](https://github.com/cms-rwth/CoffeaRunner/blob/master/config/weight_splitcat.py)
 
 - In case you have correction depends on category, i.e. different ID/objects used in the different cateogries, use `"bycategory":{$category_name:$weight_dict}`
@@ -190,6 +171,7 @@ Example in [weight_splitcat.py](https://github.com/cms-rwth/CoffeaRunner/blob/ma
 "weights":{
         "common":{
             "inclusive":{
+                "lumiMasks":"Cert_294927-306462_13TeV_UL2017_Collisions17_GoldenJSON.txt",
                 "PU": "puweight_UL17.histo.root",
                 "JME": "mc_compile_jec.pkl.gz",
                 "BTV": {
@@ -315,43 +297,81 @@ Alternatively the process can be monitored **live** during execution by doing:
 memray run --live  runner.py --cfg config/example.py
 ```
 ### :construction:  Plotting code (not generalize...)
+- data/MC comparisons
+:exclamation_mark: If using wildcard for input, do not forget the quoatation marks! (see 2nd example below)
 
+You can specify `-v all` to plot all the variables in the `coffea` file, or use wildcard options (e.g. `-v "*DeepJet*"` for the input variables containing `DeepJet`)
 
-
-- data/MC comparison code from BTV:
-Prodcuce data/MC comparisons
 ```
-python plotdataMC.py -i a.coffea,b.coffea --lumi 41900 -p dilep_sf -d zmass,z_pt
+python plotdataMC.py -i a.coffea,b.coffea --lumi 41500 -p dilep_sf -v z_mass,z_pt
+python plotdataMC.py -i "test*.coffea" --lumi 41500 -p dilep_sf -v z_mass,z_pt
 
-optional arguments:
+options:
+  -h, --help            show this help message and exit
   --lumi LUMI           luminosity in /pb
+  --com COM             sqrt(s) in TeV
   -p {dilep_sf,ttsemilep_sf,ctag_Wc_sf,ctag_DY_sf,ctag_ttsemilep_sf,ctag_ttdilep_sf}, --phase {dilep_sf,ttsemilep_sf,ctag_Wc_sf,ctag_DY_sf,ctag_ttsemilep_sf,ctag_ttdilep_sf}
-                        which workflows
-  --log LOG             log on x axis
+                        which phase space
+  --log LOG             log on y axis
   --norm NORM           Use for reshape SF, scale to same yield as no SFs case
-  -d DISCR_LIST, --discr_list DISCR_LIST
-                        discriminators
+  -v VARIABLE, --variable VARIABLE
+                        variables to plot, splitted by ,. Wildcard option * available as well. Specifying `all` will run through all variables.
   --SF                  make w/, w/o SF comparisons
-  --ext EXT             prefix output file
+  --ext EXT             prefix name
   -i INPUT, --input INPUT
-                        input coffea files (str), splitted different files with ,
+                        input coffea files (str), splitted different files with ','. Wildcard option * available as well.
+   --autorebin AUTOREBIN
+                        Rebin the plotting variables by merging N bins in case the current binning is too fine for you 
 ```
-- data/data, MC/MC comparison from BTV
-```
-python comparison.py -i a.coffea,b.coffea -p dilep_sf -d zmass,z_pt
+- data/data, MC/MC comparisons
 
-python -m plotting.comparison --phase ctag_ttdilep_sf --output ctag_ttdilep_sf -r 2017_runB -c 2017_runC,2017_runD -d zmass, z_pt (--sepflav True/False)
-optional arguments:
+You can specify `-v all` to plot all the variables in the `coffea` file, or use wildcard options (e.g. `-v "*DeepJet*"` for the input variables containing `DeepJet`)
+:exclamation_mark: If using wildcard for input, do not forget the quoatation marks! (see 2nd example below)
+
+```
+python comparison.py -i a.coffea,b.coffea -p ttsemilep_sf -r SingleMuon_Run2017B-106X_PFNanov1 -c DYJetsToLL_M-50_TuneCP5_13TeV-madgraphMLM-pythia8 -v DeepJet_Cpfcan_BtagPf_trackJetDistVal_0 --shortref Run2017B --shortcomp DYJets (--sepflav True/False)
+python comparison.py -i "test*.coffea" -p ttsemilep_sf -r SingleMuon_Run2017B-106X_PFNanov1 -c DYJetsToLL_M-50_TuneCP5_13TeV-madgraphMLM-pythia8 -v DeepJet_Cpfcan_BtagPf_trackJetDistVal_0 --shortref Run2017B --shortcomp DYJets (--sepflav True/False)
+
+options:
+  -h, --help            show this help message and exit
   -p {dilep_sf,ttsemilep_sf,ctag_Wc_sf,ctag_DY_sf,ctag_ttsemilep_sf,ctag_ttdilep_sf}, --phase {dilep_sf,ttsemilep_sf,ctag_Wc_sf,ctag_DY_sf,ctag_ttsemilep_sf,ctag_ttdilep_sf}
                         which phase space
   -i INPUT, --input INPUT
-                        files set
+                        input coffea files (str), splitted different files with ','. Wildcard option * available as well.
   -r REF, --ref REF     referance dataset
   -c COMPARED, --compared COMPARED
-                        compared dataset
-  --sepflav SEPFLAV     seperate flavour
-  --log                 log on x axis
-  -d DISCR_LIST [DISCR_LIST ...], --discr_list DISCR_LIST [DISCR_LIST ...]
-                        discriminators
+                        compared datasets, splitted by ,
+  --sepflav SEPFLAV     seperate flavour(b/c/light)
+  --log                 log on y axis
+  -v VARIABLE, --variable VARIABLE
+                        variables to plot, splitted by ,. Wildcard option * available as well. Specifying `all` will run through all variables.
   --ext EXT             prefix name
+  --com COM             sqrt(s) in TeV
+  --shortref SHORTREF   short name for reference dataset for legend
+  --shortcomp SHORTCOMP
+                        short names for compared datasets for legend, split by ','
+   --autorebin AUTOREBIN
+                        Rebin the plotting variables by merging N bins in case the current binning is too fine for you 
 ```
+
+#### Running jupyter remotely
+See also https://hackmd.io/GkiNxag0TUmHnnCiqdND1Q#Remote-jupyter
+
+1. On your local machine, edit `.ssh/config`:
+```
+Host lxplus*
+  HostName lxplus7.cern.ch
+  User <your-user-name>
+  ForwardX11 yes
+  ForwardAgent yes
+  ForwardX11Trusted yes
+Host *_f
+  LocalForward localhost:8800 localhost:8800
+  ExitOnForwardFailure yes
+```
+2. Connect to remote with `ssh lxplus_f`
+3. Start a jupyter notebook:
+```
+jupyter notebook --ip=127.0.0.1 --port 8800 --no-browser
+```
+4. URL for notebook will be printed, copy and open in local browser
