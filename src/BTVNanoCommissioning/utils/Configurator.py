@@ -11,7 +11,7 @@ import inspect
 class Configurator:
     def __init__(self, cfg, overwrite_output_dir=None, plot=False, plot_version=None):
         # Load config file and attributes
-        ## MY: --- not use in CoffeaRunner framework!
+        ## MY: plot not use in CoffeaRunner framework!
         # self.plot = plot
         # self.plot_version = plot_version
 
@@ -265,7 +265,7 @@ class Configurator:
                         : self.run_options["limit"]
                     ]
                 else:
-                    raise NotImplemented
+                    raise NotImplementedError
 
     def define_output(self):
         self.outfile = os.path.join(self.output, "output.coffea")

@@ -13,10 +13,11 @@ from coffea import processor
 from BTVNanoCommissioning.workflows import workflows
 
 # This would crash if the ExampleWorkflow does not exist
+from ExampleWorkflow.workflows import workflows
+from ZplusJets.workflows import workflows
 # from ExampleWorkflow.workflows import workflows
 # from VHcc.workflows import workflows
-
-from Hpluscharm.workflows import workflows
+# from Hpluscharm.workflows import workflows
 
 # Should come up with a smarter way to import all worflows from subdirectories of ./src/
 
@@ -153,14 +154,14 @@ def get_main_parser():
     parser.add_argument(
         "--chunk",
         type=int,
-        default=50000000,
+        default=100000,
         metavar="N",
         help="Number of events per process chunk",
     )
     parser.add_argument(
         "--retries",
         type=int,
-        default=3,
+        default=10,
         metavar="N",
         help="Number of retries for coffea processor",
     )
@@ -305,8 +306,11 @@ if __name__ == "__main__":
             f"export PYTHONPATH=$PYTHONPATH:{os.getcwd()}",
         ]
         condor_extra = [
-            f"cd {os.getcwd()}",
+            f'cd {os.getcwd()}',
+            f'ls {os.getcwd()}',
+
             f'source {os.environ["HOME"]}/.bashrc',
+            f'source {os.getcwd()}/CondaSetup.sh',
             f'conda activate {os.environ["CONDA_PREFIX"]}',
         ]
 

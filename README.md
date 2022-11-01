@@ -114,15 +114,16 @@ The config file in `.py` format is passed as the argument `--cfg` of the `runner
 
 | Parameter name    | Allowed values               | Description
 | :-----:           | :---:                        | :------------------------------------------
-| `json`            | string (required)            | Path of .json file to create with NanoAOD files (can load multiple files)
-| `workflow`        | workflows (required)         | Workflow to run
-| `output`          | string  (required)           | Path of output folder
-| `executor`        | string (required)            | See [executor](#executors) below 
-| `workers`         | int                          | Number of parallel threads (with futures)
-| `scaleout`        | int                          | Number of jobs to submit (with parsl/slurm)
+| `json`  (required)             | string          | Path of .json file to create with NanoAOD files (can load multiple files)
+| `workflow` (required)          | workflows         | Workflow to run
+| `output`  (required)          | string            | Path of output folder
+| `executor`   (required)           | string       | See [executor](#executors) below 
+| `workers`         | int                          | Number of parallel threads (with `futures` and clusters without fixed workers)
+| `scaleout`        | int                          | Number of jobs to submit, use for cluster
 | `chunk`           | int                          | Chunk size
 | `max`             | int                          | Maximum number of chunks to process
 | `skipbadfiles`    | bool                         | Skip bad files
+| `splitjobs`       | bool                         | Split runner and accumulator to separate jobs to avoid local memory consumption to large
 | `voms`            | string                       | Voms parameters (with condor)
 | `limit`           | int                          | Maximum number of files per sample to process
 | `preselections`   | list                         | List of preselection cuts
@@ -138,6 +139,7 @@ Use `filter` to exclude/include specific sample, if there's no `filter` then wou
 #### Advanced usages
 ##### filter
 Use `filter(option)` to specify samples want to processed in the json files
+
 ```
 "dataset" : {
         "jsons": ["src/Hpluscharm/input_json/higgs_UL17.json"],
@@ -149,6 +151,7 @@ Use `filter(option)` to specify samples want to processed in the json files
         }
     },
 ```
+
 ##### Weights
 All the `lumiMask`, correction files (SFs, pileup weight), and JEC, JER files are under  `BTVNanoCommissioning/src/data/` following the substructure `${type}/${campaign}/${files}`(except `lumiMasks` and `Prescales`)
 
@@ -214,6 +217,7 @@ Example in [weight_splitcat.py](https://github.com/cms-rwth/CoffeaRunner/blob/ma
 
 ##### User config (example from Hpluscharm)
 Write your own configurations used in your analysis
+
 ```
 "userconfig":{
     "systematics": 
@@ -228,6 +232,7 @@ Write your own configurations used in your analysis
     }
     }
 ```
+
 #### Executors
 Scale out can be notoriously tricky between different sites. Coffea's integration of `slurm` and `dask`
 makes this quite a bit easier and for some sites the ``native'' implementation is sufficient, e.g Condor@DESY.
@@ -296,65 +301,126 @@ Alternatively the process can be monitored **live** during execution by doing:
 ```
 memray run --live  runner.py --cfg config/example.py
 ```
-### :construction:  Plotting code (not generalize...)
-- data/MC comparisons
-:exclamation_mark: If using wildcard for input, do not forget the quoatation marks! (see 2nd example below)
+###  Plotting code 
 
-You can specify `-v all` to plot all the variables in the `coffea` file, or use wildcard options (e.g. `-v "*DeepJet*"` for the input variables containing `DeepJet`)
+:construction: Error band still needed
 
-```
-python plotdataMC.py -i a.coffea,b.coffea --lumi 41500 -p dilep_sf -v z_mass,z_pt
-python plotdataMC.py -i "test*.coffea" --lumi 41500 -p dilep_sf -v z_mass,z_pt
+Produce data/MC comparison, shape comparison plots from `.coffea` files, load configuration (`yaml`) files, brief [intro](https://docs.fileformat.com/programming/yaml/) of yaml.
 
-options:
-  -h, --help            show this help message and exit
-  --lumi LUMI           luminosity in /pb
-  --com COM             sqrt(s) in TeV
-  -p {dilep_sf,ttsemilep_sf,ctag_Wc_sf,ctag_DY_sf,ctag_ttsemilep_sf,ctag_ttdilep_sf}, --phase {dilep_sf,ttsemilep_sf,ctag_Wc_sf,ctag_DY_sf,ctag_ttsemilep_sf,ctag_ttdilep_sf}
-                        which phase space
-  --log LOG             log on y axis
-  --norm NORM           Use for reshape SF, scale to same yield as no SFs case
-  -v VARIABLE, --variable VARIABLE
-                        variables to plot, splitted by ,. Wildcard option * available as well. Specifying `all` will run through all variables.
-  --SF                  make w/, w/o SF comparisons
-  --ext EXT             prefix name
-  -i INPUT, --input INPUT
-                        input coffea files (str), splitted different files with ','. Wildcard option * available as well.
-   --autorebin AUTOREBIN
-                        Rebin the plotting variables by merging N bins in case the current binning is too fine for you 
-```
-- data/data, MC/MC comparisons
+Details of yaml file format would summarized in table below. Information used in data/MC script would marked with (:large_blue_circle:) and comparsion script with (:red_circle:). The **required** info are marked as bold style. 
 
-You can specify `-v all` to plot all the variables in the `coffea` file, or use wildcard options (e.g. `-v "*DeepJet*"` for the input variables containing `DeepJet`)
-:exclamation_mark: If using wildcard for input, do not forget the quoatation marks! (see 2nd example below)
+You can find test file set(`.coffea` and `.yaml`) in `testfile/`. Specify `--debug` to get more info for yaml format.
 
 ```
-python comparison.py -i a.coffea,b.coffea -p ttsemilep_sf -r SingleMuon_Run2017B-106X_PFNanov1 -c DYJetsToLL_M-50_TuneCP5_13TeV-madgraphMLM-pythia8 -v DeepJet_Cpfcan_BtagPf_trackJetDistVal_0 --shortref Run2017B --shortcomp DYJets (--sepflav True/False)
-python comparison.py -i "test*.coffea" -p ttsemilep_sf -r SingleMuon_Run2017B-106X_PFNanov1 -c DYJetsToLL_M-50_TuneCP5_13TeV-madgraphMLM-pythia8 -v DeepJet_Cpfcan_BtagPf_trackJetDistVal_0 --shortref Run2017B --shortcomp DYJets (--sepflav True/False)
-
-options:
-  -h, --help            show this help message and exit
-  -p {dilep_sf,ttsemilep_sf,ctag_Wc_sf,ctag_DY_sf,ctag_ttsemilep_sf,ctag_ttdilep_sf}, --phase {dilep_sf,ttsemilep_sf,ctag_Wc_sf,ctag_DY_sf,ctag_ttsemilep_sf,ctag_ttdilep_sf}
-                        which phase space
-  -i INPUT, --input INPUT
-                        input coffea files (str), splitted different files with ','. Wildcard option * available as well.
-  -r REF, --ref REF     referance dataset
-  -c COMPARED, --compared COMPARED
-                        compared datasets, splitted by ,
-  --sepflav SEPFLAV     seperate flavour(b/c/light)
-  --log                 log on y axis
-  -v VARIABLE, --variable VARIABLE
-                        variables to plot, splitted by ,. Wildcard option * available as well. Specifying `all` will run through all variables.
-  --ext EXT             prefix name
-  --com COM             sqrt(s) in TeV
-  --shortref SHORTREF   short name for reference dataset for legend
-  --shortcomp SHORTCOMP
-                        short names for compared datasets for legend, split by ','
-   --autorebin AUTOREBIN
-                        Rebin the plotting variables by merging N bins in case the current binning is too fine for you 
+python plotting/plotdataMC.py --cfg testfile/btv_datamc.yml (--debug)
+python plotting/comparison.py --cfg testfile/btv_compare.yml (--debug)
 ```
 
-#### Running jupyter remotely
+
+| Parameter name        | Allowed values               | Description
+| :-----:               | :---:                        | :-----------------------------
+| **input**(Required):large_blue_circle::red_circle:| `list` or `str` <br>(wildcard options `*` accepted)|   input `.coffea` files| 
+| **output** (Required):large_blue_circle::red_circle:| `str` | output directory of plots with date| 
+| **mergemap**:large_blue_circle:/ **reference** & **compare**:red_circle: | `dict`(Required) | collect sample names, color, label setting for file set. details in [map diction](#dict-of-merge-maps-and-comparison-file-lists)|
+| **variable**(Required):large_blue_circle::red_circle: | `dict` | variables to plot, see [variables section](#variables)|
+|com:large_blue_circle::red_circle:| `str` | √s , default set to be 13TeV|
+|inbox_text:large_blue_circle::red_circle:| `str` | text put in `AnchoredText`|
+|log:large_blue_circle::red_circle:| `str` | log scale on y-axis |
+|disable_ratio:large_blue_circle:|`bool`| disable ratio panel for data/MC comparison plot|
+|scale:large_blue_circle:| `dict` | Scale up particular MC collections|
+|norm:red_circle:| `bool`| noramlized  yield to reference sample|
+
+#### `dict` of merge maps and comparison file lists
+
+- data/MC comparison `mergemap` :large_blue_circle:
+
+To avoid crowded legend in the plot, we would merge a set of files with similar properties. For example, pT binned DY+jets sample would merge into DY+jets, or diboson (VV) is a collection of WW, WZ and ZZ. 
+
+Create a `dict` for each collection under `mergemap`. You can specify the color and label name used in the plot
+
+```yaml
+mergemap:
+    DY: # key name of file collections
+        list: # collections of files(key of dataset name in coffea file)
+            - "DYJetsToLL_M-50_TuneCP5_13p6TeV-madgraphMLM-pythia8"
+            - "DYJetsToLL_M-10to50_TuneCP5_13p6TeV-madgraphMLM-pythia8"
+        label : "DYjet" #Optional, if not exist would take key name of the list. i.e. DY in this case
+        color : '#eb4034' #Optional, color use for this category. 
+    VV: 
+        list:
+            - "WW_TuneCP5_13p6TeV-pythia8" 
+            - "WZ_TuneCP5_13p6TeV-pythia8"
+            - "ZZ_TuneCP5_13p6TeV-pythia8"
+```
+
+- shape comparison plot `reference`, `compare` :red_circle:
+
+Make shape comparison or compare different versions of file. 
+
+Specify the configuration with `dict` under `reference`  and `compare`. `reference` only accept one entry. 
+
+```yaml
+## Required, reference dict
+reference: 
+    Muon_Run2022C-PromptReco-v1: 
+        label: RunC  #Optional, label name
+        color : 'b' #Optional
+        
+## Required, compare dict
+compare: 
+    # if not specify anything, leave empty value for key
+    Muon_Run2022D-PromptReco-v1: 
+    Muon_Run2022D-PromptReco-v2: 
+```
+
+#### Variables 
+
+Common definitions for both usage, use default settings if leave empty value for the keys. 
+:bangbang: `blind` option is only used in the data/MC comparison plots to blind particular observable like BDT score. 
+
+|Option| Default |
+|:-----: |:---:   |
+| `xlabel` | take name of `key` |
+| `axis` | `sum` over all the axes |
+| `rebin` | no rebinning |
+| `blind` | no blind region | 
+
+```yaml
+## specify variable to plot
+    btagDeepFlavB_0:
+        # Optional, set x label of variable
+        xlabel: "deepJet Prob(b)" 
+        # Optional, specify hist axis with dict
+        axis : 
+            syst: noSF # Optional, access bin
+            flav : sum # Optional, access bin, can convert sum to sum operation later
+        # Optional, rebin variable 
+        rebin :  
+            # Optional, you can specify the rebin axis with rebin value
+            # discr: 2
+            # or just put a number, would rebin distribution the last axis (usually the variable)
+            2
+        # Optional(only for data/MC), blind variables
+        blind : -10, #blind variable[-10:], if put -10,-5 would blind variable[-10:-5]
+        
+    ## specify variable, if not specify anything, leave empty value for key
+    btagDeepFlavC_0:
+
+    ## Accept wildcard option
+    # only axis and rebin can be specify here
+    btagDeepFlav* :
+        axis : 
+            syst: noSF
+            flav : sum
+        rebin :  
+            discr: 2
+    # Use "all" will produce plots for all the variables
+    # only rebin of last axis (variable-axis) can be specify here
+    all: 
+        rebin: 2
+``` 
+
+### Running jupyter remotely
 See also https://hackmd.io/GkiNxag0TUmHnnCiqdND1Q#Remote-jupyter
 
 1. On your local machine, edit `.ssh/config`:

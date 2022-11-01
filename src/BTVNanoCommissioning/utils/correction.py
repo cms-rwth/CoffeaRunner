@@ -13,7 +13,6 @@ from coffea.analysis_tools import Weights
 from coffea.lumi_tools import LumiMask
 from coffea.btag_tools import BTagScaleFactor
 from coffea.jetmet_tools import JECStack, CorrectedJetsFactory
-from coffea.lookup_tools import extractor
 
 
 def load_lumi(path):
