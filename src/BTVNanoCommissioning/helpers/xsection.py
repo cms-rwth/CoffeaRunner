@@ -958,6 +958,7 @@ xsection = [
         "MCM": "SMP-RunIIFall17MiniAODv2-00019",
         "equivalent_lumi": "",
         "fraction_negative_weight": "0.2771",
+    },
     {
         "id": "60d05b7b2946173d8008686f",
         "process_name": "DYJetsToLL_Pt-50To100_MatchEWPDG20_TuneCP5_13TeV-amcatnloFXFX-pythia8",

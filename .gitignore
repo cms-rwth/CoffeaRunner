@@ -1,9 +1,10 @@
 *.coffea
 *.pyc
 *.*~
+*.ipynb
 .ipynb_checkpoints/
 \#*
-
+configurator.pkl
 src/BTVNanoCommissioning/version.py
 src/BTVNanoCommissioning/workflows/
 src/BTVNanoCommissioning.egg-info/

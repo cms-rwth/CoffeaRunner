@@ -15,9 +15,6 @@ dependencies:
   - parsl
   - arrow
   - dask-jobqueue
-<<<<<<< HEAD
   - pip
   - pip: 
     - coffea
-=======
->>>>>>> 4b1c1774294ed6d213d675ef12117d6f0e1b3356

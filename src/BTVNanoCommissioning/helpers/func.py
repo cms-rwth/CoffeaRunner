@@ -307,6 +307,8 @@ def empty_column_accumulator():
 
 def defaultdict_accumulator():
     return processor.defaultdict_accumulator(empty_column_accumulator)
+
+
 def update(events, collections):
     """Return a shallow copy of events array with some collections swapped out"""
     out = events
