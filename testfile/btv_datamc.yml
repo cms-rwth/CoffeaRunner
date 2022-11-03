@@ -1,0 +1,93 @@
+lumi : 7655  # Required, lumimosity in /pb
+
+## Required, output directory
+output: "ctag_Wc_sf"   
+## Required, input files 
+
+input : 
+    # Use wildcard options
+    testfile/hists_*_Oct27.coffea   
+    # or put a list
+    # - testfile/hists_ctag_Wc_sf_DY_Oct27.coffea
+    # - testfile/hists_ctag_Wc_sf_st_Oct27.coffea
+    # - testfile/hists_ctag_Wc_sf_tt_Oct27.coffea
+    # - hists_ctag_Wc_sf_VV_Oct27.coffea
+    # - testfile/hists_ctag_Wc_sf_WJet_Oct27.coffea
+    # - testfile/hists_ctag_Wc_sf_runc1_Oct27.coffea
+    # - testfile/hists_ctag_Wc_sf_runc2_Oct27.coffea
+
+## Required, merge files or samples into collections
+mergemap :  
+    DY: # key name of file collections
+        list: # collections of files(key of dataset name in coffea file)
+            - "DYJetsToLL_M-50_TuneCP5_13p6TeV-madgraphMLM-pythia8"
+            - "DYJetsToLL_M-10to50_TuneCP5_13p6TeV-madgraphMLM-pythia8"
+        label : "DYjet" #Optional, if not exist would take key name of the list. i.e. DY in this case
+        color : '#eb4034' #Optional, color use for this category. 
+    ST: 
+        list :
+            - "TWminus_DR_AtLeastOneLepton_CP5_13p6TeV_powheg-pythia8"
+            - "TBbarQ_t-channel_4FS_CP5_13p6TeV_powheg-madspin-pythia8"
+            - "TbarWplus_DR_AtLeastOneLepton_CP5_13p6TeV_powheg-pythia8"
+            - "TbarBQ_t-channel_4FS_CP5_13p6TeV_powheg-madspin-pythia8"
+    TT: 
+        list :
+            - "TTTo2L2Nu_CP5_13p6TeV_powheg-pythia8"
+            - "TTTo2J1L1Nu_CP5_13p6TeV_powheg-pythia8"
+    WJet: 
+        list: "WJetsToLNu_TuneCP5_13p6TeV-madgraphMLM-pythia8"
+    VV: 
+        list:
+            - "WW_TuneCP5_13p6TeV-pythia8" 
+            - "WZ_TuneCP5_13p6TeV-pythia8"
+            - "ZZ_TuneCP5_13p6TeV-pythia8"
+    data: 
+        list : 
+            - "Muon_Run2022D-PromptReco-v1"
+            - "SingleMuon_Run2022C-PromptReco-v1"
+            - "Muon_Run2022C-PromptReco-v1"
+            - "Muon_Run2022D-PromptReco-v2"
+
+## Required, variable set
+variable :
+    ## specify variable to plot
+    btagDeepFlavB_0:
+        # Optional, set x label of variable
+        xlabel: "deepJet Prob(b)" 
+        # Optional, specify hist axis with dict
+        axis : 
+            syst: noSF # Optional, access bin
+            flav : sum # Optional, access bin, can convert sum to sum operation later
+        # Optional, rebin variable 
+        rebin :  
+            # Optional, you can specify the rebin axis with rebin value
+            # discr: 2
+            # or just put a number, would rebin distribution the last axis (usually the variable)
+            2
+        # Optional(only for data/MC), blind variables
+        blind : -10, #blind variable[-10:], if put -10,-5 would blind variable[-10:-5]
+        
+    ## specify variable, if not specify anything, leave empty value for key
+    btagDeepFlavC_0:
+
+    ## Accept wildcard option
+    # only axis and rebin can be specify here
+    btagDeepFlav* :
+        axis : 
+            syst: noSF
+            flav : sum
+        rebin :  
+            discr: 2
+    # Use "all" will produce plots for all the variables
+    # only rebin of last axis (variable-axis) can be specify here
+    all: 
+        rebin: 2
+    
+    
+## Optional, scale up particular set 
+scale : 
+    VV : 100.
+com : "13.6" # Optional, # √s = 13TeV
+inbox_text: "" #Optional, text write in anchor text box
+disable_ratio : False #Optional, disable ratio panel
+log : True #Optional, log y axis

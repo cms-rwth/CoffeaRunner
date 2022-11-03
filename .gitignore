@@ -1,16 +1,33 @@
 *.coffea
 *.pyc
 *.*~
+*.ipynb
 .ipynb_checkpoints/
 \#*
-plotting/plot/
+configurator.pkl
 src/BTVNanoCommissioning/version.py
+src/BTVNanoCommissioning/workflows/
 src/BTVNanoCommissioning.egg-info/
+## not track BTV stuff
+src/BTVNanoCommissioning/helpers/definitions.py
+src/BTVNanoCommissioning/utils/AK4_parameters.py
+src/BTVNanoCommissioning/utils/selection.py
+.github/workflows/ctag_DY_workflow.yml
+.github/workflows/ctag_Wc_workflow.yml
+.github/workflows/ttbar_SL_DL_workflow.yml
+.github/workflows/validation_workflow.yml
+metadata/*PF*
+metadata/*Comm*
+
 __pycache__
-src/Hpluscharm/
 workflows/__pycache__/
 .vscode/
 runinfo/
 dask-report.html
 dask-worker-space/
 .job_wrapper_failure
+plot/
+plotting/plot/
+
+## other submodules
+src/Hpluscharm/

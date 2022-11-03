@@ -187,18 +187,94 @@ if __name__ == "__main__":
                             init_blocks=config.run_options["scaleout"],
                             partition="all",
                             worker_init="\n".join(env_extra),
-                            walltime="00:120:00",
+                            walltime=config.run_options["walltime"],
                         ),
                     )
                 ],
                 retries=config.run_options["retries"],
             )
-        elif "condor" in config.run_options["executor"]:
-            if "naf_lite" in config.run_options["executor"]:
+            if config.run_options["splitjobs"]:
                 htex_config = Config(
                     executors=[
                         HighThroughputExecutor(
-                            label="coffea_parsl_condor",
+                            label="run",
+                            address=address_by_hostname(),
+                            prefetch_capacity=0,
+                            provider=SlurmProvider(
+                                channel=LocalChannel(script_dir="logs_parsl"),
+                                launcher=SrunLauncher(),
+                                max_blocks=(config.run_options["scaleout"]) + 10,
+                                init_blocks=config.run_options["scaleout"],
+                                partition="all",
+                                worker_init="\n".join(env_extra),
+                                walltime=config.run_options["walltime"],
+                            ),
+                        ),
+                        HighThroughputExecutor(
+                            label="merge",
+                            address=address_by_hostname(),
+                            prefetch_capacity=0,
+                            provider=SlurmProvider(
+                                channel=LocalChannel(script_dir="logs_parsl"),
+                                launcher=SrunLauncher(),
+                                max_blocks=(config.run_options["scaleout"]) + 10,
+                                init_blocks=config.run_options["scaleout"],
+                                partition="all",
+                                worker_init="\n".join(env_extra),
+                                walltime="00:30:00",
+                            ),
+                        ),
+                    ],
+                    retries=config.run_options["retries"],
+                    retry_handler=retry_handler,
+                )
+        elif "condor" in config.run_options["executor"]:
+            if "naf_lite" in config.run_options["executor"]:
+                config.run_options["mem_per_worker"] = 2
+                config.run_options["walltime"] = "03:00:00"
+            htex_config = Config(
+                executors=[
+                    HighThroughputExecutor(
+                        label="coffea_parsl_condor",
+                        address=address_by_query(),
+                        max_workers=1,
+                        worker_debug=True,
+                        provider=CondorProvider(
+                            nodes_per_block=1,
+                            cores_per_slot=config.run_options["workers"],
+                            mem_per_slot=config.run_options["mem_per_worker"],
+                            init_blocks=config.run_options["scaleout"],
+                            max_blocks=(config.run_options["scaleout"]) + 2,
+                            worker_init="\n".join(env_extra + condor_extra),
+                            walltime=config.run_options["walltime"],
+                        ),
+                    )
+                ],
+                retries=config.run_options["retries"],
+                retry_handler=retry_handler,
+            )
+            if config.run_options["splitjobs"]:
+                htex_config = Config(
+                    executors=[
+                        HighThroughputExecutor(
+                            label="run",
+                            address=address_by_query(),
+                            max_workers=1,
+                            worker_debug=True,
+                            provider=CondorProvider(
+                                nodes_per_block=1,
+                                cores_per_slot=config.run_options["workers"],
+                                mem_per_slot=config.run_options["mem_per_worker"],
+                                init_blocks=config.run_options["scaleout"],
+                                max_blocks=(config.run_options["scaleout"]) + 2,
+                                worker_init="\n".join(env_extra + condor_extra),
+                                walltime=config.run_options[
+                                    "walltime"
+                                ],  # lite / short queue requirement
+                            ),
+                        ),
+                        HighThroughputExecutor(
+                            label="merge",
                             address=address_by_query(),
                             max_workers=1,
                             worker_debug=True,
@@ -209,47 +285,39 @@ if __name__ == "__main__":
                                 init_blocks=config.run_options["scaleout"],
                                 max_blocks=(config.run_options["scaleout"]) + 2,
                                 worker_init="\n".join(env_extra + condor_extra),
-                                walltime="03:00:00",  # lite / short queue requirement
+                                walltime="00:30:00",  # lite / short queue requirement
                             ),
-                        )
+                        ),
                     ],
                     retries=config.run_options["retries"],
                     retry_handler=retry_handler,
                 )
-            else:
-                htex_config = Config(
-                    executors=[
-                        HighThroughputExecutor(
-                            label="coffea_parsl_condor",
-                            address=address_by_query(),
-                            max_workers=1,
-                            provider=CondorProvider(
-                                nodes_per_block=1,
-                                cores_per_slot=config.run_options["workers"],
-                                init_blocks=config.run_options["scaleout"],
-                                max_blocks=(config.run_options["scaleout"]) + 2,
-                                worker_init="\n".join(env_extra + condor_extra),
-                                walltime="00:60:00",
-                            ),
-                        )
-                    ],
-                    retries=config.run_options["retries"],
-                )
+
         else:
             raise NotImplementedError
 
         dfk = parsl.load(htex_config)
-
+        if not config.run_options["splitjobs"]:
+            executor_args_condor = {
+                "skipbadfiles": config.run_options["skipbadfiles"],
+                "schema": processor.NanoAODSchema,
+                "config": None,
+            }
+        else:
+            executor_args = {
+                "skipbadfiles": args.skipbadfiles,
+                "schema": processor.NanoAODSchema,
+                "merging": True,
+                "merges_executors": ["merge"],
+                "jobs_executors": ["run"],
+                "config": None,
+            }
         output = processor.run_uproot_job(
             config.fileset,
             treename="Events",
             processor_instance=config.processor_instance,
             executor=processor.parsl_executor,
-            executor_args={
-                "skipbadfiles": config.run_options["skipbadfiles"],
-                "schema": processor.NanoAODSchema,
-                "config": None,
-            },
+            executor_args=executor_args_condor,
             chunksize=config.run_options["chunk"],
             maxchunks=config.run_options["max"],
         )
@@ -301,16 +369,15 @@ if __name__ == "__main__":
                 queue="all",
                 cores=config.run_options["workers"],
                 processes=config.run_options["workers"],
-                memory="200 GB",
+                memory=config.run_options["mem_per_worker"],
                 retries=config.run_options["retries"],
-                walltime="00:30:00",
+                walltime=config.run_options["walltime"],
                 env_extra=env_extra,
             )
         elif "condor" in config.run_options["executor"]:
             cluster = HTCondorCluster(
                 cores=config.run_options["workers"],
-                memory="4GB",
-                disk="4GB",
+                memory=config.run_options["mem_per_worker"],
                 env_extra=env_extra,
             )
 

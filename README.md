@@ -7,11 +7,12 @@ Generalized framework columnar-based analysis with [coffea](https://coffeateam.g
 
 ## Requirements
 
-### Setup for python=3.7
+### Setup 
 
 :heavy_exclamation_mark: Install under `bash` environment
 
 Clone repository from git
+
 ```bash
 # only first time 
 git clone git@github.com:cms-rwth/CoffeaRunner.git
@@ -25,17 +26,20 @@ bash Miniconda3-latest-Linux-x86_64.sh
 ```
 NOTE: always make sure that conda, python, and pip point to local Miniconda installation (`which conda` etc.).
 
-You can either use the default environment `base` or create a new one:
+You could simply create the environment through the existing `test_env.yml` under your conda environment
+
+```
+conda env create -f test_env.yml 
+```
+
+Or you can either use the default environment `base` or create a new one:
 
 ```bash
-# create new environment with python 3.7, e.g. environment of name `CoffeaRunner`
-conda create --name CoffeaRunner python=3.7
+# create new environment with name `CoffeaRunner`
+conda create --name CoffeaRunner
 # activate environment `CoffeaRunner`
 conda activate CoffeaRunner
-```
-
-Install manually for the required packages:
-```
+#Install manually for the required packages:
 pip install coffea
 conda install -c conda-forge xrootd
 conda install -c conda-forge ca-certificates
@@ -47,45 +51,12 @@ conda install dask
 conda install -c conda-forge parsl
 ```
 
-You could simply create the environment through the existing `test_env.yml` under your conda environment
-```
-conda env create -f test_env.yml 
-```
-
-
-create new environment with python 3.7, e.g. environment of name `CoffeaRunner`
-
-`conda create --name CoffeaRunner python=3.7`
-
 Once the environment is set up, compile the python package:
 ```
 pip install -e .
 ```
 
-#### Other installation options for coffea
-See https://coffeateam.github.io/coffea/installation.html
 
-#### Running jupyter remotely
-See also https://hackmd.io/GkiNxag0TUmHnnCiqdND1Q#Remote-jupyter
-
-1. On your local machine, edit `.ssh/config`:
-```
-Host lxplus*
-  HostName lxplus7.cern.ch
-  User <your-user-name>
-  ForwardX11 yes
-  ForwardAgent yes
-  ForwardX11Trusted yes
-Host *_f
-  LocalForward localhost:8800 localhost:8800
-  ExitOnForwardFailure yes
-```
-2. Connect to remote with `ssh lxplus_f`
-3. Start a jupyter notebook:
-```
-jupyter notebook --ip=127.0.0.1 --port 8800 --no-browser
-```
-4. URL for notebook will be printed, copy and open in local browser
 
 
 
@@ -93,7 +64,7 @@ jupyter notebook --ip=127.0.0.1 --port 8800 --no-browser
 
 The development of the code is driven by user-friendliness, reproducibility and efficiency.
 
-## How to run
+## How to run 
 setup enviroment first
 ```bash
 # activate enviroement
@@ -101,7 +72,7 @@ conda activate CoffeaRunner
 # setup proxy
 voms-proxy-init --voms cms --vomses ~/.grid-security/vomses 
 ```
-### Make the dataset json files
+### Make the dataset json files (Optional)
 
 Use the `fetch.py` in `filefetcher`, the `$input_DAS_list` is the info extract from DAS, and output json files in `metadata/`. Default site is `prod/global`, use `prod/phys03` for personal productions.
 
@@ -109,7 +80,7 @@ Use the `fetch.py` in `filefetcher`, the `$input_DAS_list` is the info extract f
 python fetch.py --input ${input_DAS_list} --output ${output_json_name} --site ${site}
 ```
 
-### Create compiled corretions file(`pkl.gz`)
+### Create compiled corretions file, like JERC (Optional)
 
 :exclamation: In case existing correction file doesn't work for you due to the incompatibility of `cloudpickle` in different python versions. Please recompile the file to get new pickle file.
 
@@ -143,15 +114,16 @@ The config file in `.py` format is passed as the argument `--cfg` of the `runner
 
 | Parameter name    | Allowed values               | Description
 | :-----:           | :---:                        | :------------------------------------------
-| `json`            | string (required)            | Path of .json file to create with NanoAOD files (can load multiple files)
-| `workflow`        | workflows (required)         | Workflow to run
-| `output`          | string  (required)           | Path of output folder
-| `executor`        | string (required)            | See [executor](#executors) below 
-| `workers`         | int                          | Number of parallel threads (with futures)
-| `scaleout`        | int                          | Number of jobs to submit (with parsl/slurm)
+| `json`  (required)             | string          | Path of .json file to create with NanoAOD files (can load multiple files)
+| `workflow` (required)          | workflows         | Workflow to run
+| `output`  (required)          | string            | Path of output folder
+| `executor`   (required)           | string       | See [executor](#executors) below 
+| `workers`         | int                          | Number of parallel threads (with `futures` and clusters without fixed workers)
+| `scaleout`        | int                          | Number of jobs to submit, use for cluster
 | `chunk`           | int                          | Chunk size
 | `max`             | int                          | Maximum number of chunks to process
 | `skipbadfiles`    | bool                         | Skip bad files
+| `splitjobs`       | bool                         | Split runner and accumulator to separate jobs to avoid local memory consumption to large
 | `voms`            | string                       | Voms parameters (with condor)
 | `limit`           | int                          | Maximum number of files per sample to process
 | `preselections`   | list                         | List of preselection cuts
@@ -167,6 +139,7 @@ Use `filter` to exclude/include specific sample, if there's no `filter` then wou
 #### Advanced usages
 ##### filter
 Use `filter(option)` to specify samples want to processed in the json files
+
 ```
 "dataset" : {
         "jsons": ["src/Hpluscharm/input_json/higgs_UL17.json"],
@@ -178,8 +151,19 @@ Use `filter(option)` to specify samples want to processed in the json files
         }
     },
 ```
+
 ##### Weights
-Nested dictionary with weights. Notice the `category` need to be specify if you use `bycategory` in the weight list
+All the `lumiMask`, correction files (SFs, pileup weight), and JEC, JER files are under  `BTVNanoCommissioning/src/data/` following the substructure `${type}/${campaign}/${files}`(except `lumiMasks` and `Prescales`)
+
+| Type        | File type |  Comments|
+| :---:   | :---: | :---: | 
+| `lumiMasks` |`.json` | Masked good lumi-section used for physics analysis|
+| `Prescales` | `.txt` | HLT paths for prescaled triggers|
+| `PU`  | `.pkl.gz` or `.histo.root` | Pileup reweight files, matched MC to data| 
+| `LSF` | `.histo.root` | Lepton ID/Iso/Reco/Trigger SFs|
+| `BTV` | `.csv` or `.root` | b-tagger, c-tagger SFs|
+| `JME` | `.txt` | JER, JEC files|
+
 Example in [weight_splitcat.py](https://github.com/cms-rwth/CoffeaRunner/blob/master/config/weight_splitcat.py)
 
 - In case you have correction depends on category, i.e. different ID/objects used in the different cateogries, use `"bycategory":{$category_name:$weight_dict}`
@@ -190,6 +174,7 @@ Example in [weight_splitcat.py](https://github.com/cms-rwth/CoffeaRunner/blob/ma
 "weights":{
         "common":{
             "inclusive":{
+                "lumiMasks":"Cert_294927-306462_13TeV_UL2017_Collisions17_GoldenJSON.txt",
                 "PU": "puweight_UL17.histo.root",
                 "JME": "mc_compile_jec.pkl.gz",
                 "BTV": {
@@ -232,6 +217,7 @@ Example in [weight_splitcat.py](https://github.com/cms-rwth/CoffeaRunner/blob/ma
 
 ##### User config (example from Hpluscharm)
 Write your own configurations used in your analysis
+
 ```
 "userconfig":{
     "systematics": 
@@ -246,6 +232,7 @@ Write your own configurations used in your analysis
     }
     }
 ```
+
 #### Executors
 Scale out can be notoriously tricky between different sites. Coffea's integration of `slurm` and `dask`
 makes this quite a bit easier and for some sites the ``native'' implementation is sufficient, e.g Condor@DESY.
@@ -314,44 +301,143 @@ Alternatively the process can be monitored **live** during execution by doing:
 ```
 memray run --live  runner.py --cfg config/example.py
 ```
-### :construction:  Plotting code (not generalize...)
+###  Plotting code 
 
+:construction: Error band still needed
 
+Produce data/MC comparison, shape comparison plots from `.coffea` files, load configuration (`yaml`) files, brief [intro](https://docs.fileformat.com/programming/yaml/) of yaml.
 
-- data/MC comparison code from BTV:
-Prodcuce data/MC comparisons
+Details of yaml file format would summarized in table below. Information used in data/MC script would marked with (:large_blue_circle:) and comparsion script with (:red_circle:). The **required** info are marked as bold style. 
+
+You can find test file set(`.coffea` and `.yaml`) in `testfile/`. Specify `--debug` to get more info for yaml format.
+
 ```
-python plotdataMC.py -i a.coffea,b.coffea --lumi 41900 -p dilep_sf -d zmass,z_pt
+python plotting/plotdataMC.py --cfg testfile/btv_datamc.yml (--debug)
+python plotting/comparison.py --cfg testfile/btv_compare.yml (--debug)
+```
 
-optional arguments:
-  --lumi LUMI           luminosity in /pb
-  -p {dilep_sf,ttsemilep_sf,ctag_Wc_sf,ctag_DY_sf,ctag_ttsemilep_sf,ctag_ttdilep_sf}, --phase {dilep_sf,ttsemilep_sf,ctag_Wc_sf,ctag_DY_sf,ctag_ttsemilep_sf,ctag_ttdilep_sf}
-                        which workflows
-  --log LOG             log on x axis
-  --norm NORM           Use for reshape SF, scale to same yield as no SFs case
-  -d DISCR_LIST, --discr_list DISCR_LIST
-                        discriminators
-  --SF                  make w/, w/o SF comparisons
-  --ext EXT             prefix output file
-  -i INPUT, --input INPUT
-                        input coffea files (str), splitted different files with ,
-```
-- data/data, MC/MC comparison from BTV
-```
-python comparison.py -i a.coffea,b.coffea -p dilep_sf -d zmass,z_pt
 
-python -m plotting.comparison --phase ctag_ttdilep_sf --output ctag_ttdilep_sf -r 2017_runB -c 2017_runC,2017_runD -d zmass, z_pt (--sepflav True/False)
-optional arguments:
-  -p {dilep_sf,ttsemilep_sf,ctag_Wc_sf,ctag_DY_sf,ctag_ttsemilep_sf,ctag_ttdilep_sf}, --phase {dilep_sf,ttsemilep_sf,ctag_Wc_sf,ctag_DY_sf,ctag_ttsemilep_sf,ctag_ttdilep_sf}
-                        which phase space
-  -i INPUT, --input INPUT
-                        files set
-  -r REF, --ref REF     referance dataset
-  -c COMPARED, --compared COMPARED
-                        compared dataset
-  --sepflav SEPFLAV     seperate flavour
-  --log                 log on x axis
-  -d DISCR_LIST [DISCR_LIST ...], --discr_list DISCR_LIST [DISCR_LIST ...]
-                        discriminators
-  --ext EXT             prefix name
+| Parameter name        | Allowed values               | Description
+| :-----:               | :---:                        | :-----------------------------
+| **input**(Required):large_blue_circle::red_circle:| `list` or `str` <br>(wildcard options `*` accepted)|   input `.coffea` files| 
+| **output** (Required):large_blue_circle::red_circle:| `str` | output directory of plots with date| 
+| **mergemap**:large_blue_circle:/ **reference** & **compare**:red_circle: | `dict`(Required) | collect sample names, color, label setting for file set. details in [map diction](#dict-of-merge-maps-and-comparison-file-lists)|
+| **variable**(Required):large_blue_circle::red_circle: | `dict` | variables to plot, see [variables section](#variables)|
+|com:large_blue_circle::red_circle:| `str` | √s , default set to be 13TeV|
+|inbox_text:large_blue_circle::red_circle:| `str` | text put in `AnchoredText`|
+|log:large_blue_circle::red_circle:| `str` | log scale on y-axis |
+|disable_ratio:large_blue_circle:|`bool`| disable ratio panel for data/MC comparison plot|
+|scale:large_blue_circle:| `dict` | Scale up particular MC collections|
+|norm:red_circle:| `bool`| noramlized  yield to reference sample|
+
+#### `dict` of merge maps and comparison file lists
+
+- data/MC comparison `mergemap` :large_blue_circle:
+
+To avoid crowded legend in the plot, we would merge a set of files with similar properties. For example, pT binned DY+jets sample would merge into DY+jets, or diboson (VV) is a collection of WW, WZ and ZZ. 
+
+Create a `dict` for each collection under `mergemap`. You can specify the color and label name used in the plot
+
+```yaml
+mergemap:
+    DY: # key name of file collections
+        list: # collections of files(key of dataset name in coffea file)
+            - "DYJetsToLL_M-50_TuneCP5_13p6TeV-madgraphMLM-pythia8"
+            - "DYJetsToLL_M-10to50_TuneCP5_13p6TeV-madgraphMLM-pythia8"
+        label : "DYjet" #Optional, if not exist would take key name of the list. i.e. DY in this case
+        color : '#eb4034' #Optional, color use for this category. 
+    VV: 
+        list:
+            - "WW_TuneCP5_13p6TeV-pythia8" 
+            - "WZ_TuneCP5_13p6TeV-pythia8"
+            - "ZZ_TuneCP5_13p6TeV-pythia8"
 ```
+
+- shape comparison plot `reference`, `compare` :red_circle:
+
+Make shape comparison or compare different versions of file. 
+
+Specify the configuration with `dict` under `reference`  and `compare`. `reference` only accept one entry. 
+
+```yaml
+## Required, reference dict
+reference: 
+    Muon_Run2022C-PromptReco-v1: 
+        label: RunC  #Optional, label name
+        color : 'b' #Optional
+        
+## Required, compare dict
+compare: 
+    # if not specify anything, leave empty value for key
+    Muon_Run2022D-PromptReco-v1: 
+    Muon_Run2022D-PromptReco-v2: 
+```
+
+#### Variables 
+
+Common definitions for both usage, use default settings if leave empty value for the keys. 
+:bangbang: `blind` option is only used in the data/MC comparison plots to blind particular observable like BDT score. 
+
+|Option| Default |
+|:-----: |:---:   |
+| `xlabel` | take name of `key` |
+| `axis` | `sum` over all the axes |
+| `rebin` | no rebinning |
+| `blind` | no blind region | 
+
+```yaml
+## specify variable to plot
+    btagDeepFlavB_0:
+        # Optional, set x label of variable
+        xlabel: "deepJet Prob(b)" 
+        # Optional, specify hist axis with dict
+        axis : 
+            syst: noSF # Optional, access bin
+            flav : sum # Optional, access bin, can convert sum to sum operation later
+        # Optional, rebin variable 
+        rebin :  
+            # Optional, you can specify the rebin axis with rebin value
+            # discr: 2
+            # or just put a number, would rebin distribution the last axis (usually the variable)
+            2
+        # Optional(only for data/MC), blind variables
+        blind : -10, #blind variable[-10:], if put -10,-5 would blind variable[-10:-5]
+        
+    ## specify variable, if not specify anything, leave empty value for key
+    btagDeepFlavC_0:
+
+    ## Accept wildcard option
+    # only axis and rebin can be specify here
+    btagDeepFlav* :
+        axis : 
+            syst: noSF
+            flav : sum
+        rebin :  
+            discr: 2
+    # Use "all" will produce plots for all the variables
+    # only rebin of last axis (variable-axis) can be specify here
+    all: 
+        rebin: 2
+``` 
+
+### Running jupyter remotely
+See also https://hackmd.io/GkiNxag0TUmHnnCiqdND1Q#Remote-jupyter
+
+1. On your local machine, edit `.ssh/config`:
+```
+Host lxplus*
+  HostName lxplus7.cern.ch
+  User <your-user-name>
+  ForwardX11 yes
+  ForwardAgent yes
+  ForwardX11Trusted yes
+Host *_f
+  LocalForward localhost:8800 localhost:8800
+  ExitOnForwardFailure yes
+```
+2. Connect to remote with `ssh lxplus_f`
+3. Start a jupyter notebook:
+```
+jupyter notebook --ip=127.0.0.1 --port 8800 --no-browser
+```
+4. URL for notebook will be printed, copy and open in local browser

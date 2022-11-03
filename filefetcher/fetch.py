@@ -18,7 +18,10 @@ parser.add_argument(
     "-o", "--output", default=r"test_my_samples", help="Site (default: %(default)s)"
 )
 parser.add_argument(
-    "--xrd", default="root://xrootd-cms.infn.it//", type=str, help="xrootd prefix string (default: %(default)s)"
+    "--xrd",
+    default="root://xrootd-cms.infn.it//",
+    type=str,
+    help="xrootd prefix string (default: %(default)s)",
 )
 
 args = parser.parse_args()
@@ -35,14 +38,14 @@ instance = "prod/" + args.site
 
 
 for dataset in fset:
-    if dataset.startswith('#') or dataset.strip()=="":
-        #print("we skip this line:", line)
+    if dataset.startswith("#") or dataset.strip() == "":
+        # print("we skip this line:", line)
         continue
-    print('Creating list of files for dataset', dataset)
-    Tier = dataset.split("/")[3] # NANOAODSIM for regular samples, USER for private
-    instance="prod/global"
-    if Tier=="USER":
-        instance="prod/phys03"
+    print("Creating list of files for dataset", dataset)
+    Tier = dataset.split("/")[3]  # NANOAODSIM for regular samples, USER for private
+    instance = "prod/global"
+    if Tier == "USER":
+        instance = "prod/phys03"
     flist = (
         os.popen(
             (

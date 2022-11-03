@@ -307,3 +307,6 @@ def empty_column_accumulator():
 
 def defaultdict_accumulator():
     return processor.defaultdict_accumulator(empty_column_accumulator)
+
+def num(ar):
+    return ak.num(ak.fill_none(ar[~ak.is_none(ar)], 0), axis=0)
