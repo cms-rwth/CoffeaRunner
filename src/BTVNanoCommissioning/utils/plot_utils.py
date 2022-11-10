@@ -104,7 +104,8 @@ def load_default(config, isDataMC=True):
     ## set color
     for m in maps:
         for i, mc in enumerate(config[m].keys()):
-            if config[m][mc] == None: config[m][mc] = {}
+            if config[m][mc] == None:
+                config[m][mc] = {}
             if "color" not in config[m][mc]:
                 config[m][mc]["color"] = colors[i]
             if "label" not in config[m][mc]:
