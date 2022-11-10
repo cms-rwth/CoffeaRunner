@@ -1,5 +1,5 @@
 import pickle, os, sys, numpy as np
-from coffea import hist, processor
+from coffea import processor
 import awkward as ak
 import hist as Hist
 from functools import partial
@@ -7,7 +7,7 @@ import gc
 import os, psutil
 import coffea
 from BTVNanoCommissioning.utils.correction import (
-    lumiMasks,
+    #lumiMasks,
     met_filters,
 )
 from BTVNanoCommissioning.helpers.func import (
@@ -45,7 +45,7 @@ class NanoProcessor(processor.ProcessorABC):
         self._year = self.cfg.dataset["year"]
         self._campaign = self.cfg.dataset["campaign"]
         self._met_filters = met_filters[self._campaign]
-        self._lumiMasks = lumiMasks[self._campaign]
+        #self._lumiMasks = lumiMasks[self._campaign]
 
         pt_axis = Hist.axis.Regular(50, 0, 300, name="pt", label=" $p_{T}$ [GeV]")
         eta_axis = Hist.axis.Regular(25, -2.5, 2.5, name="eta", label=" $\eta$")

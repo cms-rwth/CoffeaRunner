@@ -20,7 +20,7 @@ from BTVNanoCommissioning.utils.plot_utils import (
 
 parser = argparse.ArgumentParser(description="hist plotter for commissioning")
 parser.add_argument(
-    "-cfg", "--config", type=str, required=True, help="Configuration files"
+    "--cfg", "--config", type=str, required=True, help="Configuration files"
 )
 parser.add_argument(
     "--debug", action="store_true", help="Run detailed checks of yaml file"
@@ -28,7 +28,7 @@ parser.add_argument(
 arg = parser.parse_args()
 
 # load config from yaml
-with open(arg.config, "r") as f:
+with open(arg.cfg, "r") as f:
     config = yaml.safe_load(f)
 if arg.debug:
     check_config(config, True)
@@ -186,3 +186,7 @@ for var in var_set:
         hep.mpl_magic(ax=ax)
     fig.savefig(f"plot/{config['output']}_{time}/{var}{name}.pdf")
     fig.savefig(f"plot/{config['output']}_{time}/{var}{name}.png")
+
+
+
+print(f"The output will be saved at plot/{config['output']}_{time}")

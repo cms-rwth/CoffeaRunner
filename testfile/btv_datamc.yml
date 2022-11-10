@@ -72,16 +72,16 @@ variable :
 
     ## Accept wildcard option
     # only axis and rebin can be specify here
-    btagDeepFlav* :
-        axis : 
-            syst: noSF
-            flav : sum
-        rebin :  
-            discr: 2
+    #btagDeepFlav* :
+    #    axis : 
+    #        syst: noSF
+    #        flav : sum
+    #    rebin :  
+    #        discr: 2
     # Use "all" will produce plots for all the variables
     # only rebin of last axis (variable-axis) can be specify here
-    all: 
-        rebin: 2
+    #all: 
+    #    rebin: 2
     
     
 ## Optional, scale up particular set 

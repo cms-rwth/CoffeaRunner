@@ -21,7 +21,7 @@ from BTVNanoCommissioning.utils.plot_utils import (
 
 parser = argparse.ArgumentParser(description="make comparison for different campaigns")
 parser.add_argument(
-    "-cfg", "--config", type=str, required=True, help="Configuration files"
+    "--cfg", "--config", type=str, required=True, help="Configuration files"
 )
 parser.add_argument(
     "--debug", action="store_true", help="Run detailed checks of yaml file"
@@ -30,7 +30,7 @@ parser.add_argument
 args = parser.parse_args()
 
 # load config from yaml
-with open(args.config, "r") as f:
+with open(args.cfg, "r") as f:
     config = yaml.safe_load(f)
 ## create output dictionary
 if not os.path.isdir(f"plot/{config['output']}_{time}/"):
@@ -57,6 +57,7 @@ else:
             comparelist.extend([m for m in output[f].keys() if c == m])
         mergemap[c] = comparelist
 collated = collate(output, mergemap)
+config = load_default(config,False)
 ### style settings
 if "Run" in list(config["reference"].keys())[0]:
     hist_type = "errorbar"
@@ -86,6 +87,7 @@ for var in var_set:
     ## Normalize to reference yield
     if config["norm"]:
         for c in config["compare"].keys():
+            print (c, var)
             collated[c][var] = collated[c][var] * float(
                 np.sum(collated[refname][var][rebin_axis].values())
                 / np.sum(collated[c][var][rebin_axis].values())
