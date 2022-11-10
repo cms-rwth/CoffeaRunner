@@ -1,6 +1,6 @@
-// Local Variables:
-// python-indent-offset: 4
-// End:
+# Local Variables:
+# python-indent-offset: 4
+# End:
 
 from test_wf import NanoProcessor as test_wf
 
