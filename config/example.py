@@ -6,7 +6,7 @@ from test_wf import NanoProcessor as test_wf
 
 cfg = {
     "dataset": {
-        "jsons": ["metadata/vjets3.json"],
+        "jsons": ["metadata/test_UL17_NanoV9.json"],
         "campaign": "UL17",
         "year": "2017",
         "filter": {
@@ -20,9 +20,9 @@ cfg = {
     "workflow": test_wf,
     "output": "test",
     "run_options": {
-        "executor": "parsl/condor",
-        # "executor": "futures",
-        "workers": 1,
+        #"executor": "parsl/condor",
+         "executor": "futures",
+        "workers": 10,
         "scaleout": 40,
         "walltime": "03:00:00",
         "mem_per_worker": 2,  # GB
@@ -30,7 +30,7 @@ cfg = {
         "max": None,
         "skipbadfiles": None,
         "voms": None,
-        "limit": 20,
+        "limit": 2,
         "retries": 20,
         "splitjobs": False,
     },
