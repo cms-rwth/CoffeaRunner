@@ -186,3 +186,6 @@ for var in var_set:
         hep.mpl_magic(ax=ax)
     fig.savefig(f"plot/{config['output']}_{time}/{var}{name}.pdf")
     fig.savefig(f"plot/{config['output']}_{time}/{var}{name}.png")
+
+
+print(f"The output will be saved at plot/{config['output']}_{time}")

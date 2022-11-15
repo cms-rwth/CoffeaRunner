@@ -56,7 +56,7 @@ else:
             comparelist.extend([m for m in output[f].keys() if c == m])
         mergemap[c] = comparelist
 collated = collate(output, mergemap)
-config = load_default(config, False)  # update configurations with default
+config = load_default(config, False)
 ### style settings
 if "Run" in list(config["reference"].keys())[0]:
     hist_type = "errorbar"
@@ -86,6 +86,7 @@ for var in var_set:
     ## Normalize to reference yield
     if config["norm"]:
         for c in config["compare"].keys():
+            print(c, var)
             collated[c][var] = collated[c][var] * float(
                 np.sum(collated[refname][var][rebin_axis].values())
                 / np.sum(collated[c][var][rebin_axis].values())

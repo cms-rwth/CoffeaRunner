@@ -19,7 +19,7 @@ reference:
 compare: 
     # if not specify anything, leave empty value for key
     Muon_Run2022D-PromptReco-v1: 
-    Muon_Run2022D-PromptReco-v2: 
+    #Muon_Run2022D-PromptReco-v2: 
     
 ## Required, variable set
 variable :
@@ -42,16 +42,16 @@ variable :
 
     ## Accept wildcard option
     # only axis and rebin can be specify here
-    btagDeepFlav* :
-        axis : 
-            syst: noSF
-            flav : sum
-        rebin :  
-            discr: 2
+    #btagDeepFlav* :
+    #    axis : 
+    #        syst: noSF
+    #        flav : sum
+    #    rebin :  
+    #        discr: 2
     # Use "all" will produce plots for all the variables
     # only rebin of last axis (variable-axis) can be specify here
-    all: 
-        rebin: 2
+    #all: 
+    #    rebin: 2
     
 com : "13.6" # Optional, # √s = 13TeV
 inbox_text: "" #Optional, text write in anchor text box

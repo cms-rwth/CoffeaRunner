@@ -1,5 +1,5 @@
 import pickle, os, sys, numpy as np
-from coffea import hist, processor
+from coffea import processor
 import awkward as ak
 import hist as Hist
 from functools import partial

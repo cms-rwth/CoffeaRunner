@@ -1,3 +1,7 @@
+# Local Variables:
+# python-indent-offset: 4
+# End:
+
 from test_wf import NanoProcessor as test_wf
 
 cfg = {
@@ -17,16 +21,19 @@ cfg = {
     "workflow": test_wf,
     "output": "test",
     "run_options": {
-        "executor": "iterative",
-        "workers": 6,
-        "scaleout": 10,
+        # "executor": "parsl/condor",
+        "executor": "futures",
+        "workers": 10,
+        "scaleout": 40,
         "walltime": "03:00:00",
         "mem_per_worker": 2,  # GB
         "chunk": 500000,
         "max": None,
         "skipbadfiles": None,
         "voms": None,
-        "limit": 1,
+        "limit": 2,
+        "retries": 20,
+        "splitjobs": False,
     },
     ## weights
     "weights": {
