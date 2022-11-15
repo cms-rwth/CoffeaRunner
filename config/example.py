@@ -5,6 +5,13 @@ cfg = {
         "jsons": ["metadata/test.json"],
         "campaign": "UL17",
         "year": "2017",
+        "filter": {
+            "samples": [
+                "GluGluHToWWTo2L2Nu_M-125_TuneCP5_13TeV-powheg-jhugen727-pythia8",
+                "SingleMuon_Run2017B-UL2017_MiniAODv2_NanoAODv9-v1",
+            ],
+            "samples_exclude": ["TTTo2L2Nu_TuneCP5_13TeV-powheg-pythia8"],
+        },
     },
     # Input and output files
     "workflow": test_wf,
@@ -15,10 +22,18 @@ cfg = {
         "scaleout": 10,
         "walltime": "03:00:00",
         "mem_per_worker": 2,  # GB
-        "chunk": 50000000,
+        "chunk": 500000,
         "max": None,
         "skipbadfiles": None,
         "voms": None,
         "limit": 1,
+    },
+    ## weights
+    "weights": {
+        "common": {
+            "inclusive": {
+                "lumiMask": "Cert_294927-306462_13TeV_UL2017_Collisions17_GoldenJSON.txt"
+            }
+        }
     },
 }
