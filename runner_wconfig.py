@@ -141,6 +141,7 @@ if __name__ == "__main__":
         condor_extra = [
             f"cd {os.getcwd()}",
             f'source {os.environ["HOME"]}/.bashrc',
+            f"source {os.getcwd()}/CondaSetup.sh",
             f'conda activate {os.environ["CONDA_PREFIX"]}',
         ]
 
@@ -304,8 +305,8 @@ if __name__ == "__main__":
                 "config": None,
             }
         else:
-            executor_args = {
-                "skipbadfiles": args.skipbadfiles,
+            executor_args_condor = {
+                "skipbadfiles": config.run_options["skipbadfiles"],
                 "schema": processor.NanoAODSchema,
                 "merging": True,
                 "merges_executors": ["merge"],

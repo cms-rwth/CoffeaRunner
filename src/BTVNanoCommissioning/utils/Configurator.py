@@ -230,8 +230,9 @@ class Configurator:
         #     print(f"The output will be saved to {self.plots}")
         #     return
         # else:
-        path = self.output
-        version = 1
+        version = 0
+        tag = str(version).rjust(2, "0")
+        path = f"{self.output}_v{tag}"
         while os.path.exists(path):
             tag = str(version).rjust(2, "0")
             path = f"{self.output}_v{tag}"

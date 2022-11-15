@@ -16,19 +16,19 @@ from BTVNanoCommissioning.utils.plot_utils import (
     load_coffea,
     load_default,
     rebin_and_xlabel,
+    plotratio,
+    unc_fill_opt,
 )
 
 parser = argparse.ArgumentParser(description="hist plotter for commissioning")
-parser.add_argument(
-    "-cfg", "--config", type=str, required=True, help="Configuration files"
-)
+parser.add_argument("--cfg", type=str, required=True, help="Configuration files")
 parser.add_argument(
     "--debug", action="store_true", help="Run detailed checks of yaml file"
 )
 arg = parser.parse_args()
 
 # load config from yaml
-with open(arg.config, "r") as f:
+with open(arg.cfg, "r") as f:
     config = yaml.safe_load(f)
 if arg.debug:
     check_config(config, True)
@@ -95,6 +95,22 @@ for var in var_set:
         ],
         ax=ax,
     )
+
+    for i, mc in enumerate(collated.keys()):
+        if "data" in mc:
+            continue
+        if i == 0:
+            summc = collated[mc][var][rebin_axis]
+        else:
+            summc = collated[mc][var][rebin_axis] + summc
+    ax.stairs(
+        values=summc.values() - np.sqrt(summc.values()),
+        baseline=summc.values() + np.sqrt(summc.values()),
+        edges=summc.axes[0].edges,
+        label="Stat unc.",
+        **unc_fill_opt,
+    )
+
     ## Scale particular sample
     if "scale" in config.keys():
         for mc in collated.keys():
@@ -142,26 +158,10 @@ for var in var_set:
         ax=ax,
     )
     ## Ratio plot
-    if "disable_ratio" not in config.keys() or not config["disable_ratio"]:
-        summc = np.zeros(len(collated["data"][var][rebin_axis].values()))
-        for mc in collated.keys():
-            if "data" not in mc:
-                sumc = collated[mc][var][rebin_axis].values() + summc
-        rax.errorbar(
-            x=collated["data"][var][rebin_axis].axes[0].centers,
-            y=hdata / summc,
-            yerr=ratio_uncertainty(
-                hdata,
-                summc,
-            ),
-            color="k",
-            linestyle="none",
-            marker="o",
-            elinewidth=1,
-        )
+    if "disable_ratio" not in config.keys() or config["disable_ratio"] == False:
+        plotratio(hdata, summc, data_is_np=True, ax=rax)
         rax.set_ylabel("Data/MC")
         rax.set_xlabel(xlabel)
-        rax.axhline(y=1.0, linestyle="dashed", color="gray")
         rax.set_ylim(0.5, 1.5)
         ax.set_xlabel(None)
     ##  plot settings, adjust range
@@ -186,3 +186,6 @@ for var in var_set:
         hep.mpl_magic(ax=ax)
     fig.savefig(f"plot/{config['output']}_{time}/{var}{name}.pdf")
     fig.savefig(f"plot/{config['output']}_{time}/{var}{name}.png")
+
+
+print(f"The output will be saved at plot/{config['output']}_{time}")

@@ -15,6 +15,7 @@ from BTVNanoCommissioning.workflows import workflows
 # This would crash if the ExampleWorkflow does not exist
 from ExampleWorkflow.workflows import workflows
 from ZplusJets.workflows import workflows
+
 # from ExampleWorkflow.workflows import workflows
 # from VHcc.workflows import workflows
 # from Hpluscharm.workflows import workflows
@@ -306,11 +307,10 @@ if __name__ == "__main__":
             f"export PYTHONPATH=$PYTHONPATH:{os.getcwd()}",
         ]
         condor_extra = [
-            f'cd {os.getcwd()}',
-            f'ls {os.getcwd()}',
-
+            f"cd {os.getcwd()}",
+            f"ls {os.getcwd()}",
             f'source {os.environ["HOME"]}/.bashrc',
-            f'source {os.getcwd()}/CondaSetup.sh',
+            f"source {os.getcwd()}/CondaSetup.sh",
             f'conda activate {os.environ["CONDA_PREFIX"]}',
         ]
 
