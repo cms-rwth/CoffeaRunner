@@ -7,7 +7,7 @@ import gc
 import os, psutil
 import coffea
 from BTVNanoCommissioning.utils.correction import (
-    # lumiMasks,
+    load_lumi,
     met_filters,
 )
 from BTVNanoCommissioning.helpers.func import (
@@ -45,7 +45,7 @@ class NanoProcessor(processor.ProcessorABC):
         self._year = self.cfg.dataset["year"]
         self._campaign = self.cfg.dataset["campaign"]
         self._met_filters = met_filters[self._campaign]
-        # self._lumiMasks = lumiMasks[self._campaign]
+        self._lumiMasks = load_lumi(self.cfg.weights_config["lumiMask"])
 
         pt_axis = Hist.axis.Regular(50, 0, 300, name="pt", label=" $p_{T}$ [GeV]")
         eta_axis = Hist.axis.Regular(25, -2.5, 2.5, name="eta", label=" $\eta$")

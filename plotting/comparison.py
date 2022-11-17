@@ -17,12 +17,11 @@ from BTVNanoCommissioning.utils.plot_utils import (
     load_coffea,
     load_default,
     rebin_and_xlabel,
+    plotratio,
 )
 
 parser = argparse.ArgumentParser(description="make comparison for different campaigns")
-parser.add_argument(
-    "--cfg", "--config", type=str, required=True, help="Configuration files"
-)
+parser.add_argument("--cfg", type=str, required=True, help="Configuration files")
 parser.add_argument(
     "--debug", action="store_true", help="Run detailed checks of yaml file"
 )
@@ -120,19 +119,13 @@ for var in var_set:
         )
     # plot ratio of com/Ref
     for i, c in enumerate(config["compare"].keys()):
-        rax.errorbar(
-            x=collated[c][var][rebin_axis].axes[0].centers,
-            y=collated[c][var][rebin_axis].values()
-            / collated[refname][var][rebin_axis].values(),
-            yerr=ratio_uncertainty(
-                collated[c][var][rebin_axis].values(),
-                collated[refname][var][rebin_axis].values(),
-            ),
-            marker="o",
-            linestyle="none",
-            color=ax.get_lines()[i + 1].get_color(),
-            elinewidth=1,
+        plotratio(
+            collated[c][var][rebin_axis],
+            collated[refname][var][rebin_axis],
+            denom_fill_opts=None,
+            error_opts={"color": ax.get_lines()[i + 1].get_color()},
         )
+
     ##  plot settings, adjust range
     rax.set_xlabel(xlabel)
     rax.axhline(y=1.0, linestyle="dashed", color="gray")
