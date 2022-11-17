@@ -149,6 +149,13 @@ xsection = [
         "comment": "from HIG-19-001 AN",
     },
     {
+        "process_name": "GluGluHToZZTo4L_M125_TuneCP5_13TeV_powheg2_JHUGenV7011_pythia8_RunIISummer20UL16NanoAODAPVv9-106X_mcRun2_asymptotic_preVFP_v11-v1",
+        "DAS": "/GluGluHToZZTo4L_M125_TuneCP5_13TeV_powheg2_JHUGenV7011_pythia8/RunIISummer20UL17NanoAODv9-106X_mc2017_realistic_v9-v2/NANOAODSIM",
+        "cross_section": "0.0128",
+        "energy": "13",
+        "comment": "from HIG-19-001 AN",
+    },
+    {
         "process_name": "GluGluToZH_HToZZTo4L_M125_TuneCP5_13TeV-jhugenv723-pythia8",
         "DAS": "/GluGluToZH_HToZZTo4L_M125_TuneCP5_13TeV-jhugenv723-pythia8/RunIISummer20UL17NanoAODv9-106X_mc2017_realistic_v9-v2/NANOAODSIM",
         "cross_section": "0.00003213513",
@@ -157,6 +164,13 @@ xsection = [
     },
     {
         "process_name": "VBF_HToZZTo4L_M125_TuneCP5_withDipoleRecoil_13TeV-powheg2-jhugenv7011-pythia8",
+        "DAS": "/VBF_HToZZTo4L_M125_TuneCP5_withDipoleRecoil_13TeV-powheg2-jhugenv7011-pythia8/RunIISummer20UL17NanoAODv9-106X_mc2017_realistic_v9-v2/NANOAODSIM",
+        "cross_section": "0.001044",
+        "energy": "13",
+        "comment": "from HIG-19-001",
+    },
+    {
+        "process_name": "VBF_HToZZTo4L_M125_TuneCP5_withDipoleRecoil_13TeV-powheg2-jhugenv7011-pythia8_RunIISummer20UL16NanoAODAPVv9-106X_mcRun2_asymptotic_preVFP_v11-v1",
         "DAS": "/VBF_HToZZTo4L_M125_TuneCP5_withDipoleRecoil_13TeV-powheg2-jhugenv7011-pythia8/RunIISummer20UL17NanoAODv9-106X_mc2017_realistic_v9-v2/NANOAODSIM",
         "cross_section": "0.001044",
         "energy": "13",
@@ -750,7 +764,6 @@ xsection = [
         "total_uncertainty": "5.042e-04",
         "DAS": "/DYJetsToLL_LHEFilterPtZ-650ToInf_MatchEWPDG20_TuneCP5_13TeV-amcatnloFXFX-pythia8/RunIISummer20UL17MiniAODv2-106X_mc2017_realistic_v9-v2/MINIAODSIM",
         "fraction_negative_weight": "0.2771",
-        "matrix_generator": "none",
         "energy": "13",
         "comments": "GENXSanalyzer",
     },
@@ -1003,6 +1016,38 @@ xsection = [
     {"process_name": "gchcWW2QLNu", "cross_section": "0.00821330551"},
     {"process_name": "gchcWW2L2Nu", "cross_section": "0.00396958157"},
     {"process_name": "gchcWW2L2Nu_4f", "cross_section": "0.00204444792"},
+    {
+        "process_name": "HPlusCharm_4FS_MuRFScaleDynX0p50_HToWWTo2L2Nu_M125_TuneCP5_13TeV-amcatnloFXFX-pythia8",
+        "cross_section": "0.00204444792",
+    },
+    {
+        "process_name": "HPlusCharm_4FS_MuRFScaleDynX0p50_HToGG_M125_TuneCP5_13TeV_amcatnloFXFX_pythia8",
+        "cross_section": "0.0002045951",
+    },
+    {
+        "process_name": "HPlusCharm_4FS_MuRFScaleDynX0p50_HToZZTo4L_M125_TuneCP5_13TeV_amcatnloFXFX_JHUGenV7011_pythia8",
+        "cross_section": "2.3388735e-5",
+    },
+    {
+        "process_name": "HPlusCharm_4FS_MuRFScaleDynX0p50_HToWWTo2L2Nu_M125_TuneCP5_13TeV-amcatnlo-pythia8",
+        "cross_section": "0.00182941002",
+    },
+    {
+        "process_name": "HPlusCharm_3FS_MuRFScaleDynX0p50_HToWWTo2L2Nu_M125_TuneCP5_13TeV-amcatnlo-pythia8",
+        "cross_section": "0.00204444792",
+    },
+    {
+        "process_name": "HPlusBottom_4FS_MuRFScaleDynX0p50_HToWWTo2L2Nu_M125_TuneCP5_13TeV-amcatnlo-pythia8",
+        "cross_section": "0.00827941296",
+    },
+    {
+        "process_name": "HPlusBottom_5FS_MuRFScaleDynX0p50_HToWWTo2L2Nu_M125_TuneCP5_13TeV-amcatnloFXFX-pythia8",
+        "cross_section": "0.01583069126",
+    },
+    {
+        "process_name": "HPlusBottom_5FS_MuRFScaleDynX0p50_HToWWTo2L2Nu_M125_TuneCP5_13TeV-amcatnlo-pythia8",
+        "cross_section": "0.0128682493",
+    },
     {
         "process_name": "DYJets_UNLOPS",
         "cross_section": "2025",

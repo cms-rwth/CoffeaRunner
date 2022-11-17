@@ -13,7 +13,9 @@ Generalized framework columnar-based analysis with [coffea](https://coffeateam.g
 
 :heavy_exclamation_mark: Install under `bash` environment
 
-Clone repository from git
+```
+# only first time, including submodules
+git clone --recursive git@github.com:cms-btv-pog/BTVNanoCommissioning.git 
 
 ```bash
 # only first time 
@@ -68,7 +70,47 @@ voms-proxy-init --voms cms --vomses ~/.grid-security/vomses
 Use the `./filefetcher/fetch.py` script:
 
 ```
+<<<<<<< HEAD
 python filefetcher/fetch.py --input filefetcher/input_DAS_list.txt --output output_name.json
+=======
+--wf {validation,ttcom,ttdilep_sf,ttsemilep_sf,emctag_ttdilep_sf,ctag_ttdilep_sf,ectag_ttdilep_sf,ctag_ttsemilep_sf,ectag_ttsemilep_sf,ctag_Wc_sf,ectag_Wc_sf,ctag_DY_sf,ectag_DY_sf}, --workflow {validation,ttcom,ttdilep_sf,ttsemilep_sf,emctag_ttdilep_sf,ctag_ttdilep_sf,ectag_ttdilep_sf,ctag_ttsemilep_sf,ectag_ttsemilep_sf,ctag_Wc_sf,ectag_Wc_sf,ctag_DY_sf,ectag_DY_sf}
+                        Which processor to run
+  -o OUTPUT, --output OUTPUT
+                        Output histogram filename (default: hists.coffea)
+  --samples SAMPLEJSON, --json SAMPLEJSON
+                        JSON file containing dataset and file locations
+                        (default: dummy_samples.json)
+  --year YEAR           Year
+  --campaign CAMPAIGN   Dataset campaign, change the corresponding correction
+                        files{ "Rereco17_94X","Winter22Run3","2018_UL","2017_UL","2016preVFP_UL","2016postVFP_UL"}
+  --isCorr              Run with SFs
+  --isJERC              JER/JEC implemented to jet
+  --isSyst              Run with systematics for SF
+  --executor {iterative,futures,parsl/slurm,parsl/condor,parsl/condor/naf_lite,dask/condor,dask/slurm,dask/lpc,dask/lxplus,dask/casa}
+                        The type of executor to use (default: futures). 
+  -j WORKERS, --workers WORKERS
+                        Number of workers (cores/threads) to use for multi- worker executors (e.g. futures or condor) (default:
+                        3)
+  -s SCALEOUT, --scaleout SCALEOUT
+                        Number of nodes to scale out to if using slurm/condor.
+                        Total number of concurrent threads is ``workers x
+                        scaleout`` (default: 6)
+  --memory MEMORY       Memory used in jobs (in GB) ``(default: 4GB)
+  --disk DISK           Disk used in jobs  ``(default: 4GB)
+  --voms VOMS           Path to voms proxy, made accessible to worker nodes.
+                        By default a copy will be made to $HOME.
+  --chunk N             Number of events per process chunk
+  --retries N           Number of retries for coffea processor
+ --index INDEX         (Specific for dask/lxplus file splitting, default:0,0) 
+                        Format: $dictindex,$fileindex. $dictindex refers to the index of the file list split to 50 files per dask-worker.
+                        The job will start submission from the corresponding indices
+  --validate            Do not process, just check all files are accessible
+  --skipbadfiles        Skip bad files.
+  --only ONLY           Only process specific dataset or file
+  --limit N             Limit to the first N files of each dataset in sample
+                        JSON
+  --max N               Max number of chunks to run in total
+>>>>>>> ca74d50... feat: correctionlib(jsonpog-integration) implementation & fixes on actions (#50)
 ```
 where the `input_DAS_list.txt` is a simple file with a list of dataset names extract from DAS (you need to create it yourself for the samples you want to run over), and output json file in creted in `./metadata` directory.
 
@@ -361,25 +403,119 @@ memray run --live  runner.py --cfg config/example.py
 ```
 ###  Plotting code 
 
+All the `lumiMask`, correction files (SFs, pileup weight), and JEC, JER files are under  `BTVNanoCommissioning/src/data/` following the substructure `${type}/${campaign}/${files}`(except `lumiMasks` and `Prescales`)
 
+<<<<<<< HEAD
 Produce data/MC comparison, shape comparison plots from `.coffea` files, load configuration (`yaml`) files, brief [intro](https://docs.fileformat.com/programming/yaml/) of yaml.
+=======
+## Correction files configurations
+:heavy_exclamation_mark:  If the correction files are not supported yet by jsonpog-integration, you can still try with custom input data.
 
-Details of yaml file format would summarized in table below. The **required** info are marked as bold style. 
+### Options with custom input data 
+>>>>>>> ca74d50... feat: correctionlib(jsonpog-integration) implementation & fixes on actions (#50)
 
-You can find test file set(`.coffea` and `.yaml`) in `testfile/`. Specify `--debug` to get more info for yaml format.
+Details of yaml file format would summarized in table below. Information used in data/MC script would marked with () and comparsion script with (). The **required** info are marked as bold style. 
+
+
+<details><summary>Take `Rereco17_94X` as an example.</summary>
+<p>
 
 ```
 python plotting/plotdataMC.py --cfg testfile/btv_datamc.yml (--debug)
 python plotting/comparison.py --cfg testfile/btv_compare.yml (--debug)
 ```
 
+</p>
+</details>
+
+### Use central maintained jsonpog-integration 
+The official correction files collected in [jsonpog-integration](https://gitlab.cern.ch/cms-nanoAOD/jsonpog-integration) is updated by POG except `lumiMask` and `JME` still updated by maintainer. No longer to request input files in the `correction_config`.  
+
+<<<<<<< HEAD
+<details><summary>See the example with `2017_UL`.</summary>
+=======
+
+<details><summary>Take `Rereco17_94X` as an example.</summary>
+>>>>>>> ca74d50... feat: correctionlib(jsonpog-integration) implementation & fixes on actions (#50)
+<p>
+
+```python
+  "2017_UL": {
+        # Same with custom config
+        "lumiMask": "Cert_294927-306462_13TeV_UL2017_Collisions17_MuonJSON.txt",
+        "JME": "jec_compiled.pkl.gz",
+        # no config need to be specify for PU weights
+        "PU": None,
+        # Btag SFs - specify $TAGGER : $TYPE-> find [$TAGGER_$TYPE] in json file
+        "BTV": {"deepCSV": "shape", "deepJet": "shape"},
+        
+        "LSF": {
+        # Electron SF - Following the scheme: "${SF_name} ${year}": "${WP}"
+        # https://github.com/cms-egamma/cms-egamma-docs/blob/master/docs/EgammaSFJSON.md
+            "ele_ID 2017": "wp90iso",
+            "ele_Reco 2017": "RecoAbove20",
+
+        # Muon SF - Following the scheme: "${SF_name} ${year}": "${WP}"
+        # WPs : ['NUM_GlobalMuons_DEN_genTracks', 'NUM_HighPtID_DEN_TrackerMuons', 'NUM_HighPtID_DEN_genTracks', 'NUM_IsoMu27_DEN_CutBasedIdTight_and_PFIsoTight', 'NUM_LooseID_DEN_TrackerMuons', 'NUM_LooseID_DEN_genTracks', 'NUM_LooseRelIso_DEN_LooseID', 'NUM_LooseRelIso_DEN_MediumID', 'NUM_LooseRelIso_DEN_MediumPromptID', 'NUM_LooseRelIso_DEN_TightIDandIPCut', 'NUM_LooseRelTkIso_DEN_HighPtIDandIPCut', 'NUM_LooseRelTkIso_DEN_TrkHighPtIDandIPCut', 'NUM_MediumID_DEN_TrackerMuons', 'NUM_MediumID_DEN_genTracks', 'NUM_MediumPromptID_DEN_TrackerMuons', 'NUM_MediumPromptID_DEN_genTracks', 'NUM_Mu50_or_OldMu100_or_TkMu100_DEN_CutBasedIdGlobalHighPt_and_TkIsoLoose', 'NUM_SoftID_DEN_TrackerMuons', 'NUM_SoftID_DEN_genTracks', 'NUM_TightID_DEN_TrackerMuons', 'NUM_TightID_DEN_genTracks', 'NUM_TightRelIso_DEN_MediumID', 'NUM_TightRelIso_DEN_MediumPromptID', 'NUM_TightRelIso_DEN_TightIDandIPCut', 'NUM_TightRelTkIso_DEN_HighPtIDandIPCut', 'NUM_TightRelTkIso_DEN_TrkHighPtIDandIPCut', 'NUM_TrackerMuons_DEN_genTracks', 'NUM_TrkHighPtID_DEN_TrackerMuons', 'NUM_TrkHighPtID_DEN_genTracks']
+
+            "mu_Reco 2017_UL": "NUM_TrackerMuons_DEN_genTracks",
+            "mu_HLT 2017_UL": "NUM_IsoMu27_DEN_CutBasedIdTight_and_PFIsoTight",
+            "mu_ID 2017_UL": "NUM_TightID_DEN_TrackerMuons",
+            "mu_Iso 2017_UL": "NUM_TightRelIso_DEN_TightIDandIPCut",
+        },
+    },
+```
+
+</p>
+</details>
+
+<<<<<<< HEAD
+=======
+### Use central maintained jsonpog-integration 
+The official correction files collected in [jsonpog-integration](https://gitlab.cern.ch/cms-nanoAOD/jsonpog-integration) is updated by POG except `lumiMask` and `JME` still updated by maintainer. No longer to request input files in the `correction_config`.  
+
+<details><summary>See the example with `2017_UL`.</summary>
+<p>
+
+```python
+  "2017_UL": {
+        # Same with custom config
+        "lumiMask": "Cert_294927-306462_13TeV_UL2017_Collisions17_MuonJSON.txt",
+        "JME": "jec_compiled.pkl.gz",
+        # no config need to be specify for PU weights
+        "PU": None,
+        # Btag SFs - specify $TAGGER : $TYPE-> find [$TAGGER_$TYPE] in json file
+        "BTV": {"deepCSV": "shape", "deepJet": "shape"},
+        
+        "LSF": {
+        # Electron SF - Following the scheme: "${SF_name} ${year}": "${WP}"
+        # https://github.com/cms-egamma/cms-egamma-docs/blob/master/docs/EgammaSFJSON.md
+            "ele_ID 2017": "wp90iso",
+            "ele_Reco 2017": "RecoAbove20",
+
+        # Muon SF - Following the scheme: "${SF_name} ${year}": "${WP}"
+        # WPs : ['NUM_GlobalMuons_DEN_genTracks', 'NUM_HighPtID_DEN_TrackerMuons', 'NUM_HighPtID_DEN_genTracks', 'NUM_IsoMu27_DEN_CutBasedIdTight_and_PFIsoTight', 'NUM_LooseID_DEN_TrackerMuons', 'NUM_LooseID_DEN_genTracks', 'NUM_LooseRelIso_DEN_LooseID', 'NUM_LooseRelIso_DEN_MediumID', 'NUM_LooseRelIso_DEN_MediumPromptID', 'NUM_LooseRelIso_DEN_TightIDandIPCut', 'NUM_LooseRelTkIso_DEN_HighPtIDandIPCut', 'NUM_LooseRelTkIso_DEN_TrkHighPtIDandIPCut', 'NUM_MediumID_DEN_TrackerMuons', 'NUM_MediumID_DEN_genTracks', 'NUM_MediumPromptID_DEN_TrackerMuons', 'NUM_MediumPromptID_DEN_genTracks', 'NUM_Mu50_or_OldMu100_or_TkMu100_DEN_CutBasedIdGlobalHighPt_and_TkIsoLoose', 'NUM_SoftID_DEN_TrackerMuons', 'NUM_SoftID_DEN_genTracks', 'NUM_TightID_DEN_TrackerMuons', 'NUM_TightID_DEN_genTracks', 'NUM_TightRelIso_DEN_MediumID', 'NUM_TightRelIso_DEN_MediumPromptID', 'NUM_TightRelIso_DEN_TightIDandIPCut', 'NUM_TightRelTkIso_DEN_HighPtIDandIPCut', 'NUM_TightRelTkIso_DEN_TrkHighPtIDandIPCut', 'NUM_TrackerMuons_DEN_genTracks', 'NUM_TrkHighPtID_DEN_TrackerMuons', 'NUM_TrkHighPtID_DEN_genTracks']
+
+            "mu_Reco 2017_UL": "NUM_TrackerMuons_DEN_genTracks",
+            "mu_HLT 2017_UL": "NUM_IsoMu27_DEN_CutBasedIdTight_and_PFIsoTight",
+            "mu_ID 2017_UL": "NUM_TightID_DEN_TrackerMuons",
+            "mu_Iso 2017_UL": "NUM_TightRelIso_DEN_TightIDandIPCut",
+        },
+    },
+```
+
+</p>
+</details>
+
+>>>>>>> ca74d50... feat: correctionlib(jsonpog-integration) implementation & fixes on actions (#50)
+## Create compiled JERC file(`pkl.gz`)
 
 | Parameter name        | Allowed values               | Description
 | :-----:               | :---:                        | :-----------------------------
 | **input**(Required)| `list` or `str` <br>(wildcard options `*` accepted)|   input `.coffea` files| 
 | **output** (Required)| `str` | output directory of plots with date| 
 | **mergemap**(Required)| `dict` | collect sample names, (color, label) setting for file set. details in [map diction](#dict-of-merge-maps-and-comparison-file-lists)|
-| **reference** & **compare** (Required) | `dict`| specify the class only for comparison plots |
+| **reference** & **compare** (Required) | `dict`| specify the class for comparison plots |
 | **variable**(Required) | `dict` | variables to plot, see [variables section](#variables)|
 |com| `str` | √s , default set to be 13TeV|
 |inbox_text| `str` | text put in `AnchoredText`|
@@ -404,6 +540,7 @@ In `comparison.py` config file (`testfile/btv_compare.yaml`),  color and label n
 <details><summary>Code snipped</summary>
 <p>
 
+<<<<<<< HEAD
 ```yaml
 ## plodataMC.py
 mergemap:
@@ -440,12 +577,46 @@ compare:
 
 </p>
 </details>
+=======
+:new: non-uniform rebinning is possible, specify the bins with  list of edges `--autorebin 50,80,81,82,83,100.5`
+
+```
+python plotdataMC.py -i a.coffea,b.coffea --lumi 41500 -p dilep_sf -v z_mass,z_pt 
+python plotdataMC.py -i "test*.coffea" --lumi 41500 -p dilep_sf -v z_mass,z_pt 
+
+options:
+  -h, --help            show this help message and exit
+  --lumi LUMI           luminosity in /pb
+  --com COM             sqrt(s) in TeV
+  -p {dilep_sf,ttsemilep_sf,ctag_Wc_sf,ctag_DY_sf,ctag_ttsemilep_sf,ctag_ttdilep_sf}, --phase {dilep_sf,ttsemilep_sf,ctag_Wc_sf,ctag_DY_sf,ctag_ttsemilep_sf,ctag_ttdilep_sf}
+                        which phase space
+  --log LOG             log on y axis
+  --norm NORM           Use for reshape SF, scale to same yield as no SFs case
+  -v VARIABLE, --variable VARIABLE
+                        variables to plot, splitted by ,. Wildcard option * available as well. Specifying `all` will run through all variables.
+  --SF                  make w/, w/o SF comparisons
+  --ext EXT             prefix name
+  -i INPUT, --input INPUT
+                        input coffea files (str), splitted different files with ','. Wildcard option * available as well.
+   --autorebin AUTOREBIN
+                        Rebin the plotting variables, input `int` or `list`. int: merge N bins. list of number: rebin edges(non-uniform bin is possible)
+   --xlabel XLABEL      rename the label for x-axis
+   --ylabel YLABEL      rename the label for y-axis
+   --splitOSSS SPLITOSSS 
+                        Only for W+c phase space, split opposite sign(1) and same sign events(-1), if not specified, the combined OS-SS phase space is used
+   --xrange XRANGE      custom x-range, --xrange xmin,xmax
+   --flow FLOW 
+                        str, optional {None, 'show', 'sum'} Whether plot the under/overflow bin. If 'show', add additional under/overflow bin. If 'sum', add the under/overflow bin content to first/last bin.
+```
+- data/data, MC/MC comparisons
+>>>>>>> ca74d50... feat: correctionlib(jsonpog-integration) implementation & fixes on actions (#50)
 
 #### Variables 
 
 Common definitions for both usage, use default settings if leave empty value for the keys. 
 :bangbang: `blind` option is only used in the data/MC comparison plots to blind particular observable like BDT score. 
 
+<<<<<<< HEAD
 |Option| Default |
 |:-----: |:---:   |
 | `xlabel` | take name of `key` |
@@ -492,6 +663,35 @@ Common definitions for both usage, use default settings if leave empty value for
     all: 
         rebin: 2
 ``` 
+=======
+options:
+  -h, --help            show this help message and exit
+  -p {dilep_sf,ttsemilep_sf,ctag_Wc_sf,ctag_DY_sf,ctag_ttsemilep_sf,ctag_ttdilep_sf}, --phase {dilep_sf,ttsemilep_sf,ctag_Wc_sf,ctag_DY_sf,ctag_ttsemilep_sf,ctag_ttdilep_sf}
+                        which phase space
+  -i INPUT, --input INPUT
+                        input coffea files (str), splitted different files with ','. Wildcard option * available as well.
+  -r REF, --ref REF     referance dataset
+  -c COMPARED, --compared COMPARED
+                        compared datasets, splitted by ,
+  --sepflav SEPFLAV     seperate flavour(b/c/light)
+  --log                 log on y axis
+  -v VARIABLE, --variable VARIABLE
+                        variables to plot, splitted by ,. Wildcard option * available as well. Specifying `all` will run through all variables.
+  --ext EXT             prefix name
+  --com COM             sqrt(s) in TeV
+  --shortref SHORTREF   short name for reference dataset for legend
+  --shortcomp SHORTCOMP
+                        short names for compared datasets for legend, split by ','
+   --autorebin AUTOREBIN
+                        Rebin the plotting variables, input `int` or `list`. int: merge N bins. list of number: rebin edges(non-uniform bin is possible)
+   --xlabel XLABEL      rename the label for x-axis
+   --ylabel YLABEL      rename the label for y-axis
+   --norm               compare shape, normalized yield to reference
+   --xrange XRANGE       custom x-range, --xrange xmin,xmax
+   --flow FLOW 
+                        str, optional {None, 'show', 'sum'} Whether plot the under/overflow bin. If 'show', add additional under/overflow bin. If 'sum', add the under/overflow bin content to first/last bin.
+```
+>>>>>>> ca74d50... feat: correctionlib(jsonpog-integration) implementation & fixes on actions (#50)
 
 </p>
 </details>

@@ -1,6 +1,6 @@
 import copy
 import hist
-from coffea import processor
+from coffea.processor import accumulate
 import os
 from BTVNanoCommissioning.helpers.xsection import xsection
 
@@ -38,12 +38,15 @@ def scaleSumW(output, lumi):
                     sumw[sample] = sumw[sample] + float(output[files][sample]["sumw"])
                 else:
                     sumw[sample] = float(output[files][sample]["sumw"])
+    for s in sumw.keys():
+        print(s, sumw[s])
     for files in output.keys():
         if "sumw" not in output[files].keys():
             scaled[files] = {}
             for sample, accu in output[files].items():
                 scaled[files][sample] = {}
                 scaled[files][sample]["sumw"] = output[files][sample]["sumw"]
+
                 if duplicated_name:
                     scaled[files][sample]["sumw"] = sumw[sample]
                 for key, h_obj in accu.items():
@@ -117,31 +120,16 @@ def additional_scale(output, scale, sample_to_scale):
 def collate(output, mergemap):
     out = {}
     merged = {}
-    counter = {}
-    duplicated_name = False
-    for val in mergemap.keys():
-        if len(mergemap[val]) != len(set(mergemap[val])):
-            duplicated_name = True
-            from collections import Counter
-
-            if "Run" not in str(mergemap[val]):
-                counter[val] = dict(Counter(mergemap[val]))
-
-    if duplicated_name:
-        for files in output.keys():
+    merged_output = accumulate([output[f] for f in output.keys()])
+    for files in merged_output.keys():
+        if "sumw" not in merged_output[files].keys():
             for m in output[files].keys():
-                merged[f"{m}_FNAME_{files[files.rfind('/')+1:]}"] = dict(
-                    output[files][m].items()
-                )
-    else:
-        for files in output.keys():
-            if "sumw" not in output[files].keys():
-                for m in output[files].keys():
-                    merged[m] = dict(output[files][m].items())
-            else:
-                merged[files] = dict(output[files].items())
+                merged[m] = dict(merged_output[files][m].items())
+        else:
+            merged[files] = dict(merged_output[files].items())
+
     for group, names in mergemap.items():
-        out[group] = processor.accumulate(
+        out[group] = accumulate(
             [v for k, v in merged.items() if k.split("_FNAME_")[0] in names]
         )
 

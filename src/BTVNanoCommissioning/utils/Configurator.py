@@ -127,6 +127,7 @@ class Configurator:
             "compression": 3,
             "index": None,
             "sample_size": 20,
+            "requirements": "",
         }
         if "run_options" not in self.cfg.keys():
             self.cfg["run_options"] = {}
