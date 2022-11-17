@@ -39,6 +39,7 @@ if args.debug:
     check_config(config, False)
 ## load coffea files
 output = load_coffea(config, False)
+print(output)
 ## build up merge map
 mergemap = {}
 refname = list(config["reference"].keys())[0]
