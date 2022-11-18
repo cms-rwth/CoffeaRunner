@@ -3,30 +3,42 @@ from Hpluscharm.workflows import workflows as hplusc_wf
 cfg = {
     "dataset": {
         "jsons": [
-            "src/Hpluscharm/input_json/higgs_UL17.json",
-            "src/Hpluscharm/input_json/signal_UL17.json",
+            # "src/Hpluscharm/input_json/higgs_UL17.json",
+            # "src/Hpluscharm/input_json/signal_UL17.json",
+            # "src/Hpluscharm/input_json/mcbkg_UL17.json"
+            "src/Hpluscharm/input_json/st_local.json"
         ],
         "campaign": "UL17",
         "year": "2017",
-        # "filter": {
-        #     "samples":["GluGluHToWWTo2L2Nu_M-125_TuneCP5_13TeV-powheg-jhugen727-pythia8"],
+        "filter": {
+            "samples": [
+                # "TTTo2L2Nu_TuneCP5_13TeV-powheg-pythia8",
+                #       "TTToSemiLeptonic_TuneCP5_13TeV-powheg-pythia8",
+                "ST_t-channel_antitop_4f_InclusiveDecays_TuneCP5_13TeV-powheg-madspin-pythia8",
+                # "ST_t-channel_top_4f_InclusiveDecays_TuneCP5_13TeV-powheg-madspin-pythia8",
+                #       "DYJetsToLL_M-10to50_TuneCP5_13TeV-madgraphMLM-pythia8",
+                #       "DYJetsToLL_M-50_TuneCP5_13TeV-amcatnloFXFX-pythia8"
+            ]
+        }
         #     "samples_exclude" : ["gchcWW2L2Nu_4f"]
         # }
     },
     # Input and output files
     "workflow": hplusc_wf["HWWtest"],
-    "output": "signal_nocut",
+    "output": "st1_array",
     "run_options": {
-        "executor": "iterative",
-        "workers": 6,
-        "scaleout": 10,
+        "executor": "parsl/condor/naf_lite",
+        "workers": 4,
+        "scaleout": 300,
         "walltime": "03:00:00",
         "mem_per_worker": 2,  # GB
-        "chunk": 50000000,
+        "chunk": 50000,
         "max": None,
-        "skipbadfiles": None,
+        "skipbadfiles": True,
+        "retries": 20,
         "voms": None,
-        "limit": 1,
+        "splitjobs": True,
+        # "limit": 1,
     },
     ## selections
     "categories": {"cats": [], "cats2": []},
@@ -49,6 +61,7 @@ cfg = {
     "weights": {
         "common": {
             "inclusive": {
+                "lumiMask": "Cert_294927-306462_13TeV_UL2017_Collisions17_GoldenJSON.txt",
                 "PU": "puweight_UL17.histo.root",
                 "JME": "mc_compile_jec.pkl.gz",
                 "BTV": {
@@ -76,7 +89,7 @@ cfg = {
             "JERC": False,
             "weights": False,
         },
-        "export_array": False,
+        "export_array": True,
         "BDT": {
             "ll": "src/Hpluscharm/MVA/xgb_output/SR_ll_scangamma_2017_gamma2.json",
             "emu": "src/Hpluscharm/MVA/xgb_output/SR_emu_scangamma_2017_gamma2.json",

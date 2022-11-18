@@ -5,7 +5,8 @@ from matplotlib.offsetbox import AnchoredText
 
 from coffea.util import load
 import hist
-from hist.intervals import ratio_uncertainty
+from BTVNanoCommissioning.helpers.definitions import definitions, axes_name
+from BTVNanoCommissioning.utils.plot_utils import plotratio, markers, autoranger
 
 time = arrow.now().format("YY_MM_DD")
 plt.style.use(hep.style.ROOT)
@@ -123,6 +124,8 @@ for var in var_set:
             collated[refname][var][rebin_axis],
             denom_fill_opts=None,
             error_opts={"color": ax.get_lines()[i + 1].get_color()},
+            clear=False,
+            ax=rax,
         )
 
     ##  plot settings, adjust range
@@ -133,6 +136,7 @@ for var in var_set:
     rax.set_ylabel("Other/Ref")
     ax.legend()
     rax.set_ylim(0.0, 2.0)
+
     at = AnchoredText(
         config["inbox_text"],
         loc=2,
@@ -141,6 +145,7 @@ for var in var_set:
     ax.add_artist(at)
     hep.mpl_magic(ax=ax)
     ax.set_ylim(bottom=0)
+
     logext = ""
     # log y axis
     if "log" in config.keys() and config["log"]:
