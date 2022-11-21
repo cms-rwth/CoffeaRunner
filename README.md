@@ -1,7 +1,7 @@
 
 # CoffeaRunner
-[![Linting](https://github.com/cms-rwth/CoffeaRunner/blob/master/.github/workflows/python_linting.yml/badge.svg)](https://github.com/cms-rwth/CoffeaRunner/blob/master/.github/workflows/python_linting.yml)
-[![Test Workflow](https://github.com/cms-rwth/CoffeaRunner/blob/master/.github/workflows/test_workflow.yml/badge.svg)](https://github.com/cms-rwth/CoffeaRunner/blob/master/.github/workflows/test_workflow.yml)
+[![Linting](https://github.com/cms-rwth/CoffeaRunner/actions/workflows/python_linting.yml/badge.svg)](https://github.com/cms-rwth/CoffeaRunner/actions/workflows/python_linting.yml)
+[![Test Workflow](https://github.com/cms-rwth/CoffeaRunner/actions/workflows/test_workflow.yml/badge.svg)](https://github.com/cms-rwth/CoffeaRunner/actions/workflows/test_workflow.yml)
 [![Code style: black](https://img.shields.io/badge/code%20style-black-000000.svg)](https://github.com/psf/black)
 Generalized framework columnar-based analysis with [coffea](https://coffeateam.github.io/coffea/) based on the developments from [BTVNanoCommissioning](https://github.com/cms-btv-pog/BTVNanoCommissioning) and some development from [PocketCoffea](https://github.com/PocketCoffea/PocketCoffea)
 
@@ -304,7 +304,6 @@ memray run --live  runner.py --cfg config/example.py
 ```
 ###  Plotting code 
 
-:construction: Error band still needed
 
 Produce data/MC comparison, shape comparison plots from `.coffea` files, load configuration (`yaml`) files, brief [intro](https://docs.fileformat.com/programming/yaml/) of yaml.
 
