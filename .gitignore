@@ -5,6 +5,10 @@
 .ipynb_checkpoints/
 \#*
 configurator.pkl
+
+runinfo/
+plot/
+plotting/plot/
 src/BTVNanoCommissioning/version.py
 src/BTVNanoCommissioning/workflows/
 src/BTVNanoCommissioning.egg-info/
@@ -16,6 +20,7 @@ src/BTVNanoCommissioning/utils/selection.py
 .github/workflows/ctag_Wc_workflow.yml
 .github/workflows/ttbar_SL_DL_workflow.yml
 .github/workflows/validation_workflow.yml
+README.md
 metadata/*PF*
 metadata/*Comm*
 
