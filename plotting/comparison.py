@@ -5,7 +5,6 @@ from matplotlib.offsetbox import AnchoredText
 
 from coffea.util import load
 import hist
-from BTVNanoCommissioning.helpers.definitions import definitions, axes_name
 from BTVNanoCommissioning.utils.plot_utils import plotratio, markers, autoranger
 
 time = arrow.now().format("YY_MM_DD")
