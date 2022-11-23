@@ -161,6 +161,7 @@ if __name__ == "__main__":
                 "skipbadfiles": config.run_options["skipbadfiles"],
                 "schema": processor.NanoAODSchema,
                 "workers": config.run_options["workers"],
+                "xrootdtimeout": 400,
             },
             chunksize=config.run_options["chunk"],
             maxchunks=config.run_options["max"],

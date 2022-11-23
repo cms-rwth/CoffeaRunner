@@ -4,7 +4,6 @@ import matplotlib.pyplot as plt, mplhep as hep
 from matplotlib.offsetbox import AnchoredText
 
 import hist
-from hist.intervals import ratio_uncertainty
 
 plt.style.use(hep.style.ROOT)
 time = arrow.now().format("YY_MM_DD")
@@ -18,6 +17,7 @@ from BTVNanoCommissioning.utils.plot_utils import (
     rebin_and_xlabel,
     plotratio,
     unc_fill_opt,
+    autoranger,
 )
 
 parser = argparse.ArgumentParser(description="hist plotter for commissioning")
@@ -25,6 +25,7 @@ parser.add_argument("--cfg", type=str, required=True, help="Configuration files"
 parser.add_argument(
     "--debug", action="store_true", help="Run detailed checks of yaml file"
 )
+
 arg = parser.parse_args()
 
 # load config from yaml
