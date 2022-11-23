@@ -19,7 +19,7 @@ reference:
 compare: 
     # if not specify anything, leave empty value for key
     Muon_Run2022D-PromptReco-v1: 
-    #Muon_Run2022D-PromptReco-v2: 
+    Muon_Run2022D-PromptReco-v2: 
     
 ## Required, variable set
 variable :
@@ -36,7 +36,7 @@ variable :
             # Optional, you can specify the rebin axis with rebin value
             # discr: 2
             # or just put a number, would rebin distribution the last axis (usually the variable)
-            2        
+            4        
     ## specify variable, if not specify anything, leave empty value for key
     btagDeepFlavC_0:
 

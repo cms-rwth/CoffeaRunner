@@ -128,7 +128,7 @@ def load_default(config, isDataMC=True):
 
 
 def load_coffea(config, isDataMC=True):
-    print('config = ', config)
+    # print('config = ', config)
     if isDataMC:
         from BTVNanoCommissioning.utils.xs_scaler import getSumW, scaleSumW
     if "*" in config["input"]:
@@ -139,7 +139,7 @@ def load_coffea(config, isDataMC=True):
                 output[out] = scaleSumW(
                     output[out], config["lumi"], getSumW(output[out])
                 )
-    elif len(config["input"]) > 1:
+    elif len(config["input"]) > 0:
         output = {i: load(i) for i in config["input"]}
         for out in output.keys():
             if isDataMC:
@@ -147,10 +147,9 @@ def load_coffea(config, isDataMC=True):
                     output[out], config["lumi"], getSumW(output[out])
                 )
     else:
-        print('Trying to load coffea file')
-        output = load(config["input"])
-        if isDataMC:
-            output = scaleSumW(output, config["lumi"], getSumW(output))
+        print('Input files are not provided in config')
+        return None
+
     return output
 
 

@@ -37,8 +37,11 @@ if not os.path.isdir(f"plot/{config['output']}_{time}/"):
 if args.debug:
     check_config(config, False)
 ## load coffea files
+
+print('config:', config)
 output = load_coffea(config, False)
 print(output)
+
 ## build up merge map
 mergemap = {}
 refname = list(config["reference"].keys())[0]
@@ -58,6 +61,8 @@ else:
         mergemap[c] = comparelist
 collated = collate(output, mergemap)
 config = load_default(config, False)
+
+#print('collated', collated)
 ### style settings
 if "Run" in list(config["reference"].keys())[0]:
     hist_type = "errorbar"
@@ -84,6 +89,7 @@ for var in var_set:
         continue
 
     xlabel, rebin_axis = rebin_and_xlabel(var, collated, config, False)
+    print(xlabel, rebin_axis)
     ## Normalize to reference yield
     if config["norm"]:
         for c in config["compare"].keys():
@@ -124,6 +130,8 @@ for var in var_set:
             collated[refname][var][rebin_axis],
             denom_fill_opts=None,
             error_opts={"color": ax.get_lines()[i + 1].get_color()},
+            clear=False,
+            ax=rax
         )
 
     ##  plot settings, adjust range
@@ -153,3 +161,6 @@ for var in var_set:
         logext = "_norm" + logext
     fig.savefig(f"plot/{config['output']}_{time}/compare_{var}{logext}.pdf")
     fig.savefig(f"plot/{config['output']}_{time}/compare_{var}{logext}.png")
+
+
+    print(f"The output is saved at: plot/{config['output']}_{time}")
