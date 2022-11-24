@@ -60,9 +60,9 @@ variable :
             syst: noSF # Optional, access bin
             flav : sum # Optional, access bin, can convert sum to sum operation later
         # Optional, rebin variable 
-        rebin :  
-            # Optional, you can specify the rebin axis with rebin value
-            # discr: 2
+        rebin:  
+        # Optional, you can specify the rebin axis with rebin value
+            #discr : 2
             # or just put a number, would rebin distribution the last axis (usually the variable)
             2
         # Optional(only for data/MC), blind variables
@@ -89,6 +89,6 @@ variable :
 scale : 
     VV : 100.
 com : "13.6" # Optional, # √s = 13TeV
-inbox_text: "" #Optional, text write in anchor text box
+inbox_text: "" #Optional, text write in anchor text box, but always put empty string
 disable_ratio : False #Optional, disable ratio panel
 log : False #Optional, log y axis

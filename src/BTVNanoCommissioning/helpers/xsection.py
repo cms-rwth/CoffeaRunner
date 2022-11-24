@@ -958,6 +958,9 @@ xsection = [
         "MCM": "SMP-RunIIFall17MiniAODv2-00019",
         "equivalent_lumi": "",
         "fraction_negative_weight": "0.2771",
+        "matrix_generator": "none",
+        "energy": "13",
+        "comments": "GENXSanalyzer",
     },
     {
         "id": "60d05b7b2946173d8008686f",
@@ -1141,6 +1144,13 @@ xsection = [
         "comment": "from TOP-22-012",
     },
     {
+        "process_name": "TBbarQ_t-channel_4FS_CP5_13p6TeV_powheg-madspin-pythia8",
+        "cross_section": "145.0",
+        "DAS": "/TBbarQ_t-channel_4FS_CP5_13p6TeV_powheg-madspin-pythia8/Run3Winter22NanoAOD-122X_mcRun3_2021_realistic_v9-v1/NANOAODSIM",
+        "energy": "13.6",
+        "comment": "from TOP-22-012",
+    },
+    {
         "process_name": "TbarWplus_DR_AtLeastOneLepton_CP5_13p6TeV_powheg-pythia8",
         "cross_section": "24.2",
         "DAS": "/TbarWplus_DR_AtLeastOneLepton_CP5_13p6TeV_powheg-pythia8/Run3Winter22NanoAOD-122X_mcRun3_2021_realistic_v9-v1/NANOAODSIM",
@@ -1201,33 +1211,5 @@ xsection = [
         "DAS": "/ZZ_TuneCP5_13p6TeV-pythia8/Run3Winter22MiniAOD-FlatPU0to70_122X_mcRun3_2021_realistic_v9-v2//NANOAODSIM",
         "energy": "13.6",
         "comment": "from TOP-22-012",
-    },
-    {
-        "process_name": "DYJetsToMuMu_M-50_massWgtFix_TuneCP5_13TeV-powhegMiNNLO-pythia8-photos",
-        "cross_section": "1976",
-        "DAS": "/DYJetsToMuMu_M-50_massWgtFix_TuneCP5_13TeV-powhegMiNNLO-pythia8-photos/RunIISummer20UL17NanoAODv9-106X_mc2017_rea",
-        "energy": "13",
-        "comment": "For Z+Jets study",
-    },
-    {
-        "process_name": "DYJetsToEE_M-50_massWgtFix_TuneCP5_13TeV-powhegMiNNLO-pythia8-photos",
-        "cross_section": "1976",
-        "DAS": "//DYJetsToEE_M-50_massWgtFix_TuneCP5_13TeV-powhegMiNNLO-pythia8-photos/",
-        "energy": "13",
-        "comment": "For Z+Jets study",
-    },
-    {
-        "process_name": "DYJetsToMuMu_BornSuppressV3_TuneCP5_13TeV-powhegMiNNLO-pythia8-photos",
-        "cross_section": "1976",
-        "DAS": "/DYJetsToMuMu_BornSuppressV3_TuneCP5_13TeV-powhegMiNNLO-pythia8-photos/*/USER",
-        "energy": "13",
-        "comment": "Private sample",
-    },
-    {
-        "process_name": "Template",
-        "cross_section": "11",
-        "DAS": "/1/2/NANOAODSIM",
-        "energy": "13",
-        "comment": "Copy this template to manually insert a new sample in this list",
     },
 ]
