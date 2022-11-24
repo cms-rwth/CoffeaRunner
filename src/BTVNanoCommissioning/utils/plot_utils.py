@@ -56,7 +56,10 @@ def check_config(config, isDataMC=True):
 
     for attr in config.keys():
         ## check type
-        if type(config[attr]) != inputtype[attr] and type(config[attr]) not in inputtype[attr]:
+        if (
+            type(config[attr]) != inputtype[attr]
+            and type(config[attr]) not in inputtype[attr]
+        ):
             raise ValueError(f"Type of {attr} should be {inputtype[attr]}")
         ## check method
         if isDataMC and attr in ["norm"]:
@@ -75,7 +78,7 @@ def check_config(config, isDataMC=True):
             elif attr == "mergemap" or attr == "reference" or attr == "compare":
                 if attr == "reference" and len(config[attr]) > 1:
                     raise ValueError("Only one reference is allowed")
-                #for sc in config[attr].keys():
+                # for sc in config[attr].keys():
                 #    if type(config[attr][sc]) != str:
                 #        raise TypeError(f"Type of {attr}[{sc}] should be string")
             else:  ## variables
@@ -148,7 +151,7 @@ def load_coffea(config, scaleToLumi=True):
                     output[out], config["lumi"], getSumW(output[out])
                 )
     else:
-        print('Input files are not provided in config')
+        print("Input files are not provided in config")
         return None
 
     return output

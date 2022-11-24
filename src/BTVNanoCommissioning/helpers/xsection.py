@@ -1223,7 +1223,6 @@ xsection = [
         "energy": "13",
         "comment": "Private sample",
     },
-
     {
         "process_name": "Template",
         "cross_section": "11",

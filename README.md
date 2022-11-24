@@ -28,37 +28,15 @@ bash Miniconda3-latest-Linux-x86_64.sh
 ```
 NOTE: always make sure that conda, python, and pip point to local Miniconda installation (`which conda` etc.).
 
-You could simply create the environment through the existing `test_env.yml` under your conda environment
+You could simply create the environment through the existing `env.yml` under your conda environment
 
 ```
-conda env create -f test_env.yml 
+conda env create -f env.yml 
 ```
-
-Or you can either use the default environment `base` or create a new one:
-
-```bash
-# create new environment with name `CoffeaRunner`
-conda create --name CoffeaRunner
-# activate environment `CoffeaRunner`
-conda activate CoffeaRunner
-#Install manually for the required packages:
-pip install coffea
-conda install -c conda-forge xrootd
-conda install -c conda-forge ca-certificates
-conda install -c conda-forge ca-policy-lcg
-conda install -c conda-forge dask-jobqueue
-conda install -c anaconda bokeh 
-conda install -c conda-forge 'fsspec>=0.3.3'
-conda install dask
-conda install -c anaconda 'openssl==1.1.1s'
-conda install -c conda-forge parsl
-```
-
 Once the environment is set up, compile the python package:
 ```
 pip install -e .
 ```
-
 
 
 

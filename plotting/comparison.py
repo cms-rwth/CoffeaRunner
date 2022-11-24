@@ -52,7 +52,7 @@ else:
     for f in output.keys():
         reflist.extend([m for m in output[f].keys() if refname == m])
     mergemap[refname] = reflist
-    print("\t What we compare?\n ",config["compare"])
+    print("\t What we compare?\n ", config["compare"])
     for c in config["compare"].keys():
         comparelist = []
         for f in output.keys():
@@ -61,7 +61,7 @@ else:
 collated = collate(output, mergemap)
 config = load_default(config, False)
 
-#print('collated', collated)
+# print('collated', collated)
 ### style settings
 if "Run" in list(config["reference"].keys())[0]:
     hist_type = "errorbar"
@@ -83,8 +83,8 @@ else:
     var_set = config["variable"].keys()
 
 
-np.seterr(invalid='ignore')
-np.seterr(divide='ignore')
+np.seterr(invalid="ignore")
+np.seterr(divide="ignore")
 
 ## Loop through all variables
 for var in var_set:
@@ -134,7 +134,7 @@ for var in var_set:
             denom_fill_opts=None,
             error_opts={"color": ax.get_lines()[i + 1].get_color()},
             clear=False,
-            ax=rax
+            ax=rax,
         )
 
     ##  plot settings, adjust range
