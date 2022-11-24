@@ -12,9 +12,6 @@ parser.add_argument(
     help="List of samples in DAS (default: %(default)s)",
 )
 parser.add_argument(
-    "-s", "--site", default=r"global", help="Site (default: %(default)s)"
-)
-parser.add_argument(
     "-o", "--output", default=r"test_my_samples", help="Site (default: %(default)s)"
 )
 parser.add_argument(
@@ -33,9 +30,6 @@ with open(args.input) as fp:
         fset.append(line)
 
 fdict = {}
-
-instance = "prod/" + args.site
-
 
 for dataset in fset:
     if dataset.startswith("#") or dataset.strip() == "":

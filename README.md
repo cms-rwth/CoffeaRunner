@@ -53,13 +53,14 @@ conda activate CoffeaRunner
 # setup proxy
 voms-proxy-init --voms cms --vomses ~/.grid-security/vomses 
 ```
-### Make the dataset json files (Optional)
+### Make the list of input files (Optional)
 
-Use the `fetch.py` in `filefetcher`, the `$input_DAS_list` is the info extract from DAS, and output json files in `metadata/`. Default site is `prod/global`, use `prod/phys03` for personal productions.
+Use the `./filefetcher/fetch.py` script:
 
 ```
-python fetch.py --input ${input_DAS_list} --output ${output_json_name} --site ${site}
+python filefetcher/fetch.py --input input_DAS_list.txt --output ${output_name.json}
 ```
+where the `input_DAS_list.txt` is a simple file with a list of dataset names extract from DAS (you need to create it yourself for the samples you want to run over), and output json file in creted in `./metadata` directory.
 
 ### Create compiled corretions file, like JERC (Optional)
 

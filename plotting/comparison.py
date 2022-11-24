@@ -83,11 +83,10 @@ else:
     var_set = config["variable"].keys()
 
 
-np.seterr(invalid="ignore")
-np.seterr(divide="ignore")
-
+np.seterr(divide="ignore", invalid="ignore")
 ## Loop through all variables
 for var in var_set:
+    print("\t Plotting now:", var)
     if "sumw" == var:
         continue
 
@@ -96,8 +95,7 @@ for var in var_set:
     ## Normalize to reference yield
     if config["norm"]:
         for c in config["compare"].keys():
-            print("Plotting now:", c, var)
-            collated[c][var] = collated[c][var] * float(
+             collated[c][var] = collated[c][var] * float(
                 np.sum(collated[refname][var][rebin_axis].values())
                 / np.sum(collated[c][var][rebin_axis].values())
             )
