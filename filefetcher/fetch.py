@@ -35,8 +35,10 @@ for dataset in fset:
     if dataset.startswith("#") or dataset.strip() == "":
         # print("we skip this line:", line)
         continue
-    dsname = dataset.strip().split("/")[1] # Dataset first name
-    Tier = dataset.strip().split("/")[3]  # NANOAODSIM for regular samples, USER for private
+    dsname = dataset.strip().split("/")[1]  # Dataset first name
+    Tier = dataset.strip().split("/")[
+        3
+    ]  # NANOAODSIM for regular samples, USER for private
     instance = "prod/global"
     if Tier == "USER":
         instance = "prod/phys03"
