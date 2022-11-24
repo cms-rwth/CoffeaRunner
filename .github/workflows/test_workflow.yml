@@ -34,7 +34,7 @@ jobs:
         channel-priority: true
         auto-update-conda: true
         activate-environment: CoffeaRunner
-        environment-file: test_env.yml
+        environment-file: env.yml
         auto-activate-base: false
 
     - name: Verify environment

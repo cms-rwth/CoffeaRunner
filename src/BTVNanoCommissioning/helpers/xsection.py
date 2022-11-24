@@ -1202,4 +1202,32 @@ xsection = [
         "energy": "13.6",
         "comment": "from TOP-22-012",
     },
+    {
+        "process_name": "DYJetsToMuMu_M-50_massWgtFix_TuneCP5_13TeV-powhegMiNNLO-pythia8-photos",
+        "cross_section": "1976",
+        "DAS": "/DYJetsToMuMu_M-50_massWgtFix_TuneCP5_13TeV-powhegMiNNLO-pythia8-photos/RunIISummer20UL17NanoAODv9-106X_mc2017_rea",
+        "energy": "13",
+        "comment": "For Z+Jets study",
+    },
+    {
+        "process_name": "DYJetsToEE_M-50_massWgtFix_TuneCP5_13TeV-powhegMiNNLO-pythia8-photos",
+        "cross_section": "1976",
+        "DAS": "//DYJetsToEE_M-50_massWgtFix_TuneCP5_13TeV-powhegMiNNLO-pythia8-photos/",
+        "energy": "13",
+        "comment": "For Z+Jets study",
+    },
+    {
+        "process_name": "DYJetsToMuMu_BornSuppressV3_TuneCP5_13TeV-powhegMiNNLO-pythia8-photos",
+        "cross_section": "1976",
+        "DAS": "/DYJetsToMuMu_BornSuppressV3_TuneCP5_13TeV-powhegMiNNLO-pythia8-photos/*/USER",
+        "energy": "13",
+        "comment": "Private sample",
+    },
+    {
+        "process_name": "Template",
+        "cross_section": "11",
+        "DAS": "/1/2/NANOAODSIM",
+        "energy": "13",
+        "comment": "Copy this template to manually insert a new sample in this list",
+    },
 ]

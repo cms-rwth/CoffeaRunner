@@ -17,7 +17,6 @@ from BTVNanoCommissioning.utils.plot_utils import (
     rebin_and_xlabel,
     plotratio,
     unc_fill_opt,
-    autoranger,
 )
 
 parser = argparse.ArgumentParser(description="hist plotter for commissioning")
@@ -37,7 +36,7 @@ if arg.debug:
 if not os.path.isdir(f"plot/{config['output']}_{time}/"):
     os.makedirs(f"plot/{config['output']}_{time}/")
 ## load coffea files
-output = load_coffea(config, True)
+output = load_coffea(config, config["scaleToLumi"])
 ## load merge map, inbox text
 mergemap = {
     merger: config["mergemap"][merger]["list"] for merger in config["mergemap"].keys()
@@ -66,6 +65,8 @@ for var in var_set:
     if "disable_ratio" in config.keys() and config["disable_ratio"]:
         fig, ax = plt.subplots(figsize=(10, 10))
     else:
+        np.seterr(invalid="ignore")
+
         fig, ((ax), (rax)) = plt.subplots(
             2, 1, figsize=(10, 10), gridspec_kw={"height_ratios": (3, 1)}, sharex=True
         )

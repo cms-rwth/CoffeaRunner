@@ -28,37 +28,15 @@ bash Miniconda3-latest-Linux-x86_64.sh
 ```
 NOTE: always make sure that conda, python, and pip point to local Miniconda installation (`which conda` etc.).
 
-You could simply create the environment through the existing `test_env.yml` under your conda environment
+You could simply create the environment through the existing `env.yml` under your conda environment
 
 ```
-conda env create -f test_env.yml 
+conda env create -f env.yml 
 ```
-
-Or you can either use the default environment `base` or create a new one:
-
-```bash
-# create new environment with name `CoffeaRunner`
-conda create --name CoffeaRunner
-# activate environment `CoffeaRunner`
-conda activate CoffeaRunner
-#Install manually for the required packages:
-pip install coffea
-conda install -c conda-forge xrootd
-conda install -c conda-forge ca-certificates
-conda install -c conda-forge ca-policy-lcg
-conda install -c conda-forge dask-jobqueue
-conda install -c anaconda bokeh 
-conda install -c conda-forge 'fsspec>=0.3.3'
-conda install dask
-conda install -c anaconda 'openssl==1.1.1s'
-conda install -c conda-forge parsl
-```
-
 Once the environment is set up, compile the python package:
 ```
 pip install -e .
 ```
-
 
 
 
@@ -75,13 +53,14 @@ conda activate CoffeaRunner
 # setup proxy
 voms-proxy-init --voms cms --vomses ~/.grid-security/vomses 
 ```
-### Make the dataset json files (Optional)
+### Make the list of input files (Optional)
 
-Use the `fetch.py` in `filefetcher`, the `$input_DAS_list` is the info extract from DAS, and output json files in `metadata/`. Default site is `prod/global`, use `prod/phys03` for personal productions.
+Use the `./filefetcher/fetch.py` script:
 
 ```
-python fetch.py --input ${input_DAS_list} --output ${output_json_name} --site ${site}
+python filefetcher/fetch.py --input input_DAS_list.txt --output ${output_name.json}
 ```
+where the `input_DAS_list.txt` is a simple file with a list of dataset names extract from DAS (you need to create it yourself for the samples you want to run over), and output json file in creted in `./metadata` directory.
 
 ### Create compiled corretions file, like JERC (Optional)
 

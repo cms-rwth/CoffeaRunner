@@ -45,6 +45,7 @@ def check_config(config, isDataMC=True):
         "disable_ratio": bool,
         "log": bool,
         "norm": bool,
+        "scaleToLumi": bool,
     }
     variabletype = {
         "xlabel": str,
@@ -55,7 +56,10 @@ def check_config(config, isDataMC=True):
 
     for attr in config.keys():
         ## check type
-        if type(attr) != inputtype[attr] and type(attr) not in inputtype[attr]:
+        if (
+            type(config[attr]) != inputtype[attr]
+            and type(config[attr]) not in inputtype[attr]
+        ):
             raise ValueError(f"Type of {attr} should be {inputtype[attr]}")
         ## check method
         if isDataMC and attr in ["norm"]:
@@ -71,12 +75,12 @@ def check_config(config, isDataMC=True):
                         or type(config["scale"][sc]) != int
                     ):
                         raise TypeError(f"Type of scale[{sc}] should be int/float")
-            elif attr == "mergemap" | attr == "reference" | attr == "compare":
+            elif attr == "mergemap" or attr == "reference" or attr == "compare":
                 if attr == "reference" and len(config[attr]) > 1:
                     raise ValueError("Only one reference is allowed")
-                for sc in config[attr].keys():
-                    if type(config[attr][sc]) != str:
-                        raise TypeError(f"Type of {attr}[{sc}] should be string")
+                # for sc in config[attr].keys():
+                #    if type(config[attr][sc]) != str:
+                #        raise TypeError(f"Type of {attr}[{sc}] should be string")
             else:  ## variables
                 for var in config[attr].keys():
                     if not isDataMC and "blind" in config[attr][var].keys():
@@ -127,28 +131,29 @@ def load_default(config, isDataMC=True):
     return config
 
 
-def load_coffea(config, isDataMC=True):
-    if isDataMC:
+def load_coffea(config, scaleToLumi=True):
+    # print('config = ', config)
+    if scaleToLumi:
         from BTVNanoCommissioning.utils.xs_scaler import getSumW, scaleSumW
     if "*" in config["input"]:
         files = glob.glob(config["input"])
         output = {i: load(i) for i in files}
         for out in output.keys():
-            if isDataMC:
+            if scaleToLumi:
                 output[out] = scaleSumW(
                     output[out], config["lumi"], getSumW(output[out])
                 )
-    elif len(config["input"]) > 1:
+    elif len(config["input"]) > 0:
         output = {i: load(i) for i in config["input"]}
         for out in output.keys():
-            if isDataMC:
+            if scaleToLumi:
                 output[out] = scaleSumW(
                     output[out], config["lumi"], getSumW(output[out])
                 )
     else:
-        output = load(config["input"])
-        if isDataMC:
-            output = scaleSumW(output, config["lumi"], getSumW(output))
+        print("Input files are not provided in config")
+        return None
+
     return output
 
 

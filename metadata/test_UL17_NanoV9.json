@@ -1,5 +1,5 @@
 {
-    "/DYJetsToLL_M-50_TuneCP5_13TeV-madgraphMLM-pythia8/RunIISummer20UL17NanoAODv9-106X_mc2017_realistic_v9-v1/NANOAODSIM": [
+    "DYJetsToLL_M-50_TuneCP5_13TeV-madgraphMLM-pythia8": [
         "root://grid-cms-xrootd.physik.rwth-aachen.de//store/mc/RunIISummer20UL17NanoAODv9/DYJetsToLL_M-50_TuneCP5_13TeV-madgraphMLM-pythia8/NANOAODSIM/106X_mc2017_realistic_v9-v1/270000/FD918196-E5D8-5444-A397-9EF7E3458FBC.root",
         "root://grid-cms-xrootd.physik.rwth-aachen.de//store/mc/RunIISummer20UL17NanoAODv9/DYJetsToLL_M-50_TuneCP5_13TeV-madgraphMLM-pythia8/NANOAODSIM/106X_mc2017_realistic_v9-v1/270000/22702AAA-AD3B-7643-B9A3-88582CB5B2B8.root",
         "root://grid-cms-xrootd.physik.rwth-aachen.de//store/mc/RunIISummer20UL17NanoAODv9/DYJetsToLL_M-50_TuneCP5_13TeV-madgraphMLM-pythia8/NANOAODSIM/106X_mc2017_realistic_v9-v1/270000/A9D7F210-E6C6-4C42-9988-E5EB065F6E4B.root",
@@ -76,7 +76,7 @@
         "root://grid-cms-xrootd.physik.rwth-aachen.de//store/mc/RunIISummer20UL17NanoAODv9/DYJetsToLL_M-50_TuneCP5_13TeV-madgraphMLM-pythia8/NANOAODSIM/106X_mc2017_realistic_v9-v1/270000/DCE7C3C2-78FB-6C45-B865-C1AF8CFC8F82.root",
         "root://grid-cms-xrootd.physik.rwth-aachen.de//store/mc/RunIISummer20UL17NanoAODv9/DYJetsToLL_M-50_TuneCP5_13TeV-madgraphMLM-pythia8/NANOAODSIM/106X_mc2017_realistic_v9-v1/270000/B7624396-0094-1D46-A789-E27B7CA0F410.root"
     ],
-    "/DYJetsToLL_M-50_TuneCP5_13TeV-amcatnloFXFX-pythia8/RunIISummer20UL17NanoAODv9-106X_mc2017_realistic_v9-v2/NANOAODSIM": [
+    "DYJetsToLL_M-50_TuneCP5_13TeV-amcatnloFXFX-pythia8": [
         "root://grid-cms-xrootd.physik.rwth-aachen.de//store/mc/RunIISummer20UL17NanoAODv9/DYJetsToLL_M-50_TuneCP5_13TeV-amcatnloFXFX-pythia8/NANOAODSIM/106X_mc2017_realistic_v9-v2/2510000/970E1290-7DA0-E84C-93A1-962287D8EC05.root",
         "root://grid-cms-xrootd.physik.rwth-aachen.de//store/mc/RunIISummer20UL17NanoAODv9/DYJetsToLL_M-50_TuneCP5_13TeV-amcatnloFXFX-pythia8/NANOAODSIM/106X_mc2017_realistic_v9-v2/2510000/EE079C18-06E6-0344-8CB0-3313E7130194.root",
         "root://grid-cms-xrootd.physik.rwth-aachen.de//store/mc/RunIISummer20UL17NanoAODv9/DYJetsToLL_M-50_TuneCP5_13TeV-amcatnloFXFX-pythia8/NANOAODSIM/106X_mc2017_realistic_v9-v2/2510000/AC80F858-FFDD-2C4F-8732-EA1F7034A4D2.root",
@@ -231,7 +231,7 @@
         "root://grid-cms-xrootd.physik.rwth-aachen.de//store/mc/RunIISummer20UL17NanoAODv9/DYJetsToLL_M-50_TuneCP5_13TeV-amcatnloFXFX-pythia8/NANOAODSIM/106X_mc2017_realistic_v9-v2/250000/6E6E9327-A13A-D94B-A79A-4347359E84E0.root",
         "root://grid-cms-xrootd.physik.rwth-aachen.de//store/mc/RunIISummer20UL17NanoAODv9/DYJetsToLL_M-50_TuneCP5_13TeV-amcatnloFXFX-pythia8/NANOAODSIM/106X_mc2017_realistic_v9-v2/250000/C0DC0C98-33A4-F249-BDD7-4BE7C0AEB52A.root"
     ],
-    "/DYJetsToMuMu_M-50_massWgtFix_TuneCP5_13TeV-powhegMiNNLO-pythia8-photos/RunIISummer20UL17NanoAODv9-106X_mc2017_realistic_v9-v2/NANOAODSIM": [
+    "DYJetsToMuMu_M-50_massWgtFix_TuneCP5_13TeV-powhegMiNNLO-pythia8-photos": [
         "root://grid-cms-xrootd.physik.rwth-aachen.de//store/mc/RunIISummer20UL17NanoAODv9/DYJetsToMuMu_M-50_massWgtFix_TuneCP5_13TeV-powhegMiNNLO-pythia8-photos/NANOAODSIM/106X_mc2017_realistic_v9-v2/2830000/E3DF1CA8-CB77-7A4D-BA33-70B43E8D7E3D.root",
         "root://grid-cms-xrootd.physik.rwth-aachen.de//store/mc/RunIISummer20UL17NanoAODv9/DYJetsToMuMu_M-50_massWgtFix_TuneCP5_13TeV-powhegMiNNLO-pythia8-photos/NANOAODSIM/106X_mc2017_realistic_v9-v2/2830000/EBA6C0B2-DBED-5144-B8D8-A2743785A192.root",
         "root://grid-cms-xrootd.physik.rwth-aachen.de//store/mc/RunIISummer20UL17NanoAODv9/DYJetsToMuMu_M-50_massWgtFix_TuneCP5_13TeV-powhegMiNNLO-pythia8-photos/NANOAODSIM/106X_mc2017_realistic_v9-v2/2830000/9C808DF6-EBD8-8840-8110-8AE23D2C0093.root",
@@ -401,7 +401,7 @@
         "root://grid-cms-xrootd.physik.rwth-aachen.de//store/mc/RunIISummer20UL17NanoAODv9/DYJetsToMuMu_M-50_massWgtFix_TuneCP5_13TeV-powhegMiNNLO-pythia8-photos/NANOAODSIM/106X_mc2017_realistic_v9-v2/60000/E7366680-EC99-B247-9156-1E8D486C0197.root",
         "root://grid-cms-xrootd.physik.rwth-aachen.de//store/mc/RunIISummer20UL17NanoAODv9/DYJetsToMuMu_M-50_massWgtFix_TuneCP5_13TeV-powhegMiNNLO-pythia8-photos/NANOAODSIM/106X_mc2017_realistic_v9-v2/2820000/5B4E1F20-F353-4349-B638-F917AD323E72.root"
     ],
-    "/DYJetsToEE_M-50_massWgtFix_TuneCP5_13TeV-powhegMiNNLO-pythia8-photos/RunIISummer20UL17NanoAODv9-106X_mc2017_realistic_v9-v2/NANOAODSIM": [
+    "DYJetsToEE_M-50_massWgtFix_TuneCP5_13TeV-powhegMiNNLO-pythia8-photos": [
         "root://grid-cms-xrootd.physik.rwth-aachen.de//store/mc/RunIISummer20UL17NanoAODv9/DYJetsToEE_M-50_massWgtFix_TuneCP5_13TeV-powhegMiNNLO-pythia8-photos/NANOAODSIM/106X_mc2017_realistic_v9-v2/60000/6FD0DEF5-9ACD-104A-B763-A4EEFBBCF613.root",
         "root://grid-cms-xrootd.physik.rwth-aachen.de//store/mc/RunIISummer20UL17NanoAODv9/DYJetsToEE_M-50_massWgtFix_TuneCP5_13TeV-powhegMiNNLO-pythia8-photos/NANOAODSIM/106X_mc2017_realistic_v9-v2/70000/91A57534-9CDD-9940-B61A-9FD5D1CF1D16.root",
         "root://grid-cms-xrootd.physik.rwth-aachen.de//store/mc/RunIISummer20UL17NanoAODv9/DYJetsToEE_M-50_massWgtFix_TuneCP5_13TeV-powhegMiNNLO-pythia8-photos/NANOAODSIM/106X_mc2017_realistic_v9-v2/60000/92674C75-7961-204F-BEEC-D03302C7E9BE.root",
@@ -667,6 +667,5 @@
         "root://grid-cms-xrootd.physik.rwth-aachen.de//store/mc/RunIISummer20UL17NanoAODv9/DYJetsToEE_M-50_massWgtFix_TuneCP5_13TeV-powhegMiNNLO-pythia8-photos/NANOAODSIM/106X_mc2017_realistic_v9-v2/2820000/9DCA2A4F-3EB1-8E45-91A6-482D184A11A1.root",
         "root://grid-cms-xrootd.physik.rwth-aachen.de//store/mc/RunIISummer20UL17NanoAODv9/DYJetsToEE_M-50_massWgtFix_TuneCP5_13TeV-powhegMiNNLO-pythia8-photos/NANOAODSIM/106X_mc2017_realistic_v9-v2/2820000/1481C5D0-664E-4D4D-829D-CA5A273F8051.root",
         "root://grid-cms-xrootd.physik.rwth-aachen.de//store/mc/RunIISummer20UL17NanoAODv9/DYJetsToEE_M-50_massWgtFix_TuneCP5_13TeV-powhegMiNNLO-pythia8-photos/NANOAODSIM/106X_mc2017_realistic_v9-v2/2820000/1B6ED924-F7E8-A44D-A657-1DB6CC0E8FE4.root"
-    ],
-    "/DYJetsToMuMu_BornSuppressV3_TuneCP5_13TeV-powhegMiNNLO-pythia8-photos/andrey-RunIISummer20UL-2022Jun27-00000000000000000000000000000000/USER": []
+    ]
 }

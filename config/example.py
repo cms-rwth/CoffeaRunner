@@ -19,7 +19,7 @@ cfg = {
     },
     # Input and output files
     "workflow": test_wf,
-    "output": "test",
+    "output": "output_test",
     "run_options": {
         # "executor": "parsl/condor",
         "executor": "futures",

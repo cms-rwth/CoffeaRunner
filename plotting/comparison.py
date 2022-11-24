@@ -5,8 +5,7 @@ from matplotlib.offsetbox import AnchoredText
 
 from coffea.util import load
 import hist
-from BTVNanoCommissioning.helpers.definitions import definitions, axes_name
-from BTVNanoCommissioning.utils.plot_utils import plotratio, markers, autoranger
+from BTVNanoCommissioning.utils.plot_utils import plotratio
 
 time = arrow.now().format("YY_MM_DD")
 plt.style.use(hep.style.ROOT)
@@ -38,7 +37,9 @@ if not os.path.isdir(f"plot/{config['output']}_{time}/"):
 if args.debug:
     check_config(config, False)
 ## load coffea files
-output = load_coffea(config, False)
+output = load_coffea(config, config["scaleToLumi"])
+
+
 ## build up merge map
 mergemap = {}
 refname = list(config["reference"].keys())[0]
@@ -51,6 +52,7 @@ else:
     for f in output.keys():
         reflist.extend([m for m in output[f].keys() if refname == m])
     mergemap[refname] = reflist
+    print("\t What we compare?\n ", config["compare"])
     for c in config["compare"].keys():
         comparelist = []
         for f in output.keys():
@@ -58,6 +60,8 @@ else:
         mergemap[c] = comparelist
 collated = collate(output, mergemap)
 config = load_default(config, False)
+
+# print('collated', collated)
 ### style settings
 if "Run" in list(config["reference"].keys())[0]:
     hist_type = "errorbar"
@@ -78,16 +82,19 @@ elif "*" in list(config["variable"].keys())[0]:
 else:
     var_set = config["variable"].keys()
 
+
+np.seterr(divide="ignore", invalid="ignore")
 ## Loop through all variables
 for var in var_set:
     if "sumw" == var:
         continue
+    print("\t Plotting now:", var)
 
     xlabel, rebin_axis = rebin_and_xlabel(var, collated, config, False)
+    # print(xlabel, rebin_axis)
     ## Normalize to reference yield
     if config["norm"]:
         for c in config["compare"].keys():
-            print(c, var)
             collated[c][var] = collated[c][var] * float(
                 np.sum(collated[refname][var][rebin_axis].values())
                 / np.sum(collated[c][var][rebin_axis].values())
@@ -157,3 +164,6 @@ for var in var_set:
         logext = "_norm" + logext
     fig.savefig(f"plot/{config['output']}_{time}/compare_{var}{logext}.pdf")
     fig.savefig(f"plot/{config['output']}_{time}/compare_{var}{logext}.png")
+
+
+print(f"The output is saved at: plot/{config['output']}_{time}")

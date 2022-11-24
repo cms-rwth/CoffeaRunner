@@ -1,4 +1,5 @@
 output: "ctag_Wc_sf"   #  Required, output directory
+scaleToLumi : False
 
 ## Required, input files 
 input : 
@@ -19,7 +20,7 @@ reference:
 compare: 
     # if not specify anything, leave empty value for key
     Muon_Run2022D-PromptReco-v1: 
-    #Muon_Run2022D-PromptReco-v2: 
+    Muon_Run2022D-PromptReco-v2: 
     
 ## Required, variable set
 variable :
