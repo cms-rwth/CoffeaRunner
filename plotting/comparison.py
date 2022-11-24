@@ -5,7 +5,7 @@ from matplotlib.offsetbox import AnchoredText
 
 from coffea.util import load
 import hist
-from BTVNanoCommissioning.utils.plot_utils import plotratio, markers, autoranger
+from BTVNanoCommissioning.utils.plot_utils import plotratio
 
 time = arrow.now().format("YY_MM_DD")
 plt.style.use(hep.style.ROOT)
@@ -38,9 +38,10 @@ if args.debug:
     check_config(config, False)
 ## load coffea files
 
-print('config:', config)
-output = load_coffea(config, False)
-print(output)
+# print('config:', config)
+#output = load_coffea(config, False)
+output = load_coffea(config, True)
+# print(output)
 
 ## build up merge map
 mergemap = {}
@@ -54,6 +55,7 @@ else:
     for f in output.keys():
         reflist.extend([m for m in output[f].keys() if refname == m])
     mergemap[refname] = reflist
+    print("\t What we compare?\n ",config["compare"])
     for c in config["compare"].keys():
         comparelist = []
         for f in output.keys():
