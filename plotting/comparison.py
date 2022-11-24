@@ -86,9 +86,9 @@ else:
 np.seterr(divide="ignore", invalid="ignore")
 ## Loop through all variables
 for var in var_set:
-    print("\t Plotting now:", var)
     if "sumw" == var:
         continue
+    print("\t Plotting now:", var)
 
     xlabel, rebin_axis = rebin_and_xlabel(var, collated, config, False)
     # print(xlabel, rebin_axis)
