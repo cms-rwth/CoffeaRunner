@@ -47,6 +47,7 @@ def check_config(config, isDataMC=True):
         "log": bool,
         "norm": bool,
         "scaleToLumi": bool,
+        "rescale_yields": dict,
     }
     variabletype = {
         "xlabel": str,
@@ -68,12 +69,12 @@ def check_config(config, isDataMC=True):
             raise NotImplementedError(f"{attr} is invalid in shape comparison")
         # Check nested case
         if isin_dict(config[attr]):
-            if attr == "scale":
-                for sc in config["scale"].keys():
-                    if float(config["scale"][sc]):
-                        config["scale"][sc] = float(config["scale"][sc])
+            if "scale" in attr:
+                for sc in config[attr].keys():
+                    if float(config[attr][sc]):
+                        config[attr][sc] = float(config[attr][sc])
                     else:
-                        raise TypeError(f"Type of scale[{sc}] should be int/float")
+                        raise TypeError(f"Type of {attr}[{sc}] should be int/float")
             elif attr == "mergemap" or attr == "reference" or attr == "compare":
                 if attr == "reference" and len(config[attr]) > 1:
                     raise ValueError("Only one reference is allowed")
@@ -140,12 +141,16 @@ def load_default(config, isDataMC=True):
         config["com"] = "13"
     if "inbox_text" not in config.keys():
         config["inbox_text"] = ""
+    if "norm" not in config.keys():
+        config["norm"] = False
+    if "disable_ratio" not in config.keys():
+        config["disable_ratio"] = False
     prop_cycle = plt.rcParams["axes.prop_cycle"]
     colors = prop_cycle.by_key()["color"]
     if isDataMC:
         maps = ["mergemap"]
     else:
-        maps = ["reference", "compare"]
+        maps = ["mergemap", "reference", "compare"]
     ## set color
     for m in maps:
         for i, mc in enumerate(config[m].keys()):

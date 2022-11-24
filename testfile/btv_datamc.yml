@@ -83,12 +83,14 @@ variable :
     # only rebin of last axis (variable-axis) can be specify here
     #all: 
     #    rebin: 2
-    
-    
-## Optional, scale up particular set 
+
+##  Optional, rescale the yields for some samples
+rescale_yields: 
+    VV : 100.0 
+## Optional, scale particular component and overlay on plot
 scale : 
-    VV : 100.
+    VV : 100.0 
 com : "13.6" # Optional, # √s = 13TeV
 inbox_text: "" #Optional, text write in anchor text box, but always put empty string
-disable_ratio : False #Optional, disable ratio panel
+# disable_ratio : False #Optional, disable ratio panel
 log : False #Optional, log y axis

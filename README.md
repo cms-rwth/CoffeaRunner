@@ -287,7 +287,7 @@ memray run --live  runner.py --cfg config/example.py
 
 Produce data/MC comparison, shape comparison plots from `.coffea` files, load configuration (`yaml`) files, brief [intro](https://docs.fileformat.com/programming/yaml/) of yaml.
 
-Details of yaml file format would summarized in table below. Information used in data/MC script would marked with (:large_blue_circle:) and comparsion script with (:red_circle:). The **required** info are marked as bold style. 
+Details of yaml file format would summarized in table below. Information used in data/MC script would marked with () and comparsion script with (). The **required** info are marked as bold style. 
 
 You can find test file set(`.coffea` and `.yaml`) in `testfile/`. Specify `--debug` to get more info for yaml format.
 
@@ -299,26 +299,33 @@ python plotting/comparison.py --cfg testfile/btv_compare.yml (--debug)
 
 | Parameter name        | Allowed values               | Description
 | :-----:               | :---:                        | :-----------------------------
-| **input**(Required):large_blue_circle::red_circle:| `list` or `str` <br>(wildcard options `*` accepted)|   input `.coffea` files| 
-| **output** (Required):large_blue_circle::red_circle:| `str` | output directory of plots with date| 
-| **mergemap**:large_blue_circle:/ **reference** & **compare**:red_circle: | `dict`(Required) | collect sample names, color, label setting for file set. details in [map diction](#dict-of-merge-maps-and-comparison-file-lists)|
-| **variable**(Required):large_blue_circle::red_circle: | `dict` | variables to plot, see [variables section](#variables)|
-|com:large_blue_circle::red_circle:| `str` | √s , default set to be 13TeV|
-|inbox_text:large_blue_circle::red_circle:| `str` | text put in `AnchoredText`|
-|log:large_blue_circle::red_circle:| `str` | log scale on y-axis |
-|disable_ratio:large_blue_circle:|`bool`| disable ratio panel for data/MC comparison plot|
-|scale:large_blue_circle:| `dict` | Scale up particular MC collections|
-|norm:red_circle:| `bool`| noramlized  yield to reference sample|
+| **input**(Required)| `list` or `str` <br>(wildcard options `*` accepted)|   input `.coffea` files| 
+| **output** (Required)| `str` | output directory of plots with date| 
+| **mergemap**(Required)| `dict` | collect sample names, (color, label) setting for file set. details in [map diction](#dict-of-merge-maps-and-comparison-file-lists)|
+| **reference** & **compare** (Required) |  `dict`| specify the class for comparison plots |
+| **variable**(Required) | `dict` | variables to plot, see [variables section](#variables)|
+|com| `str` | √s , default set to be 13TeV|
+|inbox_text| `str` | text put in `AnchoredText`|
+|log| `str` | log scale on y-axis |
+|disable_ratio|`bool`| disable ratio panel for data/MC comparison plot|
+|rescale_yields| `dict`| Rescale yields for particular MC collections (no overlay)|
+|scale| `dict` | Scale up particular MC collections overlay on the stacked histogram|
+|norm| `bool`| noramlized yield to reference sample, only for comparison plot|
 
 #### `dict` of merge maps and comparison file lists
 
-- data/MC comparison `mergemap` :large_blue_circle:
 
-To avoid crowded legend in the plot, we would merge a set of files with similar properties. For example, pT binned DY+jets sample would merge into DY+jets, or diboson (VV) is a collection of WW, WZ and ZZ. 
+To avoid crowded legend in the plot, we would merge a set of files with similar properties. For example, pT binned DY+jets sample would merge into DY+jets, or diboson (VV) is a collection of WW, WZ and ZZ. Or merge files with similar properties together.
 
-Create a `dict` for each collection under `mergemap`. You can specify the color and label name used in the plot
+
+Create a `dict` for each collection under `mergemap`, put the merging sets.
+
+In `plodataMC.py` config files (i.e. `testfile/btv_datamc.yaml`), you can specify the color and label name used in the plot. 
+
+In `comparison.py` config file (`testfile/btv_compare.yaml`),  color and label name and label names are created with `dict` under `reference`  and `compare`. `reference` only accept one entry. 
 
 ```yaml
+## plodataMC.py
 mergemap:
     DY: # key name of file collections
         list: # collections of files(key of dataset name in coffea file)
@@ -331,22 +338,20 @@ mergemap:
             - "WW_TuneCP5_13p6TeV-pythia8" 
             - "WZ_TuneCP5_13p6TeV-pythia8"
             - "ZZ_TuneCP5_13p6TeV-pythia8"
-```
-
-- shape comparison plot `reference`, `compare` :red_circle:
-
-Make shape comparison or compare different versions of file. 
-
-Specify the configuration with `dict` under `reference`  and `compare`. `reference` only accept one entry. 
-
-```yaml
-## Required, reference dict
+## comparison.py
+mergemap :  
+    runC: 
+        list : 
+            - "Muon_Run2022C-PromptReco-v1"
+            - "SingleMuon_Run2022C-PromptReco-v1"
+    Muon_Run2022C-PromptReco-v1: 
+        list : 
+            - "Muon_Run2022C-PromptReco-v1"  
 reference: 
     Muon_Run2022C-PromptReco-v1: 
         label: RunC  #Optional, label name
         color : 'b' #Optional
         
-## Required, compare dict
 compare: 
     # if not specify anything, leave empty value for key
     Muon_Run2022D-PromptReco-v1: 

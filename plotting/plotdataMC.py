@@ -8,7 +8,7 @@ import hist
 plt.style.use(hep.style.ROOT)
 time = arrow.now().format("YY_MM_DD")
 
-from BTVNanoCommissioning.utils.xs_scaler import collate
+from BTVNanoCommissioning.utils.xs_scaler import collate, additional_scale
 from BTVNanoCommissioning.utils.plot_utils import (
     isin_dict,
     check_config,
@@ -43,6 +43,14 @@ mergemap = {
 }
 collated = collate(output, mergemap)
 config = load_default(config)  # update configurations with default
+if "rescale_yields" in config.keys():
+    for sample_to_scale in config["rescale_yields"].keys():
+        print(
+            f"Rescale {sample_to_scale} by {config['rescale_yields'][sample_to_scale]}"
+        )
+        collated = additional_scale(
+            collated, config["rescale_yields"][sample_to_scale], sample_to_scale
+        )
 
 ## collect variable lists
 if "all" in list(config["variable"].keys())[0]:
@@ -62,7 +70,7 @@ for var in var_set:
         continue
     xlabel, rebin_axis = rebin_and_xlabel(var, collated, config)
     ### Figure settings
-    if "disable_ratio" in config.keys() and config["disable_ratio"]:
+    if config["disable_ratio"]:
         fig, ax = plt.subplots(figsize=(10, 10))
     else:
         np.seterr(invalid="ignore")
