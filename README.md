@@ -94,23 +94,40 @@ python runner_wconfig.py --cfg config/HWW2l2nu.py
 ### Config file
 The config file in `.py` format is passed as the argument `--cfg` of the `runner_wconfig.py` script. The file has the following structure:
 
-| Parameter name    | Allowed values               | Description
-| :-----:           | :---:                        | :------------------------------------------
-| `json`  (required)             | string          | Path of .json file to create with NanoAOD files (can load multiple files)
-| `workflow` (required)          | workflows         | Workflow to run
-| `output`  (required)          | string            | Path of output folder
-| `executor`   (required)           | string       | See [executor](#executors) below 
-| `workers`         | int                          | Number of parallel threads (with `futures` and clusters without fixed workers)
-| `scaleout`        | int                          | Number of jobs to submit, use for cluster
-| `chunk`           | int                          | Chunk size
-| `max`             | int                          | Maximum number of chunks to process
-| `skipbadfiles`    | bool                         | Skip bad files
-| `splitjobs`       | bool                         | Split runner and accumulator to separate jobs to avoid local memory consumption to large
-| `voms`            | string                       | Voms parameters (with condor)
-| `limit`           | int                          | Maximum number of files per sample to process
-| `preselections`   | list                         | List of preselection cuts
-| `categories`      | dict                         | Dictionary of categories with cuts to apply*
-| `userconfig`      | dict                         | Dictionary of user specific configuration, depends on workflow
+
+
+| Parameter              | Nested component          | Type           | Description                                                                                                                  | Default     |
+|------------------------|---------------------------|----------------|------------------------------------------------------------------------------------------------------------------------------|-------------|
+| **dataset(required)**  |                           | dict           | Dataset configurations                                                                                                       |             |
+|                        | **jsons<br>  (required)** | string         | Path of `.json` file to create with NanoAOD files (can load multiple files)                                                  |             |
+|                        | **campaign(required)**    | string         | Campaign name                                                                                                                |             |
+|                        | **year(required)**        | string         | Year flag                                                                                                                    |             |
+|                        | filter                    | dict           | Create the list of `samples`, `samples_exclude` with the dataset name(key name stored in json file)                          | `None`      |
+| **workflow(required)** |                           | python modules | Analysis workflows                                                                                                           |             |
+| **output(requred)**    |                           | string         | Output directory name, create version tag                                                                                    |             |
+| run_options            |                           | dict           | Collections of run options                                                                                                   |             |
+|                        | executor                  | string         | Executor for coffea jobs, see details in [executor](#executors)                                                              | `iterative` |
+|                        | limit                     | int            | Maximum number of files per sample to process                                                                                | `1`         |
+|                        | max                       | int            | Maximum number of chunks to process                                                                                          | `None`      |
+|                        | chunk                     | int            | Chunk size, numbers of events to be processed each time. Maximum number is the default sample size                           | `50000`     |
+|                        | workers                   | int            | Number of parallel threads (with `futures` and clusters without fixed workers)                                               | `2`         |
+|                        | mem_per_worker            | int            | Set memory for `condor/slurm` jobs                                                                                           | `2`         |
+|                        | scaleout                  | int            | Number of jobs to submit, use for cluster                                                                                    | `20`        |
+|                        | walltime                  | time           | Wall time for `condor/slurm` jobs                                                                                            | `03:00:00`  |
+|                        | retries                   | int            | Numbers of retries to submit failure jobs. Usually deal with xrootd temporary failures                                       | `20`        |
+|                        | voms                      | Path           | Path to your `x509 proxy`                                                                                                    | `None`      |
+|                        | skipbadfiles              | bool           | Skip bad files where not exist or broken(BE CAREFUL WITH DATA)                                                               | `False`     |
+|                        | splitjobs                 | bool           | Split `executor` and `accumulator` to separate jobs to avoid local memory consumption become too large                       | `True`      |
+|                        | compression               | int            | Compression level of output with `lz4`                                                                                       | `3`         |
+| categories             |                           | dict           | Dictionary of categories with cuts to apply*                                                                                 | `None`      |
+| preselections          |                           | dict           | List of preselection cuts, use for all the categories                                                                        | `None`      |
+| weights                |                           | dict           | Nested `dict` for correction files. Details and example in [weights](#####Weights)                                           | `None`      |
+|                        | common                    | dict           | Specify weights apply for all the events(`inclusive`) or category specific(`by category`)                                    |             |
+|                        | bysample                  | dict           | Weights only apply for particular sample, can be applied for all the events(`inclusive`) or category specific(`by category`) |             |
+| systematic             |                           | dict           | `dict` for systematic uncertainty                                                                                            | `None`      |
+|                        | isJERC                    | bool           | Run JER, JEC, MET scale uncertainty                                                                                          |             |
+|                        | weights                   | bool           | Weight files with up/down variations                                                                                         |             |
+| userconfig             |                           | dict           | Dictionary of user specific configuration, depends on workflow                                                               |             |
 
 *Cuts in `categories` or `preselections` don't follow, can write cuts as seperate macro
 
@@ -196,17 +213,22 @@ Example in [weight_splitcat.py](https://github.com/cms-rwth/CoffeaRunner/blob/ma
         },
     }
 ```
+##### Systematic 
 
+Specify whether run systematics or not
+
+```
+"systematics": 
+        {
+            "JERC":False,
+            "weights":False,
+        }
+```
 ##### User config (example from Hpluscharm)
 Write your own configurations used in your analysis
 
 ```
 "userconfig":{
-    "systematics": 
-        {
-            "JERC":False,
-            "weights":False,
-        },
     "export_array" : False,
     "BDT":{
         "ll":"src/Hpluscharm/MVA/xgb_output/SR_ll_scangamma_2017_gamma2.json",

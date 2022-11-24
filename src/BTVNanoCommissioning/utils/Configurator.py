@@ -14,8 +14,9 @@ class Configurator:
         ## MY: plot not use in CoffeaRunner framework!
         # self.plot = plot
         # self.plot_version = plot_version
-
+        in_cfg = cfg
         self.load_config(cfg)
+        self.load_run_options_default()
         # Load all the keys in the config (dangerous, can be improved)
         self.load_attributes()
 
@@ -72,7 +73,7 @@ class Configurator:
         self.load_workflow()
 
         # Save config file in output folder
-        self.save_config()
+        self.save_config(in_cfg)
 
     def load_config(self, path):
         spec = importlib.util.spec_from_file_location("config", path)
@@ -106,6 +107,28 @@ class Configurator:
         #         latest_dir = list(filter(lambda folder : ((output_dir == folder) | (output_dir+'_v' in folder)), sorted(os.listdir(parent_dir))))[-1]
         #         self.output = os.path.join(parent_dir, latest_dir)
         #     self.plots = os.path.join( os.path.abspath(self.output), "plots" )
+
+    def load_run_options_default(self):
+        default_config = {
+            "executor": "iterative",
+            "limit": 10,
+            "max": None,
+            "chunk": 50000,
+            "workers": 2,
+            "scaleout": 20,
+            "walltime": "03:00:00",
+            "mem_per_worker": 2,  # GB
+            "skipbadfiles": False,
+            "splitjobs": True,
+            "retries": 20,
+            "voms": None,
+            "compression": 3,
+        }
+        if "run_options" not in self.cfg.keys():
+            self.cfg["run_options"] = {}
+        for opt in default_config.keys():
+            if opt not in self.cfg["run_options"].keys():
+                self.cfg["run_options"][opt] = default_config[opt]
 
     def load_dataset(self):
         self.fileset = {}
@@ -313,8 +336,8 @@ class Configurator:
     #             )
 
     def load_workflow(self):
+
         self.processor_instance = self.workflow(cfg=self)
 
-    def save_config(self):
-        # Pickle the configurator object in order to be able to reproduce completely the configuration
-        pickle.dump(self.cfg, open(os.path.join(self.output, "configurator.pkl"), "wb"))
+    def save_config(self, cfg):
+        os.system(f"cp {cfg} {os.path.join(self.output, 'configurator.py')}")
