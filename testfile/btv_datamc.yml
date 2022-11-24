@@ -1,4 +1,5 @@
 lumi : 7650  # Required, lumimosity in /pb
+scaleToLumi : True
 
 ## Required, output directory
 output: "ctag_Wc_sf"   

@@ -12,7 +12,7 @@ cfg = {
         "filter": {
             "samples": [
                 "GluGluHToWWTo2L2Nu_M-125_TuneCP5_13TeV-powheg-jhugen727-pythia8",
-                #"SingleMuon_Run2017B-UL2017_MiniAODv2_NanoAODv9-v1",
+                "SingleMuon_Run2017B-UL2017_MiniAODv2_NanoAODv9-v1",
             ],
             "samples_exclude": ["TTTo2L2Nu_TuneCP5_13TeV-powheg-pythia8"],
         },

@@ -1,4 +1,5 @@
 output: "ctag_Wc_sf"   #  Required, output directory
+scaleToLumi : False
 
 ## Required, input files 
 input : 

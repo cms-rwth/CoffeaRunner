@@ -37,11 +37,8 @@ if not os.path.isdir(f"plot/{config['output']}_{time}/"):
 if args.debug:
     check_config(config, False)
 ## load coffea files
+output = load_coffea(config, config["scaleToLumi"])
 
-# print('config:', config)
-#output = load_coffea(config, False)
-output = load_coffea(config, True)
-# print(output)
 
 ## build up merge map
 mergemap = {}
@@ -85,17 +82,21 @@ elif "*" in list(config["variable"].keys())[0]:
 else:
     var_set = config["variable"].keys()
 
+
+np.seterr(invalid='ignore')
+np.seterr(divide='ignore')
+
 ## Loop through all variables
 for var in var_set:
     if "sumw" == var:
         continue
 
     xlabel, rebin_axis = rebin_and_xlabel(var, collated, config, False)
-    print(xlabel, rebin_axis)
+    # print(xlabel, rebin_axis)
     ## Normalize to reference yield
     if config["norm"]:
         for c in config["compare"].keys():
-            print(c, var)
+            # print(c, var)
             collated[c][var] = collated[c][var] * float(
                 np.sum(collated[refname][var][rebin_axis].values())
                 / np.sum(collated[c][var][rebin_axis].values())
@@ -167,4 +168,4 @@ for var in var_set:
     fig.savefig(f"plot/{config['output']}_{time}/compare_{var}{logext}.png")
 
 
-    print(f"The output is saved at: plot/{config['output']}_{time}")
+print(f"The output is saved at: plot/{config['output']}_{time}")
