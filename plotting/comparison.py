@@ -5,7 +5,6 @@ from matplotlib.offsetbox import AnchoredText
 
 from coffea.util import load
 import hist
-from BTVNanoCommissioning.utils.plot_utils import plotratio, r
 
 time = arrow.now().format("YY_MM_DD")
 plt.style.use(hep.style.ROOT)
@@ -18,7 +17,7 @@ from BTVNanoCommissioning.utils.plot_utils import (
     load_default,
     rebin_and_xlabel,
     plotratio,
-    autoranger
+    autoranger,
 )
 
 parser = argparse.ArgumentParser(description="make comparison for different campaigns")

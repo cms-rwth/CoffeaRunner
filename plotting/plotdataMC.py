@@ -18,7 +18,6 @@ from BTVNanoCommissioning.utils.plot_utils import (
     plotratio,
     errband_opts,
     autoranger,
-    
 )
 
 parser = argparse.ArgumentParser(description="hist plotter for commissioning")
@@ -44,7 +43,7 @@ mergemap = {
     merger: config["mergemap"][merger]["list"] for merger in config["mergemap"].keys()
 }
 collated = collate(output, mergemap)
-config = load_default(config)  
+config = load_default(config)
 
 ## If addition rescale on yields required
 if "rescale_yields" in config.keys():
@@ -122,7 +121,7 @@ for var in var_set:
         baseline=summc.values() + np.sqrt(summc.values()),
         edges=summc.axes[0].edges,
         label="Stat unc.",
-        **unc_fill_opt,
+        **errband_opts,
     )
 
     ## Scale particular sample
@@ -171,9 +170,7 @@ for var in var_set:
         yerr=True,
         ax=ax,
     )
-    xmin, xmax = autoranger(
-        collated["data"][discr][allaxis] + collated["mc"][discr][allaxis]
-    )
+    xmin, xmax = autoranger(collated["data"][var][rebin_axis] + summc)
     ax.set_xlim(xmin, xmax)
     ## Ratio plot
     if "disable_ratio" not in config.keys() or config["disable_ratio"] == False:
@@ -194,7 +191,7 @@ for var in var_set:
         config["inbox_text"],
         loc=2,
         frameon=False,
-    )  
+    )
     ax.set_ylim(bottom=0.0)
     ax.add_artist(at)
     hep.mpl_magic(ax=ax)
