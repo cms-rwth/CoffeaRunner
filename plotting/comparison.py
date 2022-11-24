@@ -10,7 +10,7 @@ from BTVNanoCommissioning.utils.plot_utils import plotratio
 time = arrow.now().format("YY_MM_DD")
 plt.style.use(hep.style.ROOT)
 
-from BTVNanoCommissioning.utils.xs_scaler import collate
+from BTVNanoCommissioning.utils.xs_scaler import collate, additional_scale
 from BTVNanoCommissioning.utils.plot_utils import (
     isin_dict,
     check_config,
@@ -41,27 +41,22 @@ output = load_coffea(config, config["scaleToLumi"])
 
 
 ## build up merge map
-mergemap = {}
+mergemap = {
+    merger: config["mergemap"][merger]["list"] for merger in config["mergemap"].keys()
+}
 refname = list(config["reference"].keys())[0]
-if not any(".coffea" in o for o in output.keys()):
-    mergemap[refname] = [m for m in output.keys() if refname == m]
-    for c in config["compare"].keys():
-        mergemap[c] = [m for m in output.keys() if c == m]
-else:
-    reflist = []
-    for f in output.keys():
-        reflist.extend([m for m in output[f].keys() if refname == m])
-    mergemap[refname] = reflist
-    print("\t What we compare?\n ", config["compare"])
-    for c in config["compare"].keys():
-        comparelist = []
-        for f in output.keys():
-            comparelist.extend([m for m in output[f].keys() if c == m])
-        mergemap[c] = comparelist
 collated = collate(output, mergemap)
 config = load_default(config, False)
 
-# print('collated', collated)
+## If addition rescale on yields required
+if "rescale_yields" in config.keys():
+    for sample_to_scale in config["rescale_yields"].keys():
+        print(
+            f"Rescale {sample_to_scale} by {config['rescale_yields'][sample_to_scale]}"
+        )
+        collated = additional_scale(
+            collated, config["rescale_yields"][sample_to_scale], sample_to_scale
+        )
 ### style settings
 if "Run" in list(config["reference"].keys())[0]:
     hist_type = "errorbar"
@@ -89,11 +84,10 @@ for var in var_set:
     if "sumw" == var:
         continue
     print("\t Plotting now:", var)
-
     xlabel, rebin_axis = rebin_and_xlabel(var, collated, config, False)
     # print(xlabel, rebin_axis)
     ## Normalize to reference yield
-    if config["norm"]:
+    if "norm" in config.keys() and config["norm"]:
         for c in config["compare"].keys():
             collated[c][var] = collated[c][var] * float(
                 np.sum(collated[refname][var][rebin_axis].values())
@@ -130,7 +124,7 @@ for var in var_set:
             collated[c][var][rebin_axis],
             collated[refname][var][rebin_axis],
             denom_fill_opts=None,
-            error_opts={"color": ax.get_lines()[i + 1].get_color()},
+            error_opts={"color": config["compare"][c]["color"]},
             clear=False,
             ax=rax,
         )
