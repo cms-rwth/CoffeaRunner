@@ -37,7 +37,7 @@ variable :
             # Optional, you can specify the rebin axis with rebin value
             # discr: 2
             # or just put a number, would rebin distribution the last axis (usually the variable)
-            4        
+            2        
     ## specify variable, if not specify anything, leave empty value for key
     btagDeepFlavC_0:
 

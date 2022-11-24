@@ -96,7 +96,7 @@ for var in var_set:
     ## Normalize to reference yield
     if config["norm"]:
         for c in config["compare"].keys():
-            # print(c, var)
+            print("Plotting now:", c, var)
             collated[c][var] = collated[c][var] * float(
                 np.sum(collated[refname][var][rebin_axis].values())
                 / np.sum(collated[c][var][rebin_axis].values())
