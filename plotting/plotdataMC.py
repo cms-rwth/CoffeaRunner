@@ -16,7 +16,9 @@ from BTVNanoCommissioning.utils.plot_utils import (
     load_default,
     rebin_and_xlabel,
     plotratio,
-    unc_fill_opt,
+    errband_opts,
+    autoranger,
+    
 )
 
 parser = argparse.ArgumentParser(description="hist plotter for commissioning")
@@ -169,6 +171,10 @@ for var in var_set:
         yerr=True,
         ax=ax,
     )
+    xmin, xmax = autoranger(
+        collated["data"][discr][allaxis] + collated["mc"][discr][allaxis]
+    )
+    ax.set_xlim(xmin, xmax)
     ## Ratio plot
     if "disable_ratio" not in config.keys() or config["disable_ratio"] == False:
         plotratio(hdata, summc, data_is_np=True, ax=rax)
@@ -176,16 +182,19 @@ for var in var_set:
         rax.set_xlabel(xlabel)
         rax.set_ylim(0.5, 1.5)
         ax.set_xlabel(None)
+        rax.set_xlim(xmin, xmax)
     ##  plot settings, adjust range
     if "disable_ratio" in config.keys() and config["disable_ratio"]:
         ax.set_xlabel(xlabel)
     ax.set_ylabel("Events")
     ax.legend()
+    ax.ticklabel_format(style="sci", scilimits=(-3, 3))
+    ax.get_yaxis().get_offset_text().set_position((-0.065, 1.05))
     at = AnchoredText(
         config["inbox_text"],
         loc=2,
         frameon=False,
-    )
+    )  
     ax.set_ylim(bottom=0.0)
     ax.add_artist(at)
     hep.mpl_magic(ax=ax)

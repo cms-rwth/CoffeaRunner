@@ -6,7 +6,7 @@ import scipy.stats
 import warnings
 import numpy as np
 
-unc_fill_opt = {
+errband_opts = {
     "hatch": "////",
     "facecolor": "none",
     "lw": 0,

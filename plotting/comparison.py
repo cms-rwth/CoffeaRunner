@@ -5,7 +5,7 @@ from matplotlib.offsetbox import AnchoredText
 
 from coffea.util import load
 import hist
-from BTVNanoCommissioning.utils.plot_utils import plotratio
+from BTVNanoCommissioning.utils.plot_utils import plotratio, r
 
 time = arrow.now().format("YY_MM_DD")
 plt.style.use(hep.style.ROOT)
@@ -18,6 +18,7 @@ from BTVNanoCommissioning.utils.plot_utils import (
     load_default,
     rebin_and_xlabel,
     plotratio,
+    autoranger
 )
 
 parser = argparse.ArgumentParser(description="make comparison for different campaigns")
@@ -85,7 +86,6 @@ for var in var_set:
         continue
     print("\t Plotting now:", var)
     xlabel, rebin_axis = rebin_and_xlabel(var, collated, config, False)
-    # print(xlabel, rebin_axis)
     ## Normalize to reference yield
     if "norm" in config.keys() and config["norm"]:
         for c in config["compare"].keys():
@@ -131,13 +131,15 @@ for var in var_set:
 
     ##  plot settings, adjust range
     rax.set_xlabel(xlabel)
-    rax.axhline(y=1.0, linestyle="dashed", color="gray")
     ax.set_xlabel(None)
     ax.set_ylabel("Events")
     rax.set_ylabel("Other/Ref")
+    ax.ticklabel_format(style="sci", scilimits=(-3, 3))
+    ax.get_yaxis().get_offset_text().set_position((-0.065, 1.05))
     ax.legend()
     rax.set_ylim(0.0, 2.0)
-
+    xmin, xmax = autoranger(collated[refname][var][rebin_axis])
+    rax.set_xlim(xmin, xmax)
     at = AnchoredText(
         config["inbox_text"],
         loc=2,
