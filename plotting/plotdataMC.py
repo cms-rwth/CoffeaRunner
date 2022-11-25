@@ -206,4 +206,4 @@ for var in var_set:
     fig.savefig(f"plot/{config['output']}_{time}/{var}{name}.png")
 
 
-print(f"The output will be saved at plot/{config['output']}_{time}")
+print(f"The output will be saved at plot/{config['output']}_{time}/")

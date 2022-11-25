@@ -16,7 +16,7 @@ mergemap :
         list : 
             - "Muon_Run2022C-PromptReco-v1"
             - "SingleMuon_Run2022C-PromptReco-v1"
-    Muon_Run2022C-PromptReco-v1: 
+    runC_1: 
         list : 
             - "Muon_Run2022C-PromptReco-v1"        
     Muon_Run2022D-PromptReco-v1: 
@@ -37,7 +37,7 @@ reference:
 ## Required, compare dict
 compare: 
     # if not specify anything, leave empty value for key
-    Muon_Run2022C-PromptReco-v1: 
+    runC_1: 
     Muon_Run2022D-PromptReco-v1: 
     Muon_Run2022D-PromptReco-v2: 
     
@@ -76,7 +76,7 @@ variable :
 com : "13.6" # Optional, # √s = 13TeV
 ##  Optional, rescale the yields for some samples
 rescale_yields: 
-    runC : 100.0 
+    runC_1 : 100.0 
 inbox_text: "" #Optional, text write in anchor text box
-norm : True #Optional, normalize to reference yields
+norm : False #Optional, normalize to reference yields
 log : True #Optional, log y axis
