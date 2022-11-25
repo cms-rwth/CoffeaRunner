@@ -44,9 +44,9 @@ jobs:
       run: |
         pip install -e .
  
-    - name: Run test workflow
+    - name: data/MC plotter 
       run: |
         python plotting/plotdataMC.py --cfg testfile/btv_datamc.yml 
-    - name: Run test workflow
+    - name: comparison plotter 
       run: |
         python plotting/comparison.py --cfg testfile/btv_comapre.yml 
