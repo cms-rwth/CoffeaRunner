@@ -68,8 +68,6 @@ if __name__ == "__main__":
     args = parser.parse_args()
     if args.cfg[-3:] == ".py":
         config = Configurator(args.cfg, overwrite_output_dir=args.overwrite_file)
-    elif args.cfg[-4:] == ".pkl":
-        config = pickle.load(open(args.cfg, "rb"))
     else:
         raise sys.exit("Please provide a .py configuration file")
 
@@ -162,6 +160,7 @@ if __name__ == "__main__":
                 "schema": processor.NanoAODSchema,
                 "workers": config.run_options["workers"],
                 "xrootdtimeout": 400,
+                "compression": config.run_options["compression"],
             },
             chunksize=config.run_options["chunk"],
             maxchunks=config.run_options["max"],
@@ -231,6 +230,7 @@ if __name__ == "__main__":
                     retry_handler=retry_handler,
                 )
         elif "condor" in config.run_options["executor"]:
+            ## code source: https://github.com/cms-rwth/CoffeaRunner/commit/d5ef86f76723e75b67bb212c3644c4012cae05be (Annika Stein)
             if "naf_lite" in config.run_options["executor"]:
                 config.run_options["mem_per_worker"] = 2
                 config.run_options["walltime"] = "03:00:00"
@@ -304,6 +304,7 @@ if __name__ == "__main__":
                 "skipbadfiles": config.run_options["skipbadfiles"],
                 "schema": processor.NanoAODSchema,
                 "config": None,
+                "compression": config.run_options["compression"],
             }
         else:
             executor_args_condor = {
@@ -313,6 +314,7 @@ if __name__ == "__main__":
                 "merges_executors": ["merge"],
                 "jobs_executors": ["run"],
                 "config": None,
+                "compression": config.run_options["compression"],
             }
         output = processor.run_uproot_job(
             config.fileset,
@@ -405,6 +407,7 @@ if __name__ == "__main__":
                     "skipbadfiles": config.run_options["skipbadfiles"],
                     "schema": processor.NanoAODSchema,
                     "retries": config.run_options["retries"],
+                    "compression": config.run_options["compression"],
                 },
                 chunksize=config.run_options["chunk"],
                 maxchunks=config.run_options["max"],
