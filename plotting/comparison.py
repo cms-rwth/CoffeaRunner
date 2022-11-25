@@ -39,7 +39,6 @@ if args.debug:
 ## load coffea files
 output = load_coffea(config, config["scaleToLumi"])
 
-
 ## build up merge map
 mergemap = {}
 refname = list(config["reference"].keys())[0]
