@@ -111,7 +111,7 @@ class Configurator:
     def load_run_options_default(self):
         default_config = {
             "executor": "iterative",
-            "limit": 10,
+            "limit": None,
             "max": None,
             "chunk": 50000,
             "workers": 2,
