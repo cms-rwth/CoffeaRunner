@@ -49,7 +49,7 @@ def additional_scale(accumulator, scale, sample_to_scale):
         for key, h_obj in accu.items():
             if isinstance(h_obj, hist.Hist):
                 h = copy.deepcopy(h_obj)
-                if sample in sample_to_scale:
+                if sample == sample_to_scale:
                     h = h * scale
                 else:
                     h = h
