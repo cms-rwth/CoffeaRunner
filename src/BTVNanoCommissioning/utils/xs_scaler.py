@@ -33,7 +33,7 @@ def scaleSumW(accumulator, lumi, sumw, dyscale=1.0):
                     h = h * xs_dict[sample] * lumi / sumw[sample]
                 else:
                     if not (("data" in sample) or ("Run" in sample)):
-                        continue
+                        raise KeyError(sample, "is not founded in xsection.py")
                     else:
                         h = h
                 scaled[sample][key] = h
@@ -49,7 +49,7 @@ def additional_scale(accumulator, scale, sample_to_scale):
         for key, h_obj in accu.items():
             if isinstance(h_obj, hist.Hist):
                 h = copy.deepcopy(h_obj)
-                if sample in sample_to_scale:
+                if sample == sample_to_scale:
                     h = h * scale
                 else:
                     h = h
@@ -90,7 +90,6 @@ def collate(output, mergemap):
             else:
                 merged[files] = dict(output[files].items())
     for group, names in mergemap.items():
-        print(group, names)
         out[group] = processor.accumulate(
             [v for k, v in merged.items() if k.split("_FNAME_")[0] in names]
         )

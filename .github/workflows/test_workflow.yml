@@ -80,6 +80,3 @@ jobs:
     - name: Run test workflow
       run: |
         python runner_wconfig.py --cfg config/example.py
-    
-    
-    

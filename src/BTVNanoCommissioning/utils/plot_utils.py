@@ -6,13 +6,14 @@ import scipy.stats
 import warnings
 import numpy as np
 
-unc_fill_opt = {
+errband_opts = {
     "hatch": "////",
     "facecolor": "none",
     "lw": 0,
     "color": "k",
     "alpha": 0.4,
 }
+markers = [".", "o", "^", "s", "+", "x", "D", "*"]
 
 
 def isin_dict(config, key=None):
@@ -46,19 +47,19 @@ def check_config(config, isDataMC=True):
         "log": bool,
         "norm": bool,
         "scaleToLumi": bool,
+        "rescale_yields": dict,
     }
     variabletype = {
         "xlabel": str,
         "axis": dict,
-        "blind": bool,
+        "blind": int,
         "rebin": [dict, float, int],
     }
 
     for attr in config.keys():
         ## check type
-        if (
-            type(config[attr]) != inputtype[attr]
-            and type(config[attr]) not in inputtype[attr]
+        if type(config[attr]) != inputtype[attr] and (
+            inputtype[attr] == list and type(config[attr]) not in inputtype[attr]
         ):
             raise ValueError(f"Type of {attr} should be {inputtype[attr]}")
         ## check method
@@ -68,44 +69,70 @@ def check_config(config, isDataMC=True):
             raise NotImplementedError(f"{attr} is invalid in shape comparison")
         # Check nested case
         if isin_dict(config[attr]):
-            if attr == "scale":
-                for sc in config["scale"].keys():
-                    if (
-                        type(config["scale"][sc]) != float
-                        or type(config["scale"][sc]) != int
-                    ):
-                        raise TypeError(f"Type of scale[{sc}] should be int/float")
+            if "scale" in attr:
+                for sc in config[attr].keys():
+                    if float(config[attr][sc]):
+                        config[attr][sc] = float(config[attr][sc])
+                    else:
+                        raise TypeError(f"Type of {attr}[{sc}] should be int/float")
             elif attr == "mergemap" or attr == "reference" or attr == "compare":
                 if attr == "reference" and len(config[attr]) > 1:
                     raise ValueError("Only one reference is allowed")
-                # for sc in config[attr].keys():
-                #    if type(config[attr][sc]) != str:
-                #        raise TypeError(f"Type of {attr}[{sc}] should be string")
             else:  ## variables
+                if (
+                    any(("*" in var or "all" == var) for var in config[attr].keys())
+                    and len(list(config[attr].keys())) > 1
+                ):
+                    raise NotImplementedError(
+                        "wildcard(*) operation/all can not specify together with normal expression"
+                    )
                 for var in config[attr].keys():
-                    if not isDataMC and "blind" in config[attr][var].keys():
-                        raise NotImplementedError(
-                            "blind is not implemented in shape comparison"
-                        )
-                    if (
-                        type(var) != variabletype[var]
-                        and type(var) not in variabletype[var]
-                    ):
-                        raise TypeError(
-                            f"Type of {attr}[{var}] should be {variabletype[var]}"
-                        )
-                    if var == "all" and set(list(config[attr][var])).difference(
-                        ["rebin"]
-                    ):
-                        raise ValueError(
-                            f"{set(list(config[attr][var])).difference(['rebin'])} not include for all"
-                        )
-                    elif "*" in var and set(list(config[attr][var])).difference(
-                        ["rebin", "axis"]
-                    ):
-                        raise ValueError(
-                            f"{set(list(config[attr][var])).difference(['rebin','axis'])} not include for wildcard operation"
-                        )
+                    if isin_dict(config[attr][var]):
+                        for var_param in config[attr][var].keys():
+                            if not isDataMC and "blind" in config[attr][var].keys():
+                                raise NotImplementedError(
+                                    "blind is not implemented in shape comparison"
+                                )
+                            ## check type
+                            if var_param == "blind":
+                                if "," not in config[attr][var][var_param]:
+                                    raise ValueError(", is needed for blind option")
+                                if not int(config[attr][var][var_param].split(",")[0]):
+                                    raise TypeError(
+                                        f"Type of {attr}[{var}][{var_param}] in {var} should be {variabletype[var_param]} not {type(config[attr][var][var_param])}"
+                                    )
+                                if config[attr][var][var_param].split(",")[
+                                    1
+                                ] != "" and not int(
+                                    config[attr][var][var_param].split(",")[1]
+                                ):
+                                    raise TypeError(
+                                        f"Type of {attr}[{var}][{var_param}] in {var} should be {variabletype[var_param]} not {type(config[attr][var][var_param])}"
+                                    )
+                            elif (
+                                variabletype[var_param] != list
+                                and type(config[attr][var][var_param])
+                                != variabletype[var_param]
+                            ) and type(
+                                config[attr][var][var_param]
+                            ) not in variabletype[
+                                "rebin"
+                            ]:
+                                raise TypeError(
+                                    f"Type of {attr}[{var}][{var_param}] in {var} should be {variabletype[var_param]} not {type(config[attr][var][var_param])}"
+                                )
+                            if var == "all" and set(list(config[attr][var])).difference(
+                                ["rebin"]
+                            ):
+                                raise ValueError(
+                                    f"{set(list(config[attr][var])).difference(['rebin'])} not include for all"
+                                )
+                            elif "*" in var and set(list(config[attr][var])).difference(
+                                ["rebin", "axis"]
+                            ):
+                                raise ValueError(
+                                    f"{set(list(config[attr][var])).difference(['rebin','axis'])} not include for wildcard(*) operation"
+                                )
 
 
 def load_default(config, isDataMC=True):
@@ -113,12 +140,16 @@ def load_default(config, isDataMC=True):
         config["com"] = "13"
     if "inbox_text" not in config.keys():
         config["inbox_text"] = ""
+    if "norm" not in config.keys():
+        config["norm"] = False
+    if "disable_ratio" not in config.keys():
+        config["disable_ratio"] = False
     prop_cycle = plt.rcParams["axes.prop_cycle"]
     colors = prop_cycle.by_key()["color"]
     if isDataMC:
         maps = ["mergemap"]
     else:
-        maps = ["reference", "compare"]
+        maps = ["mergemap", "reference", "compare"]
     ## set color
     for m in maps:
         for i, mc in enumerate(config[m].keys()):
@@ -487,3 +518,16 @@ def plotratio(
         ax.set_ylim(0, None)
 
     return ax
+
+
+def autoranger(hist):
+    val, axis = hist.values(), hist.axes[-1].edges
+    for i in range(len(val)):
+        if val[i] != 0:
+            mins = i
+            break
+    for i in reversed(range(len(val))):
+        if val[i] != 0:
+            maxs = i + 1
+            break
+    return axis[mins], axis[maxs]

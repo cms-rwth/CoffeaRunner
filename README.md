@@ -94,23 +94,40 @@ python runner_wconfig.py --cfg config/HWW2l2nu.py
 ### Config file
 The config file in `.py` format is passed as the argument `--cfg` of the `runner_wconfig.py` script. The file has the following structure:
 
-| Parameter name    | Allowed values               | Description
-| :-----:           | :---:                        | :------------------------------------------
-| `json`  (required)             | string          | Path of .json file to create with NanoAOD files (can load multiple files)
-| `workflow` (required)          | workflows         | Workflow to run
-| `output`  (required)          | string            | Path of output folder
-| `executor`   (required)           | string       | See [executor](#executors) below 
-| `workers`         | int                          | Number of parallel threads (with `futures` and clusters without fixed workers)
-| `scaleout`        | int                          | Number of jobs to submit, use for cluster
-| `chunk`           | int                          | Chunk size
-| `max`             | int                          | Maximum number of chunks to process
-| `skipbadfiles`    | bool                         | Skip bad files
-| `splitjobs`       | bool                         | Split runner and accumulator to separate jobs to avoid local memory consumption to large
-| `voms`            | string                       | Voms parameters (with condor)
-| `limit`           | int                          | Maximum number of files per sample to process
-| `preselections`   | list                         | List of preselection cuts
-| `categories`      | dict                         | Dictionary of categories with cuts to apply*
-| `userconfig`      | dict                         | Dictionary of user specific configuration, depends on workflow
+
+
+| Parameter              | Nested component          | Type           | Description                                                                                                                  | Default     |
+|------------------------|---------------------------|----------------|------------------------------------------------------------------------------------------------------------------------------|-------------|
+| **dataset(required)**  |                           | dict           | Dataset configurations                                                                                                       |             |
+|                        | **jsons<br>  (required)** | string         | Path of `.json` file to create with NanoAOD files (can load multiple files)                                                  |             |
+|                        | **campaign(required)**    | string         | Campaign name                                                                                                                |             |
+|                        | **year(required)**        | string         | Year flag                                                                                                                    |             |
+|                        | filter                    | dict           | Create the list of `samples`, `samples_exclude` with the dataset name(key name stored in json file)                          | `None`      |
+| **workflow(required)** |                           | python modules | Analysis workflows                                                                                                           |             |
+| **output(requred)**    |                           | string         | Output directory name, create version tag                                                                                    |             |
+| run_options            |                           | dict           | Collections of run options                                                                                                   |             |
+|                        | executor                  | string         | Executor for coffea jobs, see details in [executor](#executors)                                                              | `iterative` |
+|                        | limit                     | int            | Maximum number of files per sample to process                                                                                | `1`         |
+|                        | max                       | int            | Maximum number of chunks to process                                                                                          | `None`      |
+|                        | chunk                     | int            | Chunk size, numbers of events to be processed each time. Maximum number is the default sample size                           | `50000`     |
+|                        | workers                   | int            | Number of parallel threads (with `futures` and clusters without fixed workers)                                               | `2`         |
+|                        | mem_per_worker            | int            | Set memory for `condor/slurm` jobs                                                                                           | `2`         |
+|                        | scaleout                  | int            | Number of jobs to submit, use for cluster                                                                                    | `20`        |
+|                        | walltime                  | time           | Wall time for `condor/slurm` jobs                                                                                            | `03:00:00`  |
+|                        | retries                   | int            | Numbers of retries to submit failure jobs. Usually deal with xrootd temporary failures                                       | `20`        |
+|                        | voms                      | Path           | Path to your `x509 proxy`                                                                                                    | `None`      |
+|                        | skipbadfiles              | bool           | Skip bad files where not exist or broken(BE CAREFUL WITH DATA)                                                               | `False`     |
+|                        | splitjobs                 | bool           | Split `executor` and `accumulator` to separate jobs to avoid local memory consumption become too large                       | `True`      |
+|                        | compression               | int            | Compression level of output with `lz4`                                                                                       | `3`         |
+| categories             |                           | dict           | Dictionary of categories with cuts to apply*                                                                                 | `None`      |
+| preselections          |                           | dict           | List of preselection cuts, use for all the categories                                                                        | `None`      |
+| weights                |                           | dict           | Nested `dict` for correction files. Details and example in [weights](#####Weights)                                           | `None`      |
+|                        | common                    | dict           | Specify weights apply for all the events(`inclusive`) or category specific(`by category`)                                    |             |
+|                        | bysample                  | dict           | Weights only apply for particular sample, can be applied for all the events(`inclusive`) or category specific(`by category`) |             |
+| systematic             |                           | dict           | `dict` for systematic uncertainty                                                                                            | `None`      |
+|                        | isJERC                    | bool           | Run JER, JEC, MET scale uncertainty                                                                                          |             |
+|                        | weights                   | bool           | Weight files with up/down variations                                                                                         |             |
+| userconfig             |                           | dict           | Dictionary of user specific configuration, depends on workflow                                                               |             |
 
 *Cuts in `categories` or `preselections` don't follow, can write cuts as seperate macro
 
@@ -196,17 +213,22 @@ Example in [weight_splitcat.py](https://github.com/cms-rwth/CoffeaRunner/blob/ma
         },
     }
 ```
+##### Systematic 
 
+Specify whether run systematics or not
+
+```
+"systematics": 
+        {
+            "JERC":False,
+            "weights":False,
+        }
+```
 ##### User config (example from Hpluscharm)
 Write your own configurations used in your analysis
 
 ```
 "userconfig":{
-    "systematics": 
-        {
-            "JERC":False,
-            "weights":False,
-        },
     "export_array" : False,
     "BDT":{
         "ll":"src/Hpluscharm/MVA/xgb_output/SR_ll_scangamma_2017_gamma2.json",
@@ -288,7 +310,7 @@ memray run --live  runner.py --cfg config/example.py
 
 Produce data/MC comparison, shape comparison plots from `.coffea` files, load configuration (`yaml`) files, brief [intro](https://docs.fileformat.com/programming/yaml/) of yaml.
 
-Details of yaml file format would summarized in table below. Information used in data/MC script would marked with (:large_blue_circle:) and comparsion script with (:red_circle:). The **required** info are marked as bold style. 
+Details of yaml file format would summarized in table below. The **required** info are marked as bold style. 
 
 You can find test file set(`.coffea` and `.yaml`) in `testfile/`. Specify `--debug` to get more info for yaml format.
 
@@ -300,26 +322,33 @@ python plotting/comparison.py --cfg testfile/btv_compare.yml (--debug)
 
 | Parameter name        | Allowed values               | Description
 | :-----:               | :---:                        | :-----------------------------
-| **input**(Required):large_blue_circle::red_circle:| `list` or `str` <br>(wildcard options `*` accepted)|   input `.coffea` files| 
-| **output** (Required):large_blue_circle::red_circle:| `str` | output directory of plots with date| 
-| **mergemap**:large_blue_circle:/ **reference** & **compare**:red_circle: | `dict`(Required) | collect sample names, color, label setting for file set. details in [map diction](#dict-of-merge-maps-and-comparison-file-lists)|
-| **variable**(Required):large_blue_circle::red_circle: | `dict` | variables to plot, see [variables section](#variables)|
-|com:large_blue_circle::red_circle:| `str` | √s , default set to be 13TeV|
-|inbox_text:large_blue_circle::red_circle:| `str` | text put in `AnchoredText`|
-|log:large_blue_circle::red_circle:| `str` | log scale on y-axis |
-|disable_ratio:large_blue_circle:|`bool`| disable ratio panel for data/MC comparison plot|
-|scale:large_blue_circle:| `dict` | Scale up particular MC collections|
-|norm:red_circle:| `bool`| noramlized  yield to reference sample|
+| **input**(Required)| `list` or `str` <br>(wildcard options `*` accepted)|   input `.coffea` files| 
+| **output** (Required)| `str` | output directory of plots with date| 
+| **mergemap**(Required)| `dict` | collect sample names, (color, label) setting for file set. details in [map diction](#dict-of-merge-maps-and-comparison-file-lists)|
+| **reference** & **compare** (Required) | `dict`| specify the class only for comparison plots |
+| **variable**(Required) | `dict` | variables to plot, see [variables section](#variables)|
+|com| `str` | √s , default set to be 13TeV|
+|inbox_text| `str` | text put in `AnchoredText`|
+|log| `str` | log scale on y-axis |
+|disable_ratio|`bool`| disable ratio panel for data/MC comparison plot|
+|rescale_yields| `dict`| Rescale yields for particular MC collections (no overlay)|
+|scale| `dict` | Scale up particular MC collections overlay on the stacked histogram|
+|norm| `bool`| noramlized yield to reference sample, only for comparison plot|
 
 #### `dict` of merge maps and comparison file lists
 
-- data/MC comparison `mergemap` :large_blue_circle:
 
-To avoid crowded legend in the plot, we would merge a set of files with similar properties. For example, pT binned DY+jets sample would merge into DY+jets, or diboson (VV) is a collection of WW, WZ and ZZ. 
+To avoid crowded legend in the plot, we would merge a set of files with similar properties. For example, pT binned DY+jets sample would merge into DY+jets, or diboson (VV) is a collection of WW, WZ and ZZ. Or merge files with similar properties together.
 
-Create a `dict` for each collection under `mergemap`. You can specify the color and label name used in the plot
+
+Create a `dict` for each collection under `mergemap`, put the merging sets.
+
+In `plodataMC.py` config files (i.e. `testfile/btv_datamc.yaml`), you can specify the color and label name used in the plot. 
+
+In `comparison.py` config file (`testfile/btv_compare.yaml`),  color and label name and label names are created with `dict` under `reference`  and `compare`. `reference` only accept one entry. 
 
 ```yaml
+## plodataMC.py
 mergemap:
     DY: # key name of file collections
         list: # collections of files(key of dataset name in coffea file)
@@ -332,22 +361,20 @@ mergemap:
             - "WW_TuneCP5_13p6TeV-pythia8" 
             - "WZ_TuneCP5_13p6TeV-pythia8"
             - "ZZ_TuneCP5_13p6TeV-pythia8"
-```
-
-- shape comparison plot `reference`, `compare` :red_circle:
-
-Make shape comparison or compare different versions of file. 
-
-Specify the configuration with `dict` under `reference`  and `compare`. `reference` only accept one entry. 
-
-```yaml
-## Required, reference dict
+## comparison.py
+mergemap :  
+    runC: 
+        list : 
+            - "Muon_Run2022C-PromptReco-v1"
+            - "SingleMuon_Run2022C-PromptReco-v1"
+    Muon_Run2022C-PromptReco-v1: 
+        list : 
+            - "Muon_Run2022C-PromptReco-v1"  
 reference: 
     Muon_Run2022C-PromptReco-v1: 
         label: RunC  #Optional, label name
         color : 'b' #Optional
         
-## Required, compare dict
 compare: 
     # if not specify anything, leave empty value for key
     Muon_Run2022D-PromptReco-v1: 
