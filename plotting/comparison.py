@@ -83,7 +83,6 @@ for var in var_set:
     if "sumw" == var:
         continue
     print("\t Plotting now:", var)
-
     xlabel, rebin_axis = rebin_and_xlabel(var, collated, config, False)
     ## Normalize to reference yield
     if "norm" in config.keys() and config["norm"]:
