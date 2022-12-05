@@ -2,9 +2,9 @@ name: Linting
 
 on:
   push:
-    branches: [ CI ]
+    branches: [ master ]
   pull_request:
-    branches: [ CI ]
+    branches: [ master ]
 
 jobs:
   build:
@@ -13,7 +13,7 @@ jobs:
     strategy:
       max-parallel: 4
       matrix:
-        python-version: [3.7]
+        python-version: ["3.10"]
 
     steps:
     - uses: actions/checkout@v2

@@ -1,0 +1,10 @@
+CI:
+- .github/workflows/*
+
+core:
+- src/BTVNanoCommissioning/*
+
+runner:
+
+- runner_wconfig.py
+

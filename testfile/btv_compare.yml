@@ -1,0 +1,82 @@
+output: "ctag_Wc_sf"   #  Required, output directory
+scaleToLumi : False
+
+## Required, input files 
+input : 
+        # Use wildcard options
+        #hists_ctag_Wc_sf_rund*_Oct27.coffea 
+        # or put a list 
+        - testfile/hists_ctag_Wc_sf_rund1_Oct27.coffea
+        - testfile/hists_ctag_Wc_sf_rund2_Oct27.coffea
+        - testfile/hists_ctag_Wc_sf_runc2_Oct27.coffea
+        - testfile/hists_ctag_Wc_sf_runc1_Oct27.coffea
+## Required, merge files or samples into collections
+mergemap :  
+    runC: 
+        list : 
+            - "Muon_Run2022C-PromptReco-v1"
+            - "SingleMuon_Run2022C-PromptReco-v1"
+    Muon_Run2022C-PromptReco-v1: 
+        list : 
+            - "Muon_Run2022C-PromptReco-v1"        
+    Muon_Run2022D-PromptReco-v1: 
+        list : 
+            - "Muon_Run2022D-PromptReco-v1"
+    Muon_Run2022D-PromptReco-v2: 
+        list : 
+            - "Muon_Run2022D-PromptReco-v2"
+## Required, reference dict
+reference: 
+    # Muon_Run2022C-PromptReco-v1: 
+    #     label: RunC  #Optional, label name
+    #     color : 'b' #Optional
+    runC: 
+        label: RunC  #Optional, label name
+        color : 'b' #Optional
+        
+## Required, compare dict
+compare: 
+    # if not specify anything, leave empty value for key
+    Muon_Run2022C-PromptReco-v1: 
+    Muon_Run2022D-PromptReco-v1: 
+    Muon_Run2022D-PromptReco-v2: 
+    
+## Required, variable set
+variable :
+    ## specify variable to plot
+    btagDeepFlavB_0:
+        # Optional, set x label of variable
+        xlabel: "deepJet Prob(b)" 
+        # Optional, specify hist axis with dict
+        axis : 
+            syst: noSF # Optional, access bin
+            flav : sum # Optional, access bin, can convert sum to sum operation later
+        # Optional, rebin variable 
+        rebin :  
+            # Optional, you can specify the rebin axis with rebin value
+            # discr: 2
+            # or just put a number, would rebin distribution the last axis (usually the variable)
+            2        
+    ## specify variable, if not specify anything, leave empty value for key
+    btagDeepFlavC_0:
+
+    ## Accept wildcard option
+    # only axis and rebin can be specify here
+    #btagDeepFlav* :
+    #    axis : 
+    #        syst: noSF
+    #        flav : sum
+    #    rebin :  
+    #        discr: 2
+    # Use "all" will produce plots for all the variables
+    # only rebin of last axis (variable-axis) can be specify here
+    #all: 
+    #    rebin: 2
+    
+com : "13.6" # Optional, # √s = 13TeV
+##  Optional, rescale the yields for some samples
+rescale_yields: 
+    runC : 100.0 
+inbox_text: "" #Optional, text write in anchor text box
+norm : True #Optional, normalize to reference yields
+log : True #Optional, log y axis
