@@ -77,5 +77,5 @@ com : "13.6" # Optional, # √s = 13TeV
 rescale_yields: 
     runC : 100.0 
 inbox_text: "" #Optional, text write in anchor text box
-norm : False #Optional, normalize to reference yields
+norm : True #Optional, normalize to reference yields
 log : True #Optional, log y axis
