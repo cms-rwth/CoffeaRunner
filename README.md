@@ -33,6 +33,20 @@ You could simply create the environment through the existing `env.yml` under you
 ```
 conda env create -f env.yml 
 ```
+
+<details><summary>Not necessary to run framework, but helpful when identifying corrupted files and tracking the progress during said task:</summary>
+<p>
+
+```
+conda install -c conda-forge p-tqdm
+```
+    
+</p>
+</details>
+<br>
+
+=======
+
 Once the environment is set up, compile the python package:
 ```
 pip install -e .
