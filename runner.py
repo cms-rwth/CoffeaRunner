@@ -29,7 +29,7 @@ def validate(file):
         return fin["Events"].num_entries
     except:
         print("Corrupted file: {}".format(file))
-        return
+        return file
 
 
 def check_port(port):
@@ -117,7 +117,7 @@ def get_main_parser():
         "-j",
         "--workers",
         type=int,
-        default=12,
+        default=6,
         help="Number of workers (cores/threads) to use for multi-worker executors "
         "(e.g. futures or condor) (default: %(default)s)",
     )
@@ -125,7 +125,7 @@ def get_main_parser():
         "-s",
         "--scaleout",
         type=int,
-        default=6,
+        default=40,
         help="Number of nodes to scale out to if using slurm/condor. Total number of "
         "concurrent threads is ``workers x scaleout`` (default: %(default)s)",
     )
@@ -254,6 +254,14 @@ if __name__ == "__main__":
             for fi in all_invalid:
                 print(f"Removing: {fi}")
                 os.system(f"rm {fi}")
+        if input("Write list of bad files? (y/n)") == "y":
+            corrupted_name = (args.samplejson).split('.json')[0]
+            with open(f'{corrupted_name}_corrupted.txt', 'w') as bad_txt:
+                print("Writing:")
+                for fi in all_invalid:
+                    print(f"Writing: {fi}")
+                    bad_txt.write(fi)
+                    bad_txt.write('\n')
         sys.exit(0)
 
     # load workflow
@@ -272,7 +280,7 @@ if __name__ == "__main__":
         processor_instance = workflows[args.workflow](
             year=args.year, campaign=args.campaign, export_array=args.export_array
         )
-    # AS: not all workflows will have these two parameter, so probably
+    # AS: not all workflows will have these two parameters, so probably
     #     we want to avoid always calling it like that in the future
 
     if args.executor not in ["futures", "iterative", "dask/lpc", "dask/casa"]:
