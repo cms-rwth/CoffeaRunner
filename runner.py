@@ -10,6 +10,8 @@ import uproot
 from coffea.util import load, save
 from coffea import processor
 
+from BTVNanoCommissioning.workflows import workflows
+
 
 def validate(file):
     try:
@@ -243,13 +245,13 @@ if __name__ == "__main__":
                 print(f"Removing: {fi}")
                 os.system(f"rm {fi}")
         if input("Write list of bad files? (y/n)") == "y":
-            corrupted_name = (args.samplejson).split('.json')[0]
-            with open(f'{corrupted_name}_corrupted.txt', 'w') as bad_txt:
+            corrupted_name = (args.samplejson).split(".json")[0]
+            with open(f"{corrupted_name}_corrupted.txt", "w") as bad_txt:
                 print("Writing:")
                 for fi in all_invalid:
                     print(f"Writing: {fi}")
                     bad_txt.write(fi)
-                    bad_txt.write('\n')
+                    bad_txt.write("\n")
         sys.exit(0)
 
     # load workflow

@@ -1,4 +1,5 @@
-import os, sys
+import sys
+from os import popen, listdir, makedirs, path, system
 import json
 import argparse
 
@@ -58,7 +59,7 @@ def getFilesFromDas(args):
             instance = "prod/phys03"
         print("Creating list of files for dataset", dsname, Tier, instance)
         flist = (
-            os.popen(
+            popen(
                 (
                     "/cvmfs/cms.cern.ch/common/dasgoclient -query='instance={} file dataset={}'"
                 ).format(instance, fset[fset.index(dataset)].rstrip())
