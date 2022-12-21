@@ -522,6 +522,7 @@ def plotratio(
 
 def autoranger(hist):
     val, axis = hist.values(), hist.axes[-1].edges
+    mins,maxs = 0,len(val)
     for i in range(len(val)):
         if val[i] != 0:
             mins = i
