@@ -161,4 +161,4 @@ for var in var_set:
     fig.savefig(f"plot/{config['output']}_{time}/compare_{var}{logext}.png")
 
 
-print(f"The output is saved at: plot/{config['output']}_{time}")
+print(f"The output is saved at: plot/{config['output']}_{time}/")
