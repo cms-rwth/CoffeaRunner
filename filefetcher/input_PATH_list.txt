@@ -1,0 +1,2 @@
+DYJets_UNLOPS  root://grid-cms-xrootd.physik.rwth-aachen.de//store/user/andrey/NanoGEN/dyeej_UNLOPS/
+BReg_Test /net/scratch_cms3a/hcc/breg_nano17/ZH_Hbb/

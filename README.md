@@ -72,7 +72,7 @@ voms-proxy-init --voms cms --vomses ~/.grid-security/vomses
 Use the `./filefetcher/fetch.py` script:
 
 ```
-python filefetcher/fetch.py --input input_DAS_list.txt --output ${output_name.json}
+python filefetcher/fetch.py --input filefetcher/input_DAS_list.txt --output output_name.json
 ```
 where the `input_DAS_list.txt` is a simple file with a list of dataset names extract from DAS (you need to create it yourself for the samples you want to run over), and output json file in creted in `./metadata` directory.
 
