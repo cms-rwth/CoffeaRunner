@@ -1,4 +1,4 @@
-name: plotting script test
+name: Test plot
 on:
   push:
     branches: [ master ]
@@ -13,13 +13,17 @@ jobs:
     strategy:
       max-parallel: 4
       matrix:
-        python-version: ["3.8", "3.9", "3.10"]
+        python-version: ["3.8", "3.9","3.10"]
     
     defaults:
       run:
         shell: "bash -l {0}"
 
     steps:
+    - uses: actions/checkout@v2
+    - uses: cvmfs-contrib/github-action-cvmfs@v2
+      with:
+        cvmfs_repositories: 'grid.cern.ch'
 
     - name: Set conda environment
       uses: conda-incubator/setup-miniconda@v2
@@ -43,10 +47,12 @@ jobs:
     - name: Install Repo
       run: |
         pip install -e .
- 
-    - name: data/MC plotter 
+
+    
+    - name: data/MC plotter		
       run: |
         python plotting/plotdataMC.py --cfg testfile/btv_datamc.yml 
+    
     - name: comparison plotter 
       run: |
         python plotting/comparison.py --cfg testfile/btv_comapre.yml 
