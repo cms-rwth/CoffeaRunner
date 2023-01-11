@@ -1,4 +1,4 @@
-name: Test plot
+name: Test plotter
 on:
   push:
     branches: [ master ]
@@ -13,7 +13,7 @@ jobs:
     strategy:
       max-parallel: 4
       matrix:
-        python-version: ["3.8", "3.9","3.10"]
+        python-version: ["3.10"]
     
     defaults:
       run:
@@ -42,17 +42,16 @@ jobs:
         conda info
         conda env list
         conda list
-        
-      
+            
     - name: Install Repo
       run: |
         pip install -e .
-
-    
-    - name: data/MC plotter		
+	
+    - name: data/MC plotter 
       run: |
         python plotting/plotdataMC.py --cfg testfile/btv_datamc.yml 
-    
+
     - name: comparison plotter 
       run: |
         python plotting/comparison.py --cfg testfile/btv_comapre.yml 
+    
