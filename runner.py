@@ -12,16 +12,6 @@ from coffea import processor
 
 from BTVNanoCommissioning.workflows import workflows
 
-# This would crash if the ExampleWorkflow does not exist
-from ExampleWorkflow.workflows import workflows
-from ZplusJets.workflows import workflows
-
-# from ExampleWorkflow.workflows import workflows
-# from VHcc.workflows import workflows
-# from Hpluscharm.workflows import workflows
-
-# Should come up with a smarter way to import all worflows from subdirectories of ./src/
-
 
 def validate(file):
     try:
@@ -255,13 +245,13 @@ if __name__ == "__main__":
                 print(f"Removing: {fi}")
                 os.system(f"rm {fi}")
         if input("Write list of bad files? (y/n)") == "y":
-            corrupted_name = (args.samplejson).split('.json')[0]
-            with open(f'{corrupted_name}_corrupted.txt', 'w') as bad_txt:
+            corrupted_name = (args.samplejson).split(".json")[0]
+            with open(f"{corrupted_name}_corrupted.txt", "w") as bad_txt:
                 print("Writing:")
                 for fi in all_invalid:
                     print(f"Writing: {fi}")
                     bad_txt.write(fi)
-                    bad_txt.write('\n')
+                    bad_txt.write("\n")
         sys.exit(0)
 
     # load workflow

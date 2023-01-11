@@ -133,7 +133,7 @@ for var in var_set:
     ax.set_xlabel(None)
     ax.set_ylabel("Events")
     rax.set_ylabel("Other/Ref")
-    ax.ticklabel_format(style="sci", scilimits=(-3, 3))
+    ax.ticklabel_format(style="sci", axis="y", scilimits=(-3, 3))
     ax.get_yaxis().get_offset_text().set_position((-0.065, 1.05))
     ax.legend()
     rax.set_ylim(0.0, 2.0)
@@ -161,4 +161,4 @@ for var in var_set:
     fig.savefig(f"plot/{config['output']}_{time}/compare_{var}{logext}.png")
 
 
-print(f"The output is saved at: plot/{config['output']}_{time}")
+print(f"The output is saved at: plot/{config['output']}_{time}/")

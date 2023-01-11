@@ -1234,6 +1234,13 @@ xsection = [
         "comment": "Private sample",
     },
     {
+        "process_name": "DYJets_UNLOPS",
+        "cross_section": "2025",
+        "DAS": "root://grid-cms-xrootd.physik.rwth-aachen.de//store/user/andrey/NanoGEN/dyeej_UNLOPS/",
+        "energy": "13",
+        "comment": "Private sample",
+    },
+    {
         "process_name": "Template",
         "cross_section": "11",
         "DAS": "/1/2/NANOAODSIM",
