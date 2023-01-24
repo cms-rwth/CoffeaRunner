@@ -123,6 +123,8 @@ class Configurator:
             "retries": 20,
             "voms": None,
             "compression": 3,
+            "index":None,
+            "sample_size":20,
         }
         if "run_options" not in self.cfg.keys():
             self.cfg["run_options"] = {}

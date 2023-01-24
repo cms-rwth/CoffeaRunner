@@ -163,7 +163,6 @@ def load_default(config, isDataMC=True):
 
 
 def load_coffea(config, scaleToLumi=True):
-    # print('config = ', config)
     if scaleToLumi:
         from BTVNanoCommissioning.utils.xs_scaler import getSumW, scaleSumW
     if "*" in config["input"]:
@@ -175,7 +174,7 @@ def load_coffea(config, scaleToLumi=True):
                     output[out], config["lumi"], getSumW(output[out])
                 )
     elif len(config["input"]) > 0:
-        output = {i: load(i) for i in config["input"]}
+        output = {i: load(i) for i in [config["input"]]}
         for out in output.keys():
             if scaleToLumi:
                 output[out] = scaleSumW(

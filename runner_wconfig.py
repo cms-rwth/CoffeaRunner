@@ -85,9 +85,9 @@ if __name__ == "__main__":
                 desc=f"Validating {sample[:20]}...",
             )
             _results = list(_rmap)
-            counts = np.sum([r for r in _results if np.isreal(r)])
+            #counts = np.sum([r for r in _results if np.isreal(r)])
             all_invalid += [r for r in _results if type(r) == str]
-            print("Events:", np.sum(counts))
+            #print("Events:", np.sum(counts))
         print("Bad files:")
         for fi in all_invalid:
             print(f"  {fi}")
@@ -316,15 +316,49 @@ if __name__ == "__main__":
                 "config": None,
                 "compression": config.run_options["compression"],
             }
-        output = processor.run_uproot_job(
-            config.fileset,
-            treename="Events",
-            processor_instance=config.processor_instance,
-            executor=processor.parsl_executor,
-            executor_args=executor_args_condor,
-            chunksize=config.run_options["chunk"],
-            maxchunks=config.run_options["max"],
-        )
+        if config.run_options["index"] is not None:
+            findex = int(config.run_options["index"].split(",")[1])
+            for sindex, sample in enumerate(config.fileset.keys()):
+                if sindex < int(config.run_options["index"].split(",")[0]):
+                    continue
+                if int(config.run_options["index"].split(",")[1]) == findex:
+                    mins = findex * config.run_options["sample_size"]
+                else:
+                    mins = 0
+                    findex = 0
+                
+                while mins < len(config.fileset[sample]):
+                    splitted = {}
+                    maxs = mins + config.run_options["sample_size"]
+                    splitted[sample] = config.fileset[sample][mins:maxs]
+                    mins = maxs
+                    findex = findex + 1
+                    
+                    output = processor.run_uproot_job(
+                        splitted,
+                        treename="Events",
+                        processor_instance=config.processor_instance,
+                        executor=processor.parsl_executor,
+                        executor_args=executor_args_condor,
+                        chunksize=config.run_options["chunk"],
+                        maxchunks=config.run_options["max"],
+                    )
+                    save(
+                        output,
+                        config.outfile.replace(
+                            ".coffea", f"_{sindex}_{findex}.coffea"
+                        ),
+                    )
+        else:
+            output = processor.run_uproot_job(
+                config.fileset,
+                treename="Events",
+                processor_instance=config.processor_instance,
+                executor=processor.parsl_executor,
+                executor_args=executor_args_condor,
+                chunksize=config.run_options["chunk"],
+                maxchunks=config.run_options["max"],
+            )
 
     elif "dask" in config.run_options["executor"]:
         from dask_jobqueue import SLURMCluster, HTCondorCluster
