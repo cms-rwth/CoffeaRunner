@@ -88,11 +88,11 @@ variable :
     #        discr: 2
     # Use "all" will produce plots for all the variables
     # only rebin of last axis (variable-axis) can be specify here
-    #all: 
+    all: 
     #    rebin: 2
-    nj:
-        axis:
-            lepflav: mumu
+    #nj:
+    #    axis:
+    #        lepflav: mumu
 
 ##  Optional, rescale the yields for some samples
 #rescale_yields: 
