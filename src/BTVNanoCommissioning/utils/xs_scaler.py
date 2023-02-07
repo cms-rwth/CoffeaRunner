@@ -23,6 +23,12 @@ def scaleSumW(accumulator, lumi, sumw, dyscale=1.0):
     xs_dict = {}
     for obj in xsection:
         xs_dict[obj["process_name"]] = float(obj["cross_section"])
+    #print(accumulator) # for old processor
+    #for key in accumulator.keys():
+    #    if key == 'array':
+    #        break
+    #    scaled[key] = {}
+    #    for 
     for sample, accu in accumulator.items():
         scaled[sample] = {}
         for key, h_obj in accu.items():
@@ -33,7 +39,7 @@ def scaleSumW(accumulator, lumi, sumw, dyscale=1.0):
                     h = h * xs_dict[sample] * lumi / sumw[sample]
                 else:
                     if not (("data" in sample) or ("Run" in sample)):
-                        raise KeyError(sample, "is not founded in xsection.py")
+                        raise KeyError(sample, "was not found in xsection.py")
                     else:
                         h = h
                 scaled[sample][key] = h
@@ -99,6 +105,10 @@ def collate(output, mergemap):
 
 def getSumW(accumulator):
     sumw = {}
-    for key, accus in accumulator.items():
-        sumw[key] = accus["sumw"]
+    #print(accumulator.items())
+    #print(accumulator["sumw"])
+    for key, accus in accumulator.items(): #MY
+        sumw[key] = accus["sumw"] #MY
+    #for key in accumulator["sumw"].keys(): # for old processor
+    #    sumw[key] = accumulator["sumw"][key] # for old processor
     return sumw

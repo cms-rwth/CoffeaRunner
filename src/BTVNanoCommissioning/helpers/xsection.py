@@ -1234,6 +1234,20 @@ xsection = [
         "comment": "Private sample",
     },
     {
+        "process_name": "ZH125ToCC_ZLL_powheg",
+        "cross_section": "0.002342",
+        "DAS": "/ZH_HToCC_ZToLL_M125_13TeV_powheg_pythia8",
+        "energy": "13",
+        "comment": "From VHcc",
+    },
+    {
+        "process_name": "DYJetsToLL_nlo",
+        "cross_section": "6508",
+        "DAS": "/DYJetsToLL_M-50_TuneCP5_13TeV-amcatnloFXFX-pythia8",
+        "energy": "13",
+        "comment": "From VHcc",
+    },
+    {
         "process_name": "Template",
         "cross_section": "11",
         "DAS": "/1/2/NANOAODSIM",
