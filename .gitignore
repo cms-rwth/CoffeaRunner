@@ -16,6 +16,7 @@ src/BTVNanoCommissioning.egg-info/
 src/BTVNanoCommissioning/helpers/definitions.py
 src/BTVNanoCommissioning/utils/AK4_parameters.py
 src/BTVNanoCommissioning/utils/selection.py
+src/BTVNanoCommissioning/utils/histogrammer.py
 .github/workflows/ctag_DY_workflow.yml
 .github/workflows/ctag_Wc_workflow.yml
 .github/workflows/ttbar_SL_DL_workflow.yml
