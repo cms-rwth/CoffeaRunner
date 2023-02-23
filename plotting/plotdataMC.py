@@ -39,9 +39,17 @@ if not os.path.isdir(f"plot/{config['output']}_{time}/"):
 ## load coffea files
 output = load_coffea(config, config["scaleToLumi"])
 ## load merge map, inbox text
-mergemap = {
-    merger: config["mergemap"][merger]["list"] for merger in config["mergemap"].keys()
-}
+mergemap= {}
+if not any(".coffea" in o for o in output.keys()):
+    for merger in config["mergemap"].keys():
+        mergemap[merger] = [m for m in output.keys() if m in config["mergemap"][merger]]
+else:
+    for merger in config["mergemap"].keys():
+        flist = []
+        for f in output.keys():
+            flist.extend([m for m in output[f].keys() if m in config["mergemap"][merger]])
+        mergemap[merger] = flist
+    
 collated = collate(output, mergemap)
 config = load_default(config)
 

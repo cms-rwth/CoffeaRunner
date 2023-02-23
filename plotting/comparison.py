@@ -41,9 +41,16 @@ output = load_coffea(config, config["scaleToLumi"])
 
 
 ## build up merge map
-mergemap = {
-    merger: config["mergemap"][merger]["list"] for merger in config["mergemap"].keys()
-}
+mergemap= {}
+if not any(".coffea" in o for o in output.keys()):
+    for merger in config["mergemap"].keys():
+        mergemap[merger] = [m for m in output.keys() if m in config["mergemap"][merger]]
+else:
+    for merger in config["mergemap"].keys():
+        flist = []
+        for f in output.keys():
+            flist.extend([m for m in output[f].keys() if m in config["mergemap"][merger]])
+        mergemap[merger] = flist
 refname = list(config["reference"].keys())[0]
 collated = collate(output, mergemap)
 config = load_default(config, False)

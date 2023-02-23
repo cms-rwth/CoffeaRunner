@@ -3,6 +3,7 @@ import contextlib
 from coffea.lookup_tools import extractor
 from coffea.jetmet_tools import JECStack, CorrectedJetsFactory, CorrectedMETFactory
 
+
 jec_name_map = {
     "JetPt": "pt",
     "JetMass": "mass",
@@ -228,7 +229,7 @@ def jet_factories(campaign):
                     "src/BTVNanoCommissioning/data/JME/UL18/Summer19UL18_RunD_V5_DATA_UncertaintySources_AK4PFchs.junc.txt",
                 ]
             ),
-        },
+        }
     }
     return jet_factory[campaign]
 
