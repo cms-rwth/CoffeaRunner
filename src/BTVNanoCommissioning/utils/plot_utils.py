@@ -168,17 +168,16 @@ def load_coffea(config, scaleToLumi=True):
     if "*" in config["input"]:
         files = glob.glob(config["input"])
         output = {i: load(i) for i in files}
-        for out in output.keys():
-            if scaleToLumi:
-                output[out] = scaleSumW(
-                    output[out], config["lumi"], getSumW(output[out])
+
+        if scaleToLumi:
+            output = scaleSumW(
+                    output, config["lumi"]
                 )
     elif len(config["input"]) > 0:
         output = {i: load(i) for i in [config["input"]]}
-        for out in output.keys():
-            if scaleToLumi:
-                output[out] = scaleSumW(
-                    output[out], config["lumi"], getSumW(output[out])
+        if scaleToLumi:
+            output = scaleSumW(
+                output, config["lumi"]
                 )
     else:
         print("Input files are not provided in config")

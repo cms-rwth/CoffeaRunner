@@ -13,7 +13,9 @@ Generalized framework columnar-based analysis with [coffea](https://coffeateam.g
 
 :heavy_exclamation_mark: Install under `bash` environment
 
-Clone repository from git
+```
+# only first time, including submodules
+git clone --recursive git@github.com:cms-btv-pog/BTVNanoCommissioning.git 
 
 ```bash
 # only first time 
@@ -307,6 +309,46 @@ memray run --live  runner.py --cfg config/example.py
 ```
 ###  Plotting code 
 
+</p>
+</details>
+
+### Use central maintained jsonpog-integration 
+The official correction files collected in [jsonpog-integration](https://gitlab.cern.ch/cms-nanoAOD/jsonpog-integration) is updated by POG except `lumiMask` and `JME` still updated by maintainer. No longer to request input files in the `correction_config`.  
+
+<details><summary>See the example with `2017_UL`.</summary>
+<p>
+
+```python
+  "2017_UL": {
+        # Same with custom config
+        "lumiMask": "Cert_294927-306462_13TeV_UL2017_Collisions17_MuonJSON.txt",
+        "JME": "jec_compiled.pkl.gz",
+        # no config need to be specify for PU weights
+        "PU": None,
+        # Btag SFs - specify $TAGGER : $TYPE-> find [$TAGGER_$TYPE] in json file
+        "BTV": {"deepCSV": "shape", "deepJet": "shape"},
+        
+        "LSF": {
+        # Electron SF - Following the scheme: "${SF_name} ${year}": "${WP}"
+        # https://github.com/cms-egamma/cms-egamma-docs/blob/master/docs/EgammaSFJSON.md
+            "ele_ID 2017": "wp90iso",
+            "ele_Reco 2017": "RecoAbove20",
+
+        # Muon SF - Following the scheme: "${SF_name} ${year}": "${WP}"
+        # WPs : ['NUM_GlobalMuons_DEN_genTracks', 'NUM_HighPtID_DEN_TrackerMuons', 'NUM_HighPtID_DEN_genTracks', 'NUM_IsoMu27_DEN_CutBasedIdTight_and_PFIsoTight', 'NUM_LooseID_DEN_TrackerMuons', 'NUM_LooseID_DEN_genTracks', 'NUM_LooseRelIso_DEN_LooseID', 'NUM_LooseRelIso_DEN_MediumID', 'NUM_LooseRelIso_DEN_MediumPromptID', 'NUM_LooseRelIso_DEN_TightIDandIPCut', 'NUM_LooseRelTkIso_DEN_HighPtIDandIPCut', 'NUM_LooseRelTkIso_DEN_TrkHighPtIDandIPCut', 'NUM_MediumID_DEN_TrackerMuons', 'NUM_MediumID_DEN_genTracks', 'NUM_MediumPromptID_DEN_TrackerMuons', 'NUM_MediumPromptID_DEN_genTracks', 'NUM_Mu50_or_OldMu100_or_TkMu100_DEN_CutBasedIdGlobalHighPt_and_TkIsoLoose', 'NUM_SoftID_DEN_TrackerMuons', 'NUM_SoftID_DEN_genTracks', 'NUM_TightID_DEN_TrackerMuons', 'NUM_TightID_DEN_genTracks', 'NUM_TightRelIso_DEN_MediumID', 'NUM_TightRelIso_DEN_MediumPromptID', 'NUM_TightRelIso_DEN_TightIDandIPCut', 'NUM_TightRelTkIso_DEN_HighPtIDandIPCut', 'NUM_TightRelTkIso_DEN_TrkHighPtIDandIPCut', 'NUM_TrackerMuons_DEN_genTracks', 'NUM_TrkHighPtID_DEN_TrackerMuons', 'NUM_TrkHighPtID_DEN_genTracks']
+
+            "mu_Reco 2017_UL": "NUM_TrackerMuons_DEN_genTracks",
+            "mu_HLT 2017_UL": "NUM_IsoMu27_DEN_CutBasedIdTight_and_PFIsoTight",
+            "mu_ID 2017_UL": "NUM_TightID_DEN_TrackerMuons",
+            "mu_Iso 2017_UL": "NUM_TightRelIso_DEN_TightIDandIPCut",
+        },
+    },
+```
+
+</p>
+</details>
+
+## Create compiled JERC file(`pkl.gz`)
 
 Produce data/MC comparison, shape comparison plots from `.coffea` files, load configuration (`yaml`) files, brief [intro](https://docs.fileformat.com/programming/yaml/) of yaml.
 
