@@ -67,7 +67,13 @@ variable :
             2
         # Optional(only for data/MC), blind variables
         blind : -10, #blind variable[-10:], if put -10,-5 would blind variable[-10:-5]
-        
+
+    btagDeepFlavCvB_0:
+        xlabel: "deepJet CvB" 
+        # Optional, rebin variable, you can specify the rebin axis with rebin value, you can use non-uniform rebinning now!
+        rebin:  
+            discr : [-0.2,0.04,0.2,0.4,0.48,0.6,0.64,0.68,0.72,0.76,0.8,0.84,0.88,0.92,0.96,1.]
+
     ## specify variable, if not specify anything, leave empty value for key
     btagDeepFlavC_0:
 
@@ -86,10 +92,10 @@ variable :
 
 ##  Optional, rescale the yields for some samples
 rescale_yields: 
-    VV : 100.0 
+    VV : 1.0 
 ## Optional, scale particular component and overlay on plot
 scale : 
-    VV : 100.0 
+    VV : 5.0 
 com : "13.6" # Optional, # √s = 13TeV
 inbox_text: "" #Optional, text write in anchor text box, but always put empty string
 disable_ratio : False #Optional, disable ratio panel

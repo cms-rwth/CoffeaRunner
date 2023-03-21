@@ -7,6 +7,7 @@ import importlib.util
 from collections import defaultdict
 import inspect
 
+
 ## This is coming from https://github.com/PocketCoffea/PocketCoffea
 class Configurator:
     def __init__(self, cfg, overwrite_output_dir=None, plot=False, plot_version=None):
@@ -123,8 +124,8 @@ class Configurator:
             "retries": 20,
             "voms": None,
             "compression": 3,
-            "index":None,
-            "sample_size":20,
+            "index": None,
+            "sample_size": 20,
         }
         if "run_options" not in self.cfg.keys():
             self.cfg["run_options"] = {}
@@ -139,7 +140,6 @@ class Configurator:
             ds_filter = self.dataset.get("filter", None)
             if ds_filter != None:
                 for key, ds in ds_dict.items():
-
                     pass_filter = True
 
                     if "samples" in ds_filter:
@@ -338,7 +338,6 @@ class Configurator:
     #             )
 
     def load_workflow(self):
-
         self.processor_instance = self.workflow(cfg=self)
 
     def save_config(self, cfg):

@@ -9,6 +9,7 @@ from coffea import processor
 
 from BTVNanoCommissioning.utils.Configurator import Configurator
 
+
 # Should come up with a smarter way to import all worflows from subdirectories of ./src/
 def validate(file):
     try:
@@ -85,9 +86,9 @@ if __name__ == "__main__":
                 desc=f"Validating {sample[:20]}...",
             )
             _results = list(_rmap)
-            #counts = np.sum([r for r in _results if np.isreal(r)])
+            # counts = np.sum([r for r in _results if np.isreal(r)])
             all_invalid += [r for r in _results if type(r) == str]
-            #print("Events:", np.sum(counts))
+            # print("Events:", np.sum(counts))
         print("Bad files:")
         for fi in all_invalid:
             print(f"  {fi}")
@@ -326,14 +327,14 @@ if __name__ == "__main__":
                 else:
                     mins = 0
                     findex = 0
-                
+
                 while mins < len(config.fileset[sample]):
                     splitted = {}
                     maxs = mins + config.run_options["sample_size"]
                     splitted[sample] = config.fileset[sample][mins:maxs]
                     mins = maxs
                     findex = findex + 1
-                    
+
                     output = processor.run_uproot_job(
                         splitted,
                         treename="Events",
@@ -345,9 +346,7 @@ if __name__ == "__main__":
                     )
                     save(
                         output,
-                        config.outfile.replace(
-                            ".coffea", f"_{sindex}_{findex}.coffea"
-                        ),
+                        config.outfile.replace(".coffea", f"_{sindex}_{findex}.coffea"),
                     )
         else:
             output = processor.run_uproot_job(

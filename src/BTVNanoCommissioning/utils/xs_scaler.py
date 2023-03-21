@@ -97,7 +97,7 @@ def additional_scale(output, scale, sample_to_scale):
                             h = h
                         scaled[files][sample][key] = h
         else:
-            for sample, accu in output[files].items():
+            for sample, accu in output.items():
                 scaled[sample] = {}
                 for key, h_obj in accu.items():
                     if isinstance(h_obj, hist.Hist):
@@ -137,7 +137,6 @@ def collate(output, mergemap):
             else:
                 merged[files] = dict(output[files].items())
     for group, names in mergemap.items():
-        print(group, names)
         out[group] = processor.accumulate(
             [v for k, v in merged.items() if k.split("_FNAME_")[0] in names]
         )

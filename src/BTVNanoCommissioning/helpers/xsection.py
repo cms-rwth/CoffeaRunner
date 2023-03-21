@@ -17,7 +17,7 @@ xsection = [
         "process_name": "QCD_Pt-80to120_EMEnriched_TuneCP5_13TeV_pythia8",
         "cross_section": "367500.0",
         "total_uncertainty": "1091.0",
-        "equivalent_lumi": "0.002721",  
+        "equivalent_lumi": "0.002721",
         "energy": "13",
     },
     {
@@ -31,7 +31,7 @@ xsection = [
         "process_name": "QCD_Pt-170to300_EMEnriched_TuneCP5_13TeV_pythia8",
         "cross_section": "16620.0",
         "total_uncertainty": "49.1",
-        "equivalent_lumi": "0.06016",    
+        "equivalent_lumi": "0.06016",
         "energy": "13",
     },
     {
@@ -117,7 +117,7 @@ xsection = [
         "cross_section": "4.7",
         "total_uncertainty": "0.009809",
         "DAS": "/QCD_Pt-800to1000_MuEnrichedPt5_TuneCP5_13TeV_pythia8/RunIIFall17MiniAODv2-PU2017_12Apr2018_94X_mc2017_realistic_v14-v1/MINIAODSIM",
-        "equivalent_lumi": "305.3",        
+        "equivalent_lumi": "305.3",
         "energy": "13",
     },
     {
@@ -125,7 +125,6 @@ xsection = [
         "cross_section": "1.6",
         "total_uncertainty": "0.003236",
         "DAS": "/QCD_Pt-1000toInf_MuEnrichedPt5_TuneCP5_13TeV_pythia8/RunIIFall17MiniAODv2-PU2017_12Apr2018_94X_mc2017_realistic_v14-v1/MINIAODSIM",
-        
         "energy": "13",
     },
     {
@@ -133,94 +132,94 @@ xsection = [
         "cross_section": "0.101784816",
         "matrix_generator": "Powheg",
         "energy": "13",
-        "comment":"from the calculation of Higgs XS WG and PDG"
+        "comment": "from the calculation of Higgs XS WG and PDG",
     },
     {
         "process_name": "GluGluHToZZTo2L2Nu_M125_TuneCP5_13TeV_powheg2_JHUGenV735_pythia8",
         "cross_section": "0.025446204",
         "matrix_generator": "Powheg",
         "energy": "13",
-        "comment":"from the calculation of Higgs XS WG and PDG"
+        "comment": "from the calculation of Higgs XS WG and PDG",
     },
     {
         "process_name": "GluGluHToZZTo4L_M125_TuneCP5_13TeV_powheg2_JHUGenV7011_pythia8",
-        "DAS":"/GluGluHToZZTo4L_M125_TuneCP5_13TeV_powheg2_JHUGenV7011_pythia8/RunIISummer20UL17NanoAODv9-106X_mc2017_realistic_v9-v2/NANOAODSIM",
+        "DAS": "/GluGluHToZZTo4L_M125_TuneCP5_13TeV_powheg2_JHUGenV7011_pythia8/RunIISummer20UL17NanoAODv9-106X_mc2017_realistic_v9-v2/NANOAODSIM",
         "cross_section": "0.0128",
         "energy": "13",
-        "comment":"from HIG-19-001 AN"
+        "comment": "from HIG-19-001 AN",
     },
     {
         "process_name": "GluGluToZH_HToZZTo4L_M125_TuneCP5_13TeV-jhugenv723-pythia8",
-        "DAS":"/GluGluToZH_HToZZTo4L_M125_TuneCP5_13TeV-jhugenv723-pythia8/RunIISummer20UL17NanoAODv9-106X_mc2017_realistic_v9-v2/NANOAODSIM",
+        "DAS": "/GluGluToZH_HToZZTo4L_M125_TuneCP5_13TeV-jhugenv723-pythia8/RunIISummer20UL17NanoAODv9-106X_mc2017_realistic_v9-v2/NANOAODSIM",
         "cross_section": "0.00003213513",
         "energy": "13",
-        "comment":"from the calculation of Higgs XS WG and PDG"
+        "comment": "from the calculation of Higgs XS WG and PDG",
     },
     {
         "process_name": "VBF_HToZZTo4L_M125_TuneCP5_withDipoleRecoil_13TeV-powheg2-jhugenv7011-pythia8",
-        "DAS":"/VBF_HToZZTo4L_M125_TuneCP5_withDipoleRecoil_13TeV-powheg2-jhugenv7011-pythia8/RunIISummer20UL17NanoAODv9-106X_mc2017_realistic_v9-v2/NANOAODSIM",
+        "DAS": "/VBF_HToZZTo4L_M125_TuneCP5_withDipoleRecoil_13TeV-powheg2-jhugenv7011-pythia8/RunIISummer20UL17NanoAODv9-106X_mc2017_realistic_v9-v2/NANOAODSIM",
         "cross_section": "0.001044",
         "energy": "13",
-        "comment":"from HIG-19-001"
+        "comment": "from HIG-19-001",
     },
     {
         "process_name": "WminusH_HToZZTo4L_M125_TuneCP5_13TeV_powheg2-minlo-HWJ_JHUGenV7011_pythia8",
-        "DAS":"/WminusH_HToZZTo4L_M125_TuneCP5_13TeV_powheg2-minlo-HWJ_JHUGenV7011_pythia8/RunIISummer20UL17NanoAODv9-106X_mc2017_realistic_v9-v2/NANOAODSIM",
+        "DAS": "/WminusH_HToZZTo4L_M125_TuneCP5_13TeV_powheg2-minlo-HWJ_JHUGenV7011_pythia8/RunIISummer20UL17NanoAODv9-106X_mc2017_realistic_v9-v2/NANOAODSIM",
         "cross_section": "0.000232",
         "energy": "13",
-        "comment":"from HIG-19-001"
+        "comment": "from HIG-19-001",
     },
     {
         "process_name": "WplusH_HToZZTo4L_M125_TuneCP5_13TeV_powheg2-minlo-HWJ_JHUGenV7011_pythia8",
-        "DAS":"/WplusH_HToZZTo4L_M125_TuneCP5_13TeV_powheg2-minlo-HWJ_JHUGenV7011_pythia8/RunIISummer20UL17NanoAODv9-106X_mc2017_realistic_v9-v2/NANOAODSIM",
+        "DAS": "/WplusH_HToZZTo4L_M125_TuneCP5_13TeV_powheg2-minlo-HWJ_JHUGenV7011_pythia8/RunIISummer20UL17NanoAODv9-106X_mc2017_realistic_v9-v2/NANOAODSIM",
         "cross_section": "0.000147",
         "energy": "13",
-        "comment":"from HIG-19-001"
+        "comment": "from HIG-19-001",
     },
     {
         "process_name": "bbH_HToZZTo4L_M125_TuneCP2_13TeV-jhugenv7011-pythia8",
-        "DAS":"/bbH_HToZZTo4L_M125_TuneCP2_13TeV-jhugenv7011-pythia8/RunIISummer20UL17NanoAODv9-106X_mc2017_realistic_v9-v2/NANOAODSIM",
+        "DAS": "/bbH_HToZZTo4L_M125_TuneCP2_13TeV-jhugenv7011-pythia8/RunIISummer20UL17NanoAODv9-106X_mc2017_realistic_v9-v2/NANOAODSIM",
         "cross_section": "0.000135",
         "energy": "13",
-        "comment":"from HIG-19-001"
+        "comment": "from HIG-19-001",
     },
     {
         "process_name": "ttH_HToZZ_4LFilter_M125_TuneCP5_13TeV_powheg2_JHUGenV7011_pythia8",
-        "DAS":"/ttH_HToZZ_4LFilter_M125_TuneCP5_13TeV_powheg2_JHUGenV7011_pythia8/RunIISummer20UL17NanoAODv9-106X_mc2017_realistic_v9-v2/NANOAODSIM",
+        "DAS": "/ttH_HToZZ_4LFilter_M125_TuneCP5_13TeV_powheg2_JHUGenV7011_pythia8/RunIISummer20UL17NanoAODv9-106X_mc2017_realistic_v9-v2/NANOAODSIM",
         "cross_section": "0.000393",
         "energy": "13",
-        "comment":"from HIG-19-001"
+        "comment": "from HIG-19-001",
     },
     {
         "process_name": "tqH_HToZZTo4L_M125_TuneCP5_13TeV-jhugenv7011-pythia8",
-        "DAS":"/tqH_HToZZTo4L_M125_TuneCP5_13TeV-jhugenv7011-pythia8/RunIISummer20UL17NanoAODv9-106X_mc2017_realistic_v9-v2/NANOAODSIM",
+        "DAS": "/tqH_HToZZTo4L_M125_TuneCP5_13TeV-jhugenv7011-pythia8/RunIISummer20UL17NanoAODv9-106X_mc2017_realistic_v9-v2/NANOAODSIM",
         "cross_section": "0.0000213",
         "energy": "13",
-        "comment":"from HIG-19-001"
+        "comment": "from HIG-19-001",
     },
     {
         "process_name": "ZH_HToZZ_4LFilter_M125_TuneCP5_13TeV_powheg2-minlo-HZJ_JHUGenV7011_pythia8",
-        "DAS":"/ZH_HToZZ_4LFilter_M125_TuneCP5_13TeV_powheg2-minlo-HZJ_JHUGenV7011_pythia8/RunIISummer20UL17NanoAODv9-106X_mc2017_realistic_v9-v2/NANOAODSIM",
+        "DAS": "/ZH_HToZZ_4LFilter_M125_TuneCP5_13TeV_powheg2-minlo-HZJ_JHUGenV7011_pythia8/RunIISummer20UL17NanoAODv9-106X_mc2017_realistic_v9-v2/NANOAODSIM",
         "cross_section": "0.000668",
         "energy": "13",
-        "comment":"from HIG-19-001"
+        "comment": "from HIG-19-001",
     },
     {
         "process_name": "GluGluHToWWToLNuQQ_M125_TuneCP5_PSweight_13TeV-powheg2-jhugen727-pythia8",
-        "DAS":"/GluGluHToWWToLNuQQ_M125_TuneCP5_PSweight_13TeV-powheg2-jhugen727-pythia8/RunIISummer20UL17NanoAODv9-106X_mc2017_realistic_v9-v2/NANOAODSIM",
+        "DAS": "/GluGluHToWWToLNuQQ_M125_TuneCP5_PSweight_13TeV-powheg2-jhugen727-pythia8/RunIISummer20UL17NanoAODv9-106X_mc2017_realistic_v9-v2/NANOAODSIM",
         "cross_section": "0.0889472061",
         "accuracy": "NLO",
         "matrix_generator": "Powheg",
         "energy": "13",
-        "comment":"from the calculation of Higgs XS WG and PDG"
+        "comment": "from the calculation of Higgs XS WG and PDG",
     },
     {
         "process_name": "GluGluHToWWTo2L2Nu_M-125_TuneCP5_13TeV-powheg-jhugen727-pythia8",
-        "DAS":"/GluGluHToWWTo2L2Nu_M-125_TuneCP5_13TeV-powheg-jhugen727-pythia8/RunIISummer20UL17NanoAODv9-106X_mc2017_realistic_v9-v2/NANOAODSIM",
+        "DAS": "/GluGluHToWWTo2L2Nu_M-125_TuneCP5_13TeV-powheg-jhugen727-pythia8/RunIISummer20UL17NanoAODv9-106X_mc2017_realistic_v9-v2/NANOAODSIM",
         "cross_section": "0.9913",
         "total_uncertainty": "0.01033",
         "matrix_generator": "Powheg",
-        "comment":"from the calculation of Higgs XS WG and PDG",
+        "comment": "from the calculation of Higgs XS WG and PDG",
         "energy": "13",
     },
     {
@@ -998,21 +997,11 @@ xsection = [
         "energy": "13",
         "comment": "Private sample",
     },
-    {   "process_name": "gchcZZ2L2Q",
-        "cross_section":"0.00032625826"
-    },
-    {   "process_name": "gchcZZ2L2Nu",
-        "cross_section":"0.00009333531"
-    },
-    {   "process_name": "gchcWW2QLNu",
-        "cross_section":"0.00821330551"
-    },
-    {   "process_name": "gchcWW2L2Nu",
-        "cross_section":"0.00396958157"
-    },
-    {   "process_name": "gchcWW2L2Nu_4f",
-        "cross_section":"0.00204444792"
-    },
+    {"process_name": "gchcZZ2L2Q", "cross_section": "0.00032625826"},
+    {"process_name": "gchcZZ2L2Nu", "cross_section": "0.00009333531"},
+    {"process_name": "gchcWW2QLNu", "cross_section": "0.00821330551"},
+    {"process_name": "gchcWW2L2Nu", "cross_section": "0.00396958157"},
+    {"process_name": "gchcWW2L2Nu_4f", "cross_section": "0.00204444792"},
     {
         "process_name": "Template",
         "cross_section": "11",
@@ -1020,5 +1009,4 @@ xsection = [
         "energy": "13",
         "comment": "Copy this template to manually insert a new sample in this list",
     },
-
 ]
