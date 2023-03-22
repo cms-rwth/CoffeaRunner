@@ -59,7 +59,6 @@ refname = list(config["reference"].keys())[0]
 collated = collate(output, mergemap)
 config = load_default(config, False)
 
-
 ## If addition rescale on yields required
 if "rescale_yields" in config.keys():
     for sample_to_scale in config["rescale_yields"].keys():
@@ -175,4 +174,4 @@ for var in var_set:
     fig.savefig(f"plot/{config['output']}_{time}/compare_{var}{logext}.png")
 
 
-print(f"The output is saved at: plot/{config['output']}_{time}")
+print(f"The output is saved at: plot/{config['output']}_{time}/")

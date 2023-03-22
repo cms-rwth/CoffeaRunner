@@ -750,6 +750,7 @@ xsection = [
         "total_uncertainty": "5.042e-04",
         "DAS": "/DYJetsToLL_LHEFilterPtZ-650ToInf_MatchEWPDG20_TuneCP5_13TeV-amcatnloFXFX-pythia8/RunIISummer20UL17MiniAODv2-106X_mc2017_realistic_v9-v2/MINIAODSIM",
         "fraction_negative_weight": "0.2771",
+        "matrix_generator": "none",
         "energy": "13",
         "comments": "GENXSanalyzer",
     },
@@ -1002,6 +1003,13 @@ xsection = [
     {"process_name": "gchcWW2QLNu", "cross_section": "0.00821330551"},
     {"process_name": "gchcWW2L2Nu", "cross_section": "0.00396958157"},
     {"process_name": "gchcWW2L2Nu_4f", "cross_section": "0.00204444792"},
+    {
+        "process_name": "DYJets_UNLOPS",
+        "cross_section": "2025",
+        "DAS": "root://grid-cms-xrootd.physik.rwth-aachen.de//store/user/andrey/NanoGEN/dyeej_UNLOPS/",
+        "energy": "13",
+        "comment": "Private sample",
+    },
     {
         "process_name": "Template",
         "cross_section": "11",

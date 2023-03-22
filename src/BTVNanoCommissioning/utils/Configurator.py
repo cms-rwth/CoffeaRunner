@@ -338,6 +338,7 @@ class Configurator:
     #             )
 
     def load_workflow(self):
+
         self.processor_instance = self.workflow(cfg=self)
 
     def save_config(self, cfg):

@@ -17,7 +17,7 @@ from BTVNanoCommissioning.utils.plot_utils import (
     rebin_and_xlabel,
     plotratio,
     autoranger,
-    rebin_hist,
+    MCerrorband
 )
 
 parser = argparse.ArgumentParser(description="hist plotter for commissioning")

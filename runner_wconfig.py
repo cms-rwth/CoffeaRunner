@@ -448,5 +448,8 @@ if __name__ == "__main__":
 
     save(output, config.outfile)
 
-    print(output)
+    # print(output) better to print this in a file:
+    with open(f"{config.outfile}.print.txt", "w") as f:
+        print(output, file=f)
+
     print(f"Saving output to {config.outfile}")
