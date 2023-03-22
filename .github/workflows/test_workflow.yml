@@ -13,7 +13,8 @@ jobs:
     strategy:
       max-parallel: 4
       matrix:
-        python-version: [ "3.10", "3.8","3.9"]
+
+        python-version: ["3.8","3.10"]
     
     defaults:
       run:
@@ -39,7 +40,6 @@ jobs:
         miniforge-variant: Mambaforge
         channels: conda-forge,defaults
         channel-priority: true
-        auto-update-conda: true
         activate-environment: CoffeaRunner
         environment-file: env.yml
         auto-activate-base: false
@@ -84,6 +84,7 @@ jobs:
         pip install -e .
 
     
+
     - name: Run test workflow
       run: |
         python runner_wconfig.py --cfg config/example.py

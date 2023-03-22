@@ -11,6 +11,7 @@ plot/
 plotting/plot/
 src/BTVNanoCommissioning/version.py
 src/BTVNanoCommissioning/workflows/
+src/BTVNanoCommissioning/jsonpog-integration/examples/
 src/BTVNanoCommissioning.egg-info/
 ## not track BTV stuff
 src/BTVNanoCommissioning/helpers/definitions.py

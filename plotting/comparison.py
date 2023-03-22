@@ -128,6 +128,8 @@ for var in var_set:
             color=config["compare"][c]["color"],
             yerr=True,
             ax=ax,
+            xerr=do_xerr
+            # flow=args.flow,
         )
     # plot ratio of com/Ref
     for i, c in enumerate(config["compare"].keys()):

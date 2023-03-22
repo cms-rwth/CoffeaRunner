@@ -187,8 +187,6 @@ def load_SF(campaign, config, syst=False):
                 ext.finalize()
                 correction_map["EGM_custom"] = ext.make_evaluator()
 
-    return correction_map
-
 
 def load_lumi(path):
     _lumi_path = "BTVNanoCommissioning.data.lumiMasks"
@@ -242,7 +240,7 @@ met_filters = {
             "eeBadScFilter",
         ],
     },
-    "UL17": {
+    "2017_UL": {
         "data": [
             "goodVertices",
             "globalSuperTightHalo2016Filter",

@@ -350,6 +350,7 @@ if __name__ == "__main__":
                 "skipbadfiles": args.skipbadfiles,
                 "schema": processor.NanoAODSchema,
                 "workers": args.workers,
+                "xrootdtimeout": 60,
             },
             chunksize=args.chunk,
             maxchunks=args.max,

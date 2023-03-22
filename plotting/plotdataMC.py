@@ -16,8 +16,8 @@ from BTVNanoCommissioning.utils.plot_utils import (
     load_default,
     rebin_and_xlabel,
     plotratio,
-    errband_opts,
     autoranger,
+    rebin_hist,
 )
 
 parser = argparse.ArgumentParser(description="hist plotter for commissioning")
@@ -127,14 +127,7 @@ for var in var_set:
             summc = collated[mc][var]
         else:
             summc = collated[mc][var] + summc
-    ax.stairs(
-        values=summc.values() - np.sqrt(summc.variances()),
-        baseline=summc.values() + np.sqrt(summc.variances()),
-        edges=summc.axes[0].edges,
-        label="Stat unc.",
-        **errband_opts,
-    )
-
+    MCerrorband(summc, ax=ax)  # stat. unc. errorband
     ## Scale particular sample
     if "scale" in config.keys():
         for mc in collated.keys():
