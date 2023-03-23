@@ -11,13 +11,11 @@ plot/
 plotting/plot/
 src/BTVNanoCommissioning/version.py
 src/BTVNanoCommissioning/workflows/
-src/BTVNanoCommissioning/jsonpog-integration/examples/
 src/BTVNanoCommissioning.egg-info/
 ## not track BTV stuff
 src/BTVNanoCommissioning/helpers/definitions.py
 src/BTVNanoCommissioning/utils/AK4_parameters.py
 src/BTVNanoCommissioning/utils/selection.py
-src/BTVNanoCommissioning/utils/histogrammer.py
 .github/workflows/ctag_DY_workflow.yml
 .github/workflows/ctag_Wc_workflow.yml
 .github/workflows/ttbar_SL_DL_workflow.yml
@@ -35,6 +33,6 @@ dask-worker-space/
 .job_wrapper_failure
 plot/
 plotting/plot/
-*array*
+
 ## other submodules
 src/Hpluscharm/

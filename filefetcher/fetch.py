@@ -78,6 +78,7 @@ def getFilesFromDas(args):
 
 
 def getFilesFromPath(args, lim=None):
+
     fdict = {}
     fset = []
     with open(args.input) as fp:
@@ -101,6 +102,7 @@ def getFilesFromPath(args, lim=None):
 
 
 def getRootFilesFromPath(d, lim=None):
+
     import subprocess
 
     if "xrootd" in d:
@@ -146,12 +148,14 @@ def getRootFilesFromPath(d, lim=None):
 
 
 def main(args):
+
     if args.from_path:
         print("do it from path: ")
 
         fdict = getFilesFromPath(args)
 
     else:
+
         fdict = getFilesFromDas(args)
 
     # print(fdict)

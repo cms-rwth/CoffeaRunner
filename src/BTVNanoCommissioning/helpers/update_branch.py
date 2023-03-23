@@ -119,7 +119,7 @@ def add_jec(events, campaign, jmestuff):
         else:
             print("No valid jec name")
             raise NameError
-        if "2016_" in campaign:
+        if "UL16" in campaign:
             if "B" == jecname or "C" == jecname or "D" == jecname:
                 jecname = "BCD"
             elif "E" == jecname or "F" == jecname:
@@ -142,8 +142,8 @@ def add_jec(events, campaign, jmestuff):
 
     if "Run3" not in campaign:
         met = met_factory.build(events.MET, jets, {})
-        events = update(events, {"Jet": jets, "MET": met})
+        update(events, {"Jet": jets, "MET": met})
     else:
         met = met_factory.build(events.PuppiMET, jets, {})
-        events = update(events, {"Jet": jets, "PuppiMET": met})
+        update(events, {"Jet": jets, "PuppiMET": met})
     return events

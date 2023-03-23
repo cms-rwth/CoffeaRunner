@@ -23,63 +23,6 @@ def isin_dict(config, key=None):
         return type(config) is dict and key in config.keys()
 
 
-## Very nice implementtion from Kenneth Long:
-## https://gist.github.com/kdlong/d697ee691c696724fc656186c25f8814
-def rebin_hist(h, axis_name, edges):
-    if type(edges) == int:
-        return h[{axis_name: hist.rebin(edges)}]
-
-    ax = h.axes[axis_name]
-    ax_idx = [a.name for a in h.axes].index(axis_name)
-    if not all([np.isclose(x, ax.edges).any() for x in edges]):
-        raise ValueError(
-            f"Cannot rebin histogram due to incompatible edges for axis '{ax.name}'\n"
-            f"Edges of histogram are {ax.edges}, requested rebinning to {edges}"
-        )
-
-    # If you rebin to a subset of initial range, keep the overflow and underflow
-    overflow = ax.traits.overflow or (
-        edges[-1] < ax.edges[-1] and not np.isclose(edges[-1], ax.edges[-1])
-    )
-    underflow = ax.traits.underflow or (
-        edges[0] > ax.edges[0] and not np.isclose(edges[0], ax.edges[0])
-    )
-    flow = overflow or underflow
-    new_ax = hist.axis.Variable(
-        edges, name=ax.name, overflow=overflow, underflow=underflow
-    )
-    axes = list(h.axes)
-    axes[ax_idx] = new_ax
-
-    hnew = hist.Hist(*axes, name=h.name, storage=h._storage_type())
-
-    # Offset from bin edge to avoid numeric issues
-    offset = 0.5 * np.min(ax.edges[1:] - ax.edges[:-1])
-    edges_eval = edges + offset
-    edge_idx = ax.index(edges_eval)
-    # Avoid going outside the range, reduceat will add the last index anyway
-    if edge_idx[-1] == ax.size + ax.traits.overflow:
-        edge_idx = edge_idx[:-1]
-
-    if underflow:
-        # Only if the original axis had an underflow should you offset
-        if ax.traits.underflow:
-            edge_idx += 1
-        edge_idx = np.insert(edge_idx, 0, 0)
-
-    # Take is used because reduceat sums i:len(array) for the last entry, in the case
-    # where the final bin isn't the same between the initial and rebinned histogram, you
-    # want to drop this value. Add tolerance of 1/2 min bin width to avoid numeric issues
-    hnew.values(flow=flow)[...] = np.add.reduceat(
-        h.values(flow=flow), edge_idx, axis=ax_idx
-    ).take(indices=range(new_ax.size + underflow + overflow), axis=ax_idx)
-    if hnew._storage_type() == hist.storage.Weight():
-        hnew.variances(flow=flow)[...] = np.add.reduceat(
-            h.variances(flow=flow), edge_idx, axis=ax_idx
-        ).take(indices=range(new_ax.size + underflow + overflow), axis=ax_idx)
-    return hnew
-
-
 def check_config(config, isDataMC=True):
     ## Check required info
     if isDataMC:
@@ -220,18 +163,24 @@ def load_default(config, isDataMC=True):
 
 
 def load_coffea(config, scaleToLumi=True):
+    # print('config = ', config)
     if scaleToLumi:
-        from BTVNanoCommissioning.utils.xs_scaler import scaleSumW
+        from BTVNanoCommissioning.utils.xs_scaler import getSumW, scaleSumW
     if "*" in config["input"]:
         files = glob.glob(config["input"])
         output = {i: load(i) for i in files}
-
-        if scaleToLumi:
-            output = scaleSumW(output, config["lumi"])
+        for out in output.keys():
+            if scaleToLumi:
+                output[out] = scaleSumW(
+                    output[out], config["lumi"], getSumW(output[out])
+                )
     elif len(config["input"]) > 0:
         output = {i: load(i) for i in config["input"]}
-        if scaleToLumi:
-            output = scaleSumW(output, config["lumi"])
+        for out in output.keys():
+            if scaleToLumi:
+                output[out] = scaleSumW(
+                    output[out], config["lumi"], getSumW(output[out])
+                )
     else:
         print("Input files are not provided in config")
         return None
@@ -261,41 +210,33 @@ def rebin_and_xlabel(var, collated, config, isDataMC=True):
     ## self define axis
     if configvar != "all" and isin_dict(config["variable"][configvar], "axis"):
         for axis in config["variable"][configvar]["axis"].keys():
+            #print(axis, config["variable"][configvar]["axis"][axis], type(config["variable"][configvar]["axis"][axis]), configvar)
             if config["variable"][configvar]["axis"][axis] == "sum":
                 rebin_axis[axis] = sum
             else:
                 rebin_axis[axis] = config["variable"][configvar]["axis"][axis]
-
+            
     else:
         rebin_axis = {axis: sum for axis in collated[baseaxis][var].axes.name}
         rebin_axis.popitem()
     ## Set rebin axis from configuration file
-    for sample in collated.keys():
-        if isin_dict(config["variable"][configvar], "rebin"):
-            if isin_dict(config["variable"][configvar]["rebin"]):
-                for rb in config["variable"][configvar]["rebin"].keys():
-                    collated[sample][var] = rebin_hist(
-                        collated[sample][var],
-                        rb,
-                        config["variable"][configvar]["rebin"][rb],
-                    )
-
-            ## default is set to be last axis
-            else:
-                collated[sample][var] = rebin_hist(
-                    collated[sample][var],
-                    collated[sample][var][rebin_axis].axes[-1].name,
-                    config["variable"][configvar]["rebin"],
-                )
-
-        collated[sample][var] = collated[sample][var][rebin_axis]
-    return xlabel, collated
+    if isin_dict(config["variable"][configvar], "rebin"):
+        if isin_dict(config["variable"][configvar]["rebin"]):
+            for rb in config["variable"][configvar]["rebin"].keys():
+                rebin_axis[rb] = hist.rebin(config["variable"][configvar]["rebin"][rb])
+        ## default is set to be last axis
+        else:
+            rebin_axis[collated[baseaxis][var].axes[-1].name] = hist.rebin(
+                config["variable"][configvar]["rebin"]
+            )
+    return xlabel, rebin_axis
 
 
 ### copy functions coffea.hist.plotratio https://github.com/CoffeaTeam/coffea/blob/master/coffea/hist/plot.py to boost-hist
 ################
 ## ratio plot ##
 ################
+
 
 _coverage1sd = scipy.stats.norm.cdf(1) - scipy.stats.norm.cdf(-1)
 
@@ -420,7 +361,7 @@ def plotratio(
     denom,
     ax=None,
     clear=True,
-    flow=None,
+    overflow="none",
     xerr=False,
     error_opts={},
     denom_fill_opts={},
@@ -433,7 +374,7 @@ def plotratio(
     """Create a ratio plot, dividing two compatible histograms
     Parameters
     ----------
-        num : Hist, numpy array
+        num : Hist
             Numerator, a single-axis histogram
         denom : Hist
             Denominator, a single-axis histogram
@@ -441,8 +382,10 @@ def plotratio(
             Axes object (if None, one is created)
         clear : bool, optional
             Whether to clear Axes before drawing (if passed); if False, this function will skip drawing the legend
-        flow : str, optional {None, "show", "sum"}
-            Whether plot the under/overflow bin. If "show", add additional under/overflow bin. If "sum", add the under/overflow bin content to first/last bin.
+        overflow : str, optional
+            If overflow behavior is not 'none', extra bins will be drawn on either end of the nominal
+            axis range, to represent the contents of the overflow bins.  See `Hist.sum` documentation
+            for a description of the options.
         xerr: bool, optional
             If true, then error bars are drawn for x-axis to indicate the size of the bin.
         error_opts : dict, optional
@@ -465,7 +408,7 @@ def plotratio(
             (common for data/mc, for better or worse).
         label : str, optional
             Associate a label to this entry (note: y axis label set by ``num.label``)
-        ext_denom_error: list of np.array[error_up,error_down], optional
+        ext_denom_error: list of np.array[error_down,error_upe], optional
             External MC errors not stored in the original histogram
         data_is_np : If data array is a numpy array, take sumw2=sumw
     Returns
@@ -495,60 +438,15 @@ def plotratio(
     ax.set_xlabel(axis.label)
     ax.set_ylabel(denom.label)
     edges = axis.edges
-    if flow == "show":
-        edges = np.array(
-            [
-                edges[0] - (edges[1] - edges[0]) * 3,
-                edges[0] - (edges[1] - edges[0]),
-                *edges,
-                edges[-1] + (edges[1] - edges[0]),
-                edges[-1] + (edges[1] - edges[0]) * 3,
-            ]
-        )
-    centers = (edges[1:] + edges[:-1]) / 2
+    centers = axis.centers
     ranges = (edges[1:] - edges[:-1]) / 2 if xerr else None
-    sumw_num, sumw2_num = num.values(), num.variances()
-    sumw_denom, sumw2_denom = denom.values(), denom.variances()
 
     if data_is_np:
-        sumw_num, sumw2_num = (
-            num,
-            num,
-        )  ### since no weights assigned to data, variances=value
+        sumw_num, sumw2_num = num, num
     else:
-        if flow == "show":
-            print("Show under/overflow bin ")
-            sumw_num, sumw2_num = (
-                num.view(flow=True)["value"],
-                num.view(flow=True)["variance"],
-            )
-            sumw_denom, sumw2_denom = (
-                denom.view(flow=True)["value"],
-                denom.view(flow=True)["variance"],
-            )
+        sumw_num, sumw2_num = num.values(), num.variances()
+    sumw_denom, sumw2_denom = denom.values(), denom.variances()
 
-        elif flow == "sum":
-            print("Merge under/overflow bin to first/last bin")
-
-            sumw_num[0], sumw2_num[0] = (
-                sumw_num[0] + num.view(flow=True)["value"][0],
-                sumw2_num[0] + num.view(flow=True)["value"][0],
-            )
-            sumw_num[-1], sumw2_num[-1] = (
-                sumw_num[-1] + num.view(flow=True)["value"][-1],
-                sumw2_num[-1] + num.view(flow=True)["value"][-1],
-            )
-            sumw_denom[0], sumw2_denom[0] = (
-                sumw_denom[0] + denom.view(flow=True)["value"][0],
-                sumw2_denom[0] + denom.view(flow=True)["value"][0],
-            )
-            sumw_denom[-1], sumw2_denom[-1] = (
-                sumw_denom[-1] + denom.view(flow=True)["value"][-1],
-                sumw2_denom[-1] + denom.view(flow=True)["value"][-1],
-            )
-        else:
-            sumw_num, sumw2_num = num.values(), num.variances()
-            sumw_denom, sumw2_denom = denom.values(), denom.variances()
     rsumw = sumw_num / sumw_denom
     if unc == "clopper-pearson":
         rsumw_err = np.abs(clopper_pearson_interval(sumw_num, sumw_denom) - rsumw)
@@ -624,19 +522,9 @@ def plotratio(
     return ax
 
 
-def autoranger(hist, flow=None):
+def autoranger(hist):
     val, axis = hist.values(), hist.axes[-1].edges
-    if flow == "show":
-        val = hist.view(flow=True)["value"]
-        axis = np.array(
-            [
-                axis[0] - (axis[1] - axis[0]) * 3,
-                axis[0] - (axis[1] - axis[0]),
-                *axis,
-                axis[-1] + (axis[1] - axis[0]),
-                axis[-1] + (axis[1] - axis[0]) * 3,
-            ]
-        )
+    mins, maxs = 0, len(val)
     for i in range(len(val)):
         if val[i] != 0:
             mins = i
@@ -646,129 +534,3 @@ def autoranger(hist, flow=None):
             maxs = i + 1
             break
     return axis[mins], axis[maxs]
-
-
-def MCerrorband(
-    hmc,
-    ax=None,
-    flow=None,
-    label="Stat. unc.",
-    fill_opts=None,
-    ext_error=None,
-    clear=False,
-):
-    """Create a ratio plot, dividing two compatible histograms
-    Parameters
-    ----------
-        hmc : Hist
-            A single-axis histogram
-        ax : matplotlib.axes.Axes, optional
-            Axes object (if None, one is created)
-        flow : str, optional {None, "show", "sum"}
-            Whether plot the under/overflow bin. If "show", add additional under/overflow bin. If "sum", add the under/overflow bin content to first/last bin.
-        fill_opts : dict, optional
-            A dictionary of options to pass to the matplotlib
-            `ax.fill_between <https://matplotlib.org/3.1.1/api/_as_gen/matplotlib.axes.Axes.fill_between.html>`_ call
-            internal to this function, filling the denominator uncertainty band.  Leave blank for defaults.
-        label : str, optional
-            Associate a label to this entry (note: y axis label set by ``num.label``)
-        ext_error: list of np.array[error_up,error_down], optional
-            External MC errors not stored in the original histogram
-        clear : bool, optional
-            Whether to clear Axes before drawing (if passed); if False, this function will skip drawing the legend
-
-    Returns
-    -------
-        ax : matplotlib.axes.Axes
-            A matplotlib `Axes <https://matplotlib.org/3.1.1/api/axes_api.html>`_ object
-    """
-    if ax is None:
-        fig, ax = plt.subplots(1, 1)
-    else:
-        if not isinstance(ax, plt.Axes):
-            raise ValueError("ax must be a matplotlib Axes object")
-        if clear:
-            ax.clear()
-
-    if ext_error is None:
-        values = hmc.values() + np.sqrt(hmc.variances())
-        baseline = hmc.values() - np.sqrt(hmc.variances())
-        edges = hmc.axes[0].edges
-
-        if flow == "show":
-            edges = np.array(
-                [
-                    edges[0] - (edges[1] - edges[0]) * 2,
-                    *edges,
-                    edges[-1] + (edges[1] - edges[0]) * 2,
-                ]
-            )
-            values = hmc.view(flow=True)["value"] + np.sqrt(
-                hmc.view(flow=True)["variance"]
-            )
-            baseline = hmc.view(flow=True)["value"] - np.sqrt(
-                hmc.view(flow=True)["variance"]
-            )
-        if flow == "sum":
-            values[0], values[-1] = (
-                hmc.view(flow=True)["value"] + np.sqrt(hmc.view(flow=True)["variance"])
-            )[0] + values[0], (
-                hmc.view(flow=True)["value"] + np.sqrt(hmc.view(flow=True)["variance"])
-            )[
-                -1
-            ] + values[
-                -1
-            ]
-            baseline[0], baseline[-1] = (
-                hmc.view(flow=True)["value"] - np.sqrt(hmc.view(flow=True)["variance"])
-            )[0] + baseline[0], (
-                hmc.view(flow=True)["value"] - np.sqrt(hmc.view(flow=True)["variance"])
-            )[
-                -1
-            ] + baseline[
-                -1
-            ]
-
-        ax.stairs(
-            values=values,
-            baseline=baseline,
-            edges=edges,
-            label=label,
-            **errband_opts,
-        )
-    else:
-        values = hmc.values() + ext_error[1]
-        baseline = hmc.values() - ext_error[0]
-        edges = hmc.axes[-1].edges
-
-        if flow == "show":
-            edges = np.array(
-                [
-                    edges[0] - (edges[1] - edges[0]) * 2,
-                    *edges,
-                    edges[-1] + (edges[1] - edges[0]) * 2,
-                ]
-            )
-            values = hmc.view(flow=True)["value"] + ext_error[1]
-            baseline = hmc.view(flow=True)["value"] - ext_error[0]
-        if flow == "sum":
-            values[0], values[-1] = (hmc.view(flow=True)["value"] + ext_error[1])[
-                0
-            ] + values[0], (hmc.view(flow=True)["value"] + ext_error[0])[-1] + values[
-                -1
-            ]
-            baseline[0], baseline[-1] = (hmc.view(flow=True)["value"] - ext_error[1])[
-                0
-            ] + baseline[0], (hmc.view(flow=True)["value"] - ext_error[0])[
-                -1
-            ] + baseline[
-                -1
-            ]
-
-        ax.stairs(
-            values=values,
-            baseline=baseline,
-            edges=edges,
-            label=label,
-            **fill_opts,
-        )

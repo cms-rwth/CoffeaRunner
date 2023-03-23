@@ -309,23 +309,5 @@ def defaultdict_accumulator():
     return processor.defaultdict_accumulator(empty_column_accumulator)
 
 
-def update(events, collections):
-    """Return a shallow copy of events array with some collections swapped out"""
-    out = events
-    for name, value in collections.items():
-        out = ak.with_field(out, value, name)
-        if (
-            "float" not in str(ak.type(value))
-            and "int" not in str(ak.type(value))
-            and "bool" not in str(ak.type(value))
-        ):
-            if name == "Jet":
-                out.Jet["pt"] = value.pt
-            elif name == "MET":
-                out.MET["pt"] = value.pt
-                out.MET["phi"] = value.phi
-    return out
-
-
 def num(ar):
     return ak.num(ak.fill_none(ar[~ak.is_none(ar)], 0), axis=0)

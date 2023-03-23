@@ -16,8 +16,8 @@ from BTVNanoCommissioning.utils.plot_utils import (
     load_default,
     rebin_and_xlabel,
     plotratio,
+    errband_opts,
     autoranger,
-    MCerrorband,
 )
 
 parser = argparse.ArgumentParser(description="hist plotter for commissioning")
@@ -39,20 +39,9 @@ if not os.path.isdir(f"plot/{config['output']}_{time}/"):
 ## load coffea files
 output = load_coffea(config, config["scaleToLumi"])
 ## load merge map, inbox text
-mergemap = {}
-if not any(".coffea" in o for o in output.keys()):
-    for merger in config["mergemap"].keys():
-        mergemap[merger] = [
-            m for m in output.keys() if m in config["mergemap"][merger]["list"]
-        ]
-else:
-    for merger in config["mergemap"].keys():
-        flist = []
-        for f in output.keys():
-            flist.extend(
-                [m for m in output[f].keys() if m in config["mergemap"][merger]["list"]]
-            )
-        mergemap[merger] = flist
+mergemap = {
+    merger: config["mergemap"][merger]["list"] for merger in config["mergemap"].keys()
+}
 collated = collate(output, mergemap)
 config = load_default(config)
 
@@ -82,7 +71,7 @@ else:
 for var in var_set:
     if "sumw" == var:
         continue
-    xlabel, collated = rebin_and_xlabel(var, collated, config)
+    xlabel, rebin_axis = rebin_and_xlabel(var, collated, config)
     ### Figure settings
     if config["disable_ratio"]:
         fig, ax = plt.subplots(figsize=(10, 10))
@@ -103,7 +92,7 @@ for var in var_set:
     )
     ## Plot MC (stack all MC)
     hep.histplot(
-        [collated[mc][var] for mc in collated.keys() if "data" not in mc],
+        [collated[mc][var][rebin_axis] for mc in collated.keys() if "data" not in mc],
         stack=True,
         label=[
             config["mergemap"][mc]["label"]
@@ -124,16 +113,23 @@ for var in var_set:
         if "data" in mc:
             continue
         if i == 0:
-            summc = collated[mc][var]
+            summc = collated[mc][var][rebin_axis]
         else:
-            summc = collated[mc][var] + summc
-    MCerrorband(summc, ax=ax)  # stat. unc. errorband
+            summc = collated[mc][var][rebin_axis] + summc
+    ax.stairs(
+        values=summc.values() - np.sqrt(summc.values()),
+        baseline=summc.values() + np.sqrt(summc.values()),
+        edges=summc.axes[0].edges,
+        label="Stat unc.",
+        **errband_opts,
+    )
+
     ## Scale particular sample
     if "scale" in config.keys():
         for mc in collated.keys():
             if mc in config["scale"].keys():
                 hep.histplot(
-                    collated[mc][var] * config["scale"][mc],
+                    collated[mc][var][rebin_axis] * config["scale"][mc],
                     label=f'{config["mergemap"][mc]["label"]}$\\times${config["scale"][mc]}',
                     histtype="step",
                     lw=2,
@@ -150,7 +146,7 @@ for var in var_set:
         )
         and isin_dict(config["variable"][var], "blind")
     ):
-        hdata = collated["data"][var].values()
+        hdata = collated["data"][var][rebin_axis].values()
         mins = (
             None
             if config["variable"][var]["blind"].split(",")[0] == ""
@@ -163,22 +159,22 @@ for var in var_set:
         )
         hdata[mins:maxs] = 0.0
     else:
-        hdata = collated["data"][var].values()
+        hdata = collated["data"][var][rebin_axis].values()
     ## plot data
     hep.histplot(
         hdata,
-        collated["data"][var].axes.edges[-1],
+        collated["data"][var][rebin_axis].axes.edges[-1],
         histtype="errorbar",
         color="black",
         label="Data",
         yerr=True,
         ax=ax,
     )
-    xmin, xmax = autoranger(collated["data"][var] + summc)
+    xmin, xmax = autoranger(collated["data"][var][rebin_axis] + summc)
     ax.set_xlim(xmin, xmax)
     ## Ratio plot
     if "disable_ratio" not in config.keys() or config["disable_ratio"] == False:
-        plotratio(collated["data"][var], summc, ax=rax)
+        plotratio(hdata, summc, data_is_np=True, ax=rax)
         rax.set_ylabel("Data/MC")
         rax.set_xlabel(xlabel)
         rax.set_ylim(0.5, 1.5)

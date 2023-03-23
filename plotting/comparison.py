@@ -41,20 +41,9 @@ output = load_coffea(config, config["scaleToLumi"])
 
 
 ## build up merge map
-mergemap = {}
-if not any(".coffea" in o for o in output.keys()):
-    for merger in config["mergemap"].keys():
-        mergemap[merger] = [
-            m for m in output.keys() if m in config["mergemap"][merger]["list"]
-        ]
-else:
-    for merger in config["mergemap"].keys():
-        flist = []
-        for f in output.keys():
-            flist.extend(
-                [m for m in output[f].keys() if m in config["mergemap"][merger]["list"]]
-            )
-        mergemap[merger] = flist
+mergemap = {
+    merger: config["mergemap"][merger]["list"] for merger in config["mergemap"].keys()
+}
 refname = list(config["reference"].keys())[0]
 collated = collate(output, mergemap)
 config = load_default(config, False)
@@ -94,14 +83,14 @@ np.seterr(divide="ignore", invalid="ignore")
 for var in var_set:
     if "sumw" == var:
         continue
-    print("\t Plotting now:", var)
-    xlabel, collated = rebin_and_xlabel(var, collated, config, False)
+    xlabel, rebin_axis = rebin_and_xlabel(var, collated, config, False)
+    print("\t Plotting now:", var, rebin_axis)
     ## Normalize to reference yield
     if "norm" in config.keys() and config["norm"]:
         for c in config["compare"].keys():
             collated[c][var] = collated[c][var] * float(
-                np.sum(collated[refname][var].values())
-                / np.sum(collated[c][var].values())
+                np.sum(collated[refname][var][rebin_axis].values())
+                / np.sum(collated[c][var][rebin_axis].values())
             )
 
     fig, ((ax), (rax)) = plt.subplots(
@@ -110,8 +99,10 @@ for var in var_set:
     fig.subplots_adjust(hspace=0.06, top=0.92, bottom=0.1, right=0.97)
     hep.cms.label(label, com=config["com"], data=True, loc=0, ax=ax)
     ## plot reference
+    #print(collated[refname][var][rebin_axis])
+    #print(collated[refname][var][{var:sum}])
     hep.histplot(
-        collated[refname][var],
+        collated[refname][var][rebin_axis],
         label=config["reference"][refname]["label"] + " (Ref)",
         histtype=hist_type,
         color=config["reference"][refname]["color"],
@@ -120,21 +111,20 @@ for var in var_set:
     )
     ## plot compare list
     for c, s in config["compare"].items():
-        # print(collated[c][var][{var:sum}])
+        #print(collated[c][var][{var:sum}])
         hep.histplot(
-            collated[c][var],
+            collated[c][var][rebin_axis],
             label=config["compare"][c]["label"],
             histtype=hist_type,
             color=config["compare"][c]["color"],
             yerr=True,
             ax=ax,
-            # flow=args.flow,
         )
     # plot ratio of com/Ref
     for i, c in enumerate(config["compare"].keys()):
         plotratio(
-            collated[c][var],
-            collated[refname][var],
+            collated[c][var][rebin_axis],
+            collated[refname][var][rebin_axis],
             denom_fill_opts=None,
             error_opts={"color": config["compare"][c]["color"]},
             clear=False,
@@ -146,11 +136,11 @@ for var in var_set:
     ax.set_xlabel(None)
     ax.set_ylabel("Events")
     rax.set_ylabel("Other/Ref")
-    ax.ticklabel_format(style="sci", scilimits=(-3, 3))
+    ax.ticklabel_format(style="sci", axis="y", scilimits=(-3, 3))
     ax.get_yaxis().get_offset_text().set_position((-0.065, 1.05))
     ax.legend()
     rax.set_ylim(0.0, 2.0)
-    xmin, xmax = autoranger(collated[refname][var])
+    xmin, xmax = autoranger(collated[refname][var][rebin_axis])
     rax.set_xlim(xmin, xmax)
     at = AnchoredText(
         config["inbox_text"],

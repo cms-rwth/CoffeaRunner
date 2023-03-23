@@ -17,7 +17,7 @@ Clone repository from git
 
 ```bash
 # only first time 
-git clone --recursive git@github.com:cms-rwth/CoffeaRunner.git
+git clone git@github.com:cms-rwth/CoffeaRunner.git
 ```
 
 For installing Miniconda, see also https://hackmd.io/GkiNxag0TUmHnnCiqdND1Q#Local-or-remote
@@ -45,10 +45,14 @@ conda install -c conda-forge p-tqdm
 </details>
 <br>
 
+=======
+
 Once the environment is set up, compile the python package:
 ```
 pip install -e .
 ```
+
+
 
 
 ## Structures of code
@@ -179,10 +183,6 @@ Example in [weight_splitcat.py](https://github.com/cms-rwth/CoffeaRunner/blob/ma
 
 - In case you have correction depends on sample ,i.e. k-factor, use `"bysample":{$sample_name:$weight_nested_dict}`
 
-<details><summary>example with customize weight files
-</summary>
-<p>
-
 ```
 "weights":{
         "common":{
@@ -227,46 +227,6 @@ Example in [weight_splitcat.py](https://github.com/cms-rwth/CoffeaRunner/blob/ma
         },
     }
 ```
-</p>
-</details>
-
-
--  Use central maintained jsonpog-integration 
-The official correction files collected in [jsonpog-integration](https://gitlab.cern.ch/cms-nanoAOD/jsonpog-integration) is updated by POG except `lumiMask` and `JME` still updated by maintainer. No longer to request input files in the `correction_config`.  
-
-<details><summary>See the example with `2017_UL`.</summary>
-<p>
-
-```python
-  "2017_UL": {
-        # Same with custom config
-        "lumiMask": "Cert_294927-306462_13TeV_UL2017_Collisions17_MuonJSON.txt",
-        "JME": "jec_compiled.pkl.gz",
-        # no config need to be specify for PU weights
-        "PU": None,
-        # Btag SFs - specify $TAGGER : $TYPE-> find [$TAGGER_$TYPE] in json file
-        "BTV": {"deepCSV": "shape", "deepJet": "shape"},
-        
-        "LSF": {
-        # Electron SF - Following the scheme: "${SF_name} ${year}": "${WP}"
-        # https://github.com/cms-egamma/cms-egamma-docs/blob/master/docs/EgammaSFJSON.md
-            "ele_ID 2017": "wp90iso",
-            "ele_Reco 2017": "RecoAbove20",
-
-        # Muon SF - Following the scheme: "${SF_name} ${year}": "${WP}"
-        # WPs : ['NUM_GlobalMuons_DEN_genTracks', 'NUM_HighPtID_DEN_TrackerMuons', 'NUM_HighPtID_DEN_genTracks', 'NUM_IsoMu27_DEN_CutBasedIdTight_and_PFIsoTight', 'NUM_LooseID_DEN_TrackerMuons', 'NUM_LooseID_DEN_genTracks', 'NUM_LooseRelIso_DEN_LooseID', 'NUM_LooseRelIso_DEN_MediumID', 'NUM_LooseRelIso_DEN_MediumPromptID', 'NUM_LooseRelIso_DEN_TightIDandIPCut', 'NUM_LooseRelTkIso_DEN_HighPtIDandIPCut', 'NUM_LooseRelTkIso_DEN_TrkHighPtIDandIPCut', 'NUM_MediumID_DEN_TrackerMuons', 'NUM_MediumID_DEN_genTracks', 'NUM_MediumPromptID_DEN_TrackerMuons', 'NUM_MediumPromptID_DEN_genTracks', 'NUM_Mu50_or_OldMu100_or_TkMu100_DEN_CutBasedIdGlobalHighPt_and_TkIsoLoose', 'NUM_SoftID_DEN_TrackerMuons', 'NUM_SoftID_DEN_genTracks', 'NUM_TightID_DEN_TrackerMuons', 'NUM_TightID_DEN_genTracks', 'NUM_TightRelIso_DEN_MediumID', 'NUM_TightRelIso_DEN_MediumPromptID', 'NUM_TightRelIso_DEN_TightIDandIPCut', 'NUM_TightRelTkIso_DEN_HighPtIDandIPCut', 'NUM_TightRelTkIso_DEN_TrkHighPtIDandIPCut', 'NUM_TrackerMuons_DEN_genTracks', 'NUM_TrkHighPtID_DEN_TrackerMuons', 'NUM_TrkHighPtID_DEN_genTracks']
-
-            "mu_Reco 2017_UL": "NUM_TrackerMuons_DEN_genTracks",
-            "mu_HLT 2017_UL": "NUM_IsoMu27_DEN_CutBasedIdTight_and_PFIsoTight",
-            "mu_ID 2017_UL": "NUM_TightID_DEN_TrackerMuons",
-            "mu_Iso 2017_UL": "NUM_TightRelIso_DEN_TightIDandIPCut",
-        },
-    },
-```
-
-</p>
-</details>
-
 ##### Systematic 
 
 Specify whether run systematics or not
@@ -401,9 +361,6 @@ In `plodataMC.py` config files (i.e. `testfile/btv_datamc.yaml`), you can specif
 
 In `comparison.py` config file (`testfile/btv_compare.yaml`),  color and label name and label names are created with `dict` under `reference`  and `compare`. `reference` only accept one entry. 
 
-<details><summary>Code snipped</summary>
-<p>
-
 ```yaml
 ## plodataMC.py
 mergemap:
@@ -438,9 +395,6 @@ compare:
     Muon_Run2022D-PromptReco-v2: 
 ```
 
-</p>
-</details>
-
 #### Variables 
 
 Common definitions for both usage, use default settings if leave empty value for the keys. 
@@ -452,9 +406,6 @@ Common definitions for both usage, use default settings if leave empty value for
 | `axis` | `sum` over all the axes |
 | `rebin` | no rebinning |
 | `blind` | no blind region | 
-
-<details><summary>Code snipped</summary>
-<p>
 
 ```yaml
 ## specify variable to plot
@@ -471,8 +422,6 @@ Common definitions for both usage, use default settings if leave empty value for
             # discr: 2
             # or just put a number, would rebin distribution the last axis (usually the variable)
             2
-            # One can try non-uniform  rebin now! you can specify the rebin axis with rebin value
-            #discr : [-0.2,0.04,0.2,0.4,0.48,0.6,0.64,0.68,0.72,0.76,0.8,0.84,0.88,0.92,0.96,1.]
         # Optional(only for data/MC), blind variables
         blind : -10, #blind variable[-10:], if put -10,-5 would blind variable[-10:-5]
         
@@ -492,9 +441,6 @@ Common definitions for both usage, use default settings if leave empty value for
     all: 
         rebin: 2
 ``` 
-
-</p>
-</details>
 
 ### Running jupyter remotely
 See also https://hackmd.io/GkiNxag0TUmHnnCiqdND1Q#Remote-jupyter

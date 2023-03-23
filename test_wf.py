@@ -70,6 +70,7 @@ class NanoProcessor(processor.ProcessorABC):
         return self._accumulator
 
     def process(self, events):
+
         dataset = events.metadata["dataset"]
         isRealData = not hasattr(events, "genWeight")
         output = self.make_output()

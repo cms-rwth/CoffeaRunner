@@ -67,13 +67,7 @@ variable :
             2
         # Optional(only for data/MC), blind variables
         blind : -10, #blind variable[-10:], if put -10,-5 would blind variable[-10:-5]
-
-    btagDeepFlavCvB_0:
-        xlabel: "deepJet CvB" 
-        # Optional, rebin variable, you can specify the rebin axis with rebin value, you can use non-uniform rebinning now!
-        rebin:  
-            discr : [-0.2,0.04,0.2,0.4,0.48,0.6,0.64,0.68,0.72,0.76,0.8,0.84,0.88,0.92,0.96,1.]
-
+        
     ## specify variable, if not specify anything, leave empty value for key
     btagDeepFlavC_0:
 
