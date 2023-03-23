@@ -57,6 +57,11 @@ variable :
             # discr: 2
             # or just put a number, would rebin distribution the last axis (usually the variable)
             2        
+    btagDeepFlavCvB_0:
+        xlabel: "deepJet CvB" 
+        # Optional, rebin variable, you can specify the rebin axis with rebin value, you can use non-uniform rebinning now!
+        rebin:  
+            discr : [-0.2,0.04,0.2,0.4,0.48,0.6,0.64,0.68,0.72,0.76,0.8,0.84,0.88,0.92,0.96,1.]
     ## specify variable, if not specify anything, leave empty value for key
     btagDeepFlavC_0:
 

@@ -39,8 +39,22 @@ cfg = {
     "weights": {
         "common": {
             "inclusive": {
-                "lumiMask": "Cert_294927-306462_13TeV_UL2017_Collisions17_GoldenJSON.txt"
-            }
-        }
+                "lumiMask": "Cert_294927-306462_13TeV_UL2017_Collisions17_GoldenJSON.txt",
+                "PU": None,
+                "JME": "jec_compiled.pkl.gz",
+                "BTV": {"deepJet": "shape"},
+                "LSF": {
+                    "ele_ID 2017": "wp90iso",
+                    "ele_Reco 2017": "RecoAbove20",
+                    "ele_Reco_low 2017": "RecoBelow20",
+                    "mu_Reco 2017_UL": "NUM_TrackerMuons_DEN_genTracks",
+                    "mu_HLT 2017_UL": "NUM_IsoMu27_DEN_CutBasedIdTight_and_PFIsoTight",
+                    "mu_ID 2017_UL": "NUM_TightID_DEN_TrackerMuons",
+                    "mu_Iso 2017_UL": "NUM_TightRelIso_DEN_TightIDandIPCut",
+                    "mu_ID_low NUM_TightID_DEN_TrackerMuons": "Efficiency_muon_trackerMuon_Run2017_UL_ID.histo.json",
+                    "mu_Reco_low NUM_TrackerMuons_DEN_genTracks": "Efficiency_muon_generalTracks_Run2017_UL_trackerMuon.histo.json",
+                },
+            },
+        },
     },
 }
