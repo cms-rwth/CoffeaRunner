@@ -83,8 +83,8 @@ np.seterr(divide="ignore", invalid="ignore")
 for var in var_set:
     if "sumw" == var:
         continue
-    print("\t Plotting now:", var)
     xlabel, rebin_axis = rebin_and_xlabel(var, collated, config, False)
+    print("\t Plotting now:", var, rebin_axis)
     ## Normalize to reference yield
     if "norm" in config.keys() and config["norm"]:
         for c in config["compare"].keys():
@@ -99,6 +99,8 @@ for var in var_set:
     fig.subplots_adjust(hspace=0.06, top=0.92, bottom=0.1, right=0.97)
     hep.cms.label(label, com=config["com"], data=True, loc=0, ax=ax)
     ## plot reference
+    #print(collated[refname][var][rebin_axis])
+    #print(collated[refname][var][{var:sum}])
     hep.histplot(
         collated[refname][var][rebin_axis],
         label=config["reference"][refname]["label"] + " (Ref)",
@@ -109,6 +111,7 @@ for var in var_set:
     )
     ## plot compare list
     for c, s in config["compare"].items():
+        #print(collated[c][var][{var:sum}])
         hep.histplot(
             collated[c][var][rebin_axis],
             label=config["compare"][c]["label"],

@@ -32,8 +32,8 @@ def scaleSumW(accumulator, lumi, sumw, dyscale=1.0):
                 if sample in xs_dict.keys():
                     h = h * xs_dict[sample] * lumi / sumw[sample]
                 else:
-                    if not (("data" in sample) or ("Run" in sample)):
-                        raise KeyError(sample, "is not founded in xsection.py")
+                    if not (("data" in sample) or ("Run" in sample) or ("Double" in sample)):
+                        raise KeyError(sample, "is not found in xsection.py")
                     else:
                         h = h
                 scaled[sample][key] = h
