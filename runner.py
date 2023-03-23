@@ -74,14 +74,6 @@ def get_main_parser():
     parser.add_argument(
         "--campaign",
         default="Rereco17_94X",
-        choices=[
-            "Rereco17_94X",
-            "Winter22Run3",
-            "2018_UL",
-            "2017_UL",
-            "2016preVFP_UL",
-            "2016postVFP_UL",
-        ],
         help="Dataset campaign, change the corresponding correction files",
     )
 
@@ -115,7 +107,7 @@ def get_main_parser():
         "-j",
         "--workers",
         type=int,
-        default=3,
+        default=6,
         help="Number of workers (cores/threads) to use for multi-worker executors "
         "(e.g. futures or condor) (default: %(default)s)",
     )
@@ -126,18 +118,6 @@ def get_main_parser():
         default=40,
         help="Number of nodes to scale out to if using slurm/condor. Total number of "
         "concurrent threads is ``workers x scaleout`` (default: %(default)s)",
-    )
-    parser.add_argument(
-        "--memory",
-        type=float,
-        default=4.0,
-        help="Memory used in jobs default ``(default: %(default)s)",
-    )
-    parser.add_argument(
-        "--disk",
-        type=float,
-        default=4,
-        help="Disk used in jobs default ``(default: %(default)s)",
     )
     parser.add_argument(
         "--voms",
@@ -288,7 +268,7 @@ if __name__ == "__main__":
     processor_instance = workflows[args.workflow](args.year, args.campaign)
     if args.export_array is not None:
         processor_instance = workflows[args.workflow](
-            args.year, args.campaign, args.isCorr, args.isJERC, args.isSyst
+            year=args.year, campaign=args.campaign, export_array=args.export_array
         )
     # AS: not all workflows will have these two parameters, so probably
     #     we want to avoid always calling it like that in the future
@@ -348,7 +328,6 @@ if __name__ == "__main__":
                 "skipbadfiles": args.skipbadfiles,
                 "schema": processor.NanoAODSchema,
                 "workers": args.workers,
-                "xrootdtimeout": 60,
             },
             chunksize=args.chunk,
             maxchunks=args.max,
@@ -428,39 +407,21 @@ if __name__ == "__main__":
             raise NotImplementedError
 
         dfk = parsl.load(htex_config)
-        if not splitjobs:
-            output = processor.run_uproot_job(
-                sample_dict,
-                treename="Events",
-                processor_instance=processor_instance,
-                executor=processor.parsl_executor,
-                executor_args={
-                    "skipbadfiles": args.skipbadfiles,
-                    "schema": processor.NanoAODSchema,
-                    "config": None,
-                },
-                chunksize=args.chunk,
-                maxchunks=args.max,
-            )
-        else:
-            output = processor.run_uproot_job(
-                sample_dict,
-                treename="Events",
-                processor_instance=processor_instance,
-                executor=processor.parsl_executor,
-                executor_args={
-                    "skipbadfiles": args.skipbadfiles,
-                    "schema": processor.NanoAODSchema,
-                    "merging": True,
-                    "merges_executors": ["merge"],
-                    "jobs_executors": ["run"],
-                    "config": None,
-                },
-                chunksize=args.chunk,
-                maxchunks=args.max,
-            )
-        save(output, args.output)
-        print(f"Saving output to {args.output}")
+
+        output = processor.run_uproot_job(
+            sample_dict,
+            treename="Events",
+            processor_instance=processor_instance,
+            executor=processor.parsl_executor,
+            executor_args={
+                "skipbadfiles": args.skipbadfiles,
+                "schema": processor.NanoAODSchema,
+                "config": None,
+            },
+            chunksize=args.chunk,
+            maxchunks=args.max,
+        )
+
     elif "dask" in args.executor:
         from dask_jobqueue import SLURMCluster, HTCondorCluster
         from distributed import Client
@@ -478,7 +439,6 @@ if __name__ == "__main__":
                 env_extra=env_extra,
             )
         elif "lxplus" in args.executor:
-            # details: https://batchdocs.web.cern.ch/specialpayload/dask.html
             n_port = 8786
             if not check_port(8786):
                 raise RuntimeError(
@@ -501,16 +461,15 @@ if __name__ == "__main__":
                     "when_to_transfer_output": "ON_EXIT",
                     "+JobFlavour": '"workday"',
                 },
-                worker_extra_args=["--worker-port 10000:10100"],
-                job_script_prologue=job_script_prologue,
+                extra=["--worker-port {}".format(n_port)],
+                env_extra=env_extra,
             )
         elif "slurm" in args.executor:
             cluster = SLURMCluster(
                 queue="all",
                 cores=args.workers,
-                processes=args.scaleout,
-                memory=f"{args.memory}GB",
-                disk=f"{args.disk}GB",
+                processes=args.workers,
+                memory="200 GB",
                 retries=args.retries,
                 walltime="00:30:00",
                 env_extra=env_extra,
@@ -518,9 +477,9 @@ if __name__ == "__main__":
         elif "condor" in args.executor:
             cluster = HTCondorCluster(
                 cores=args.workers,
-                memory=f"{args.memory}GB",
-                disk=f"{args.disk}GB",
-                job_script_prologue=job_script_prologue,
+                memory="4GB",
+                disk="4GB",
+                env_extra=env_extra,
             )
 
         if args.executor == "dask/casa":
