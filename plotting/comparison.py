@@ -110,8 +110,6 @@ for var in var_set:
     fig.subplots_adjust(hspace=0.06, top=0.92, bottom=0.1, right=0.97)
     hep.cms.label(label, com=config["com"], data=True, loc=0, ax=ax)
     ## plot reference
-    #print(collated[refname][var][rebin_axis])
-    #print(collated[refname][var][{var:sum}])
     hep.histplot(
         collated[refname][var],
         label=config["reference"][refname]["label"] + " (Ref)",
@@ -122,7 +120,7 @@ for var in var_set:
     )
     ## plot compare list
     for c, s in config["compare"].items():
-        #print(collated[c][var][{var:sum}])
+        # print(collated[c][var][{var:sum}])
         hep.histplot(
             collated[c][var],
             label=config["compare"][c]["label"],

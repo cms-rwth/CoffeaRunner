@@ -250,7 +250,7 @@ if __name__ == "__main__":
                             max_blocks=(config.run_options["scaleout"]) + 2,
                             worker_init="\n".join(env_extra + condor_extra),
                             walltime=config.run_options["walltime"],
-                            requirements = config.run_options["requirements"],
+                            requirements=config.run_options["requirements"],
                         ),
                     )
                 ],

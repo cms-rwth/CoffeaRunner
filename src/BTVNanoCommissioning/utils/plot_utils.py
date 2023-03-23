@@ -261,12 +261,11 @@ def rebin_and_xlabel(var, collated, config, isDataMC=True):
     ## self define axis
     if configvar != "all" and isin_dict(config["variable"][configvar], "axis"):
         for axis in config["variable"][configvar]["axis"].keys():
-            #print(axis, config["variable"][configvar]["axis"][axis], type(config["variable"][configvar]["axis"][axis]), configvar)
             if config["variable"][configvar]["axis"][axis] == "sum":
                 rebin_axis[axis] = sum
             else:
                 rebin_axis[axis] = config["variable"][configvar]["axis"][axis]
-            
+
     else:
         rebin_axis = {axis: sum for axis in collated[baseaxis][var].axes.name}
         rebin_axis.popitem()
