@@ -94,8 +94,8 @@ np.seterr(divide="ignore", invalid="ignore")
 for var in var_set:
     if "sumw" == var:
         continue
-    print("\t Plotting now:", var)
     xlabel, collated = rebin_and_xlabel(var, collated, config, False)
+    print("\t Plotting now:", var, xlabel)
     ## Normalize to reference yield
     if "norm" in config.keys() and config["norm"]:
         for c in config["compare"].keys():
@@ -135,7 +135,7 @@ for var in var_set:
         plotratio(
             collated[c][var],
             collated[refname][var],
-            denom_fill_opts=None,
+            denom_fill_opts={},
             error_opts={"color": config["compare"][c]["color"]},
             clear=False,
             ax=rax,
@@ -146,7 +146,7 @@ for var in var_set:
     ax.set_xlabel(None)
     ax.set_ylabel("Events")
     rax.set_ylabel("Other/Ref")
-    ax.ticklabel_format(style="sci", scilimits=(-3, 3))
+    ax.ticklabel_format(style="sci", axis='y', scilimits=(-3, 3))
     ax.get_yaxis().get_offset_text().set_position((-0.065, 1.05))
     ax.legend()
     rax.set_ylim(0.0, 2.0)
