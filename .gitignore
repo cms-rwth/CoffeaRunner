@@ -5,7 +5,7 @@
 .ipynb_checkpoints/
 \#*
 configurator.pkl
-
+*/configurator.py
 runinfo/
 plot/
 plotting/plot/

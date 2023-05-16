@@ -84,28 +84,6 @@ def reduce_or(*what):
     return reduce(or_, what)
 
 
-def top_pT_sf_formula(pt):
-    return np.exp(
-        -2.02274e-01
-        + 1.09734e-04 * pt
-        + -1.30088e-07 * pt**2
-        + (5.83494e01 / (pt + 1.96252e02))
-    )
-
-
-def top_pT_reweighting(gen):
-    """
-    Apply this SF only to TTbar datasets!
-
-    Documentation:
-        - https://twiki.cern.ch/twiki/bin/viewauth/CMS/TopPtReweighting
-        - https://indico.cern.ch/event/904971/contributions/3857701/attachments/2036949/3410728/TopPt_20.05.12.pdf
-    """
-    top = gen[(gen.pdgId == 6) & gen.hasFlags(["isLastCopy"])]
-    anti_top = gen[(gen.pdgId == -6) & gen.hasFlags(["isLastCopy"])]
-    return np.sqrt(top_pT_sf_formula(top.pt) * top_pT_sf_formula(anti_top.pt))
-
-
 @parametrized
 def padflat(func, n_particles=1):
     @functools.wraps(func)
@@ -301,14 +279,6 @@ def normalize(val, cut=None):
         return ar
 
 
-def empty_column_accumulator():
-    return processor.column_accumulator(np.array([], dtype=np.float64))
-
-
-def defaultdict_accumulator():
-    return processor.defaultdict_accumulator(empty_column_accumulator)
-
-
 def update(events, collections):
     """Return a shallow copy of events array with some collections swapped out"""
     out = events
@@ -329,3 +299,43 @@ def update(events, collections):
 
 def num(ar):
     return ak.num(ak.fill_none(ar[~ak.is_none(ar)], 0), axis=0)
+
+def _is_rootcompat(a):
+    """Is it a flat or 1-d jagged array?"""
+    t = ak.type(a)
+    if isinstance(t, ak._ext.ArrayType):
+        if isinstance(t.type, ak._ext.PrimitiveType):
+            return True
+        if isinstance(t.type, ak._ext.ListType) and isinstance(t.type.type, ak._ext.PrimitiveType):
+            return True
+    return False
+
+def uproot_writeable(events,include=["events","run","luminosityBlock"]):
+    ev = {}
+    include = np.array(include)
+    no_filter = False
+        
+    if len(include)==1 and include[0] == "*" : no_filter = False
+    for bname in events.fields:
+        if not events[bname].fields:
+            if not no_filter and bname not in include:continue
+            ev[bname] = ak.packed(ak.without_parameters(events[bname]))
+        else:
+            b_nest={}
+            no_filter_nest = False
+            if  all(np.char.startswith(include,bname)==False):continue 
+            include_nest = [i[i.find(bname)+len(bname)+1:] for i in include if i.startswith(bname)]
+            
+            if len(include_nest)==1 and include_nest[0]=="*":no_filter_nest=True
+            if not  no_filter_nest:
+                mask_wildcard=np.char.find(include_nest,"*")!=-1
+                include_nest=np.char.replace(include_nest,"*","")
+        
+            for n in events[bname].fields:
+                if not _is_rootcompat(events[bname][n]):continue
+                ## make selections to the filter case, keep cross-ref ("Idx") 
+                if not no_filter_nest and all(np.char.find(n,include_nest)==-1) and "Idx" not in n:continue
+                if  mask_wildcard[np.where(np.char.find(n,include_nest)!=-1)]== False  and "Idx" not in n:continue
+                b_nest[n]=ak.packed(ak.without_parameters(events[bname][n]))
+            ev[bname] = ak.zip(b_nest)
+    return ev

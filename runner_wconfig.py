@@ -66,12 +66,20 @@ if __name__ == "__main__":
         action="store_true",
         help="Do not process, just check all files are accessible",
     )
+    parser.add_argument(
+        "--test",
+        action="store_true",
+        help="run 1 files, 1 chunk in iterative",
+    )
     args = parser.parse_args()
     if args.cfg[-3:] == ".py":
         config = Configurator(args.cfg, overwrite_output_dir=args.overwrite_file)
     else:
         raise sys.exit("Please provide a .py configuration file")
-
+    if args.test:
+        config.run_options["executor"] = "iterative"
+        config.fileset = {f: [config.fileset[f][0]] for f in config.fileset}
+        config.run_options["max"] = 1
     # Scan if files can be opened
     if args.validate:
         start = time.time()
@@ -166,6 +174,7 @@ if __name__ == "__main__":
             chunksize=config.run_options["chunk"],
             maxchunks=config.run_options["max"],
         )
+        save(output, config.outfile)
     elif "parsl" in config.run_options["executor"]:
         import parsl
         from parsl.providers import LocalProvider, CondorProvider, SlurmProvider
@@ -323,12 +332,16 @@ if __name__ == "__main__":
             for sindex, sample in enumerate(config.fileset.keys()):
                 if sindex < int(config.run_options["index"].split(",")[0]):
                     continue
+                if len(config.run_options["index"].split(",")) == 4 and sindex > int(
+                    config.run_options["index"].split(",")[2]
+                ):
+                    break
+
                 if int(config.run_options["index"].split(",")[1]) == findex:
                     mins = findex * config.run_options["sample_size"]
                 else:
                     mins = 0
                     findex = 0
-
                 while mins < len(config.fileset[sample]):
                     splitted = {}
                     maxs = mins + config.run_options["sample_size"]
@@ -336,6 +349,10 @@ if __name__ == "__main__":
                     mins = maxs
                     findex = findex + 1
 
+                    if len(
+                        config.run_options["index"].split(",")
+                    ) == 4 and findex > int(config.run_options["index"].split(",")[3]):
+                        break
                     output = processor.run_uproot_job(
                         splitted,
                         treename="Events",
@@ -359,7 +376,7 @@ if __name__ == "__main__":
                 chunksize=config.run_options["chunk"],
                 maxchunks=config.run_options["max"],
             )
-
+            save(output, config.outfile)
     elif "dask" in config.run_options["executor"]:
         from dask_jobqueue import SLURMCluster, HTCondorCluster
         from distributed import Client
@@ -415,6 +432,7 @@ if __name__ == "__main__":
         elif "condor" in config.run_options["executor"]:
             cluster = HTCondorCluster(
                 cores=config.run_options["workers"],
+                disk="4GB",
                 memory=config.run_options["mem_per_worker"],
                 env_extra=env_extra,
             )
@@ -447,7 +465,7 @@ if __name__ == "__main__":
                 maxchunks=config.run_options["max"],
             )
 
-    save(output, config.outfile)
+            save(output, config.outfile)
 
     # print(output) better to print this in a file:
     with open(f"{config.outfile}.print.txt", "w") as f:

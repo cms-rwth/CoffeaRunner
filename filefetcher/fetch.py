@@ -50,10 +50,14 @@ def getFilesFromDas(args):
         if dataset.startswith("#") or dataset.strip() == "":
             # print("we skip this line:", line)
             continue
+
         dsname = dataset.strip().split("/")[1]  # Dataset first name
+
         Tier = dataset.strip().split("/")[
             3
         ]  # NANOAODSIM for regular samples, USER for private
+        if "SIM" not in Tier:
+            dsname = dataset.strip().split("/")[1] + "_" + dataset.split("/")[2]
         instance = "prod/global"
         if Tier == "USER":
             instance = "prod/phys03"
@@ -154,8 +158,14 @@ def main(args):
     else:
         fdict = getFilesFromDas(args)
 
-    # print(fdict)
-    output_file = "./metadata/%s" % (args.output)
+    # Check the any file lists empty
+    empty = True
+    for dsname, flist in fdict.items():
+        if len(flist) == 0:
+            print(dsname, "is empty!!!!")
+            empty = False
+    assert empty, "you have empty lists"
+    output_file = "./%s" % (args.output)
     with open(output_file, "w") as fp:
         json.dump(fdict, fp, indent=4)
         print("The file is saved at: ", output_file)
