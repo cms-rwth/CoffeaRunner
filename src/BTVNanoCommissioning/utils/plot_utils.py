@@ -586,7 +586,7 @@ def plotratio(
         emarker = opts.pop("emarker", "")
         errbar = ax.errorbar(x=centers, y=rsumw, xerr=ranges, yerr=rsumw_err, **opts)
         plt.setp(errbar[1], "marker", emarker)
-    if denom_fill_opts is not None:
+    if denom_fill_opts is not {}:
         unity = np.ones_like(sumw_denom)
         denom_unc = poisson_interval(unity, sumw2_denom / sumw_denom**2)
         opts = {
@@ -731,6 +731,7 @@ def autoranger(hist, flow=None):
                 axis[-1] + (axis[1] - axis[0]) * 3,
             ]
         )
+    mins,maxs=0,len(val)-1
     for i in range(len(val)):
         if val[i] != 0:
             mins = i

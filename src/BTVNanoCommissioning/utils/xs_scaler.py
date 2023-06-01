@@ -60,9 +60,8 @@ def scaleSumW(output, lumi):
                                 / scaled[files][sample]["sumw"]
                             )
                         else:
-                            if not (("data" in sample) or ("Run" in sample)) or (
-                                "Double" in sample
-                            ):
+                            if not (("data" in sample) or ("Run" in sample) or 
+                                    ("Double" in sample) ):
                                 raise KeyError(sample, "is not founded in xsection.py")
                             else:
                                 h = h
