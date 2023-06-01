@@ -766,7 +766,7 @@ def MCerrorband(
             `ax.fill_between <https://matplotlib.org/3.1.1/api/_as_gen/matplotlib.axes.Axes.fill_between.html>`_ call
             internal to this function, filling the denominator uncertainty band.  Leave blank for defaults.
         label : str, optional
-Associate a label to this entry (note: y axis label set by ``num.label``)
+            Associate a label to this entry (note: y axis label set by ``num.label``)
         ext_error: list of np.array[error_up,error_down], optional
             External MC errors not stored in the original histogram
         clear : bool, optional
