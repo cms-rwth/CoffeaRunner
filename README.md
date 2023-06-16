@@ -13,10 +13,6 @@ Generalized framework columnar-based analysis with [coffea](https://coffeateam.g
 
 :heavy_exclamation_mark: Install under `bash` environment
 
-```
-# only first time, including submodules
-git clone --recursive git@github.com:cms-btv-pog/BTVNanoCommissioning.git 
-
 ```bash
 # only first time 
 git clone --recursive git@github.com:cms-rwth/CoffeaRunner.git
