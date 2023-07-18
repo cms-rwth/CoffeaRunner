@@ -56,7 +56,8 @@ def getFilesFromDas(args):
         Tier = dataset.strip().split("/")[
             3
         ]  # NANOAODSIM for regular samples, USER for private
-        if "SIM" not in Tier:
+        if Tier not in ["NANOAODSIM", "USER"]:
+            # This is for the case of reading a sample from dCache, which is not published in DAS
             dsname = dataset.strip().split("/")[1] + "_" + dataset.split("/")[2]
         instance = "prod/global"
         if Tier == "USER":

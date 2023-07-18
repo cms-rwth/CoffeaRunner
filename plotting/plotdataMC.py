@@ -62,9 +62,8 @@ if "rescale_yields" in config.keys():
         print(
             f"Rescale {sample_to_scale} by {config['rescale_yields'][sample_to_scale]}"
         )
-        collated = additional_scale(
-            collated, config["rescale_yields"][sample_to_scale], sample_to_scale
-        )
+
+    collated = additional_scale(collated, config["rescale_yields"])
 
 ## collect variable lists
 if "all" in list(config["variable"].keys())[0]:

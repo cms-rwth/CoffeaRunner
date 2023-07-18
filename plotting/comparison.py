@@ -61,13 +61,14 @@ config = load_default(config, False)
 
 ## If addition rescale on yields required
 if "rescale_yields" in config.keys():
+    # print(config["rescale_yields"])
     for sample_to_scale in config["rescale_yields"].keys():
         print(
             f"Rescale {sample_to_scale} by {config['rescale_yields'][sample_to_scale]}"
         )
-        collated = additional_scale(
-            collated, config["rescale_yields"][sample_to_scale], sample_to_scale
-        )
+
+    collated = additional_scale(collated, config["rescale_yields"])
+
 ### style settings
 if "Run" in list(config["reference"].keys())[0]:
     hist_type = "errorbar"
@@ -146,7 +147,7 @@ for var in var_set:
     ax.set_xlabel(None)
     ax.set_ylabel("Events")
     rax.set_ylabel("Other/Ref")
-    ax.ticklabel_format(style="sci", axis='y', scilimits=(-3, 3))
+    ax.ticklabel_format(style="sci", axis="y", scilimits=(-3, 3))
     ax.get_yaxis().get_offset_text().set_position((-0.065, 1.05))
     ax.legend()
     rax.set_ylim(0.0, 2.0)
