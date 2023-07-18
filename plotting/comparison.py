@@ -148,6 +148,7 @@ for var in var_set:
     ax.set_ylabel("Events")
     rax.set_ylabel("Other/Ref")
     ax.ticklabel_format(style="sci", axis="y", scilimits=(-3, 3))
+
     ax.get_yaxis().get_offset_text().set_position((-0.065, 1.05))
     ax.legend()
     rax.set_ylim(0.0, 2.0)

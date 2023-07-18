@@ -65,6 +65,7 @@ def scaleSumW(output, lumi):
                                 or ("Run" in sample)
                                 or ("Double" in sample)
                             ):
+
                                 raise KeyError(sample, "is not founded in xsection.py")
                             else:
                                 h = h
