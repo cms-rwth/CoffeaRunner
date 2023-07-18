@@ -94,7 +94,7 @@ def scaleSumW(output, lumi):
 def additional_scale(output, samples_and_scales):
     scaled = {}
     # print('output.keys():', output.keys())
-    print("samples_and_scales:", samples_and_scales)
+    # print("samples_and_scales:", samples_and_scales)
 
     for merged_output_label in output.keys():
         scaled[merged_output_label] = {}
