@@ -731,7 +731,7 @@ def autoranger(hist, flow=None):
                 axis[-1] + (axis[1] - axis[0]) * 3,
             ]
         )
-    mins,maxs=0,len(val)-1
+    mins, maxs = 0, len(val) - 1
     for i in range(len(val)):
         if val[i] != 0:
             mins = i

@@ -1018,7 +1018,6 @@ xsection = [
         "energy": "13",
         "comment": "Private sample",
     },
-
     {
         "process_name": "DYJetsToMuMu_M-50_TuneCP5_ZptWeighted_13TeV-powhegMiNNLO-pythia8-photos",
         "cross_section": "1976",
@@ -1026,7 +1025,6 @@ xsection = [
         "energy": "13",
         "comment": "Z->MuMu ZptWeighted",
     },
-    
     {
         "process_name": "DYToLL_NLO_5FS_TuneCH3_13TeV_matchbox_herwig7",
         "cross_section": "1976",
@@ -1034,7 +1032,6 @@ xsection = [
         "energy": "13",
         "comment": "Z->LL by Herwig",
     },
-    
     {"process_name": "gchcZZ2L2Q", "cross_section": "0.00032625826"},
     {"process_name": "gchcZZ2L2Nu", "cross_section": "0.00009333531"},
     {"process_name": "gchcWW2QLNu", "cross_section": "0.00821330551"},
