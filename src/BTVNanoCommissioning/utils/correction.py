@@ -1012,7 +1012,7 @@ def muSFs(mu, correct_map, weights, syst=False, isHLT=False):
 
 def jmar_sf(jet, correct_map, weights, syst=False):
     alljet = jet if jet.ndim > 1 else ak.singletons(jet)
-    for sf in correct_map["JMAR_cfgb"].keys():
+    for sf in correct_map["JMAR_cfg"].keys():
         sfs_all, sfs_all_up, sfs_all_down = (
             np.ones_like(alljet[:, 0].pt),
             np.ones_like(alljet[:, 0].pt),
