@@ -100,30 +100,17 @@ def additional_scale(output, samples_and_scales):
         scaled[merged_output_label] = {}
         # print(merged_output_label, output[merged_output_label].keys())
 
-        if "sumw" not in output[merged_output_label].keys():
-            for sample, accu in output[merged_output_label].items():
-                scaled[merged_output_label][sample] = {}
-                for key, h_obj in accu.items():
-                    if isinstance(h_obj, hist.Hist):
-                        h = copy.deepcopy(h_obj)
-                        if sample in samples_and_scales.keys():
-                            scale = samples_and_scales[sample]
-                            h = h * scale
-                        else:
-                            h = h
-                        scaled[merged_output_label][sample][key] = h
-        else:
-            for sample, accu in output.items():
-                scaled[sample] = {}
-                for key, h_obj in accu.items():
-                    if isinstance(h_obj, hist.Hist):
-                        h = copy.deepcopy(h_obj)
-                        if sample in samples_and_scales.keys():
-                            scale = samples_and_scales[sample]
-                            h = h * scale
-                        else:
-                            h = h
-                        scaled[sample][key] = h
+        for sample, accu in output.items():
+            scaled[sample] = {}
+            for key, h_obj in accu.items():
+                if isinstance(h_obj, hist.Hist):
+                    h = copy.deepcopy(h_obj)
+                    if sample in samples_and_scales.keys():
+                        scale = samples_and_scales[sample]
+                        h = h * scale
+                    else:
+                        h = h
+                    scaled[sample][key] = h
     return scaled
 
 
