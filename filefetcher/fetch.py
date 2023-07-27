@@ -53,10 +53,12 @@ def getFilesFromDas(args):
 
         dsname = dataset.strip().split("/")[1]  # Dataset first name
 
-        Tier = dataset.strip().split("/")[
-            3
-        ]  # NANOAODSIM for regular samples, USER for private
-        if "SIM" not in Tier:
+        Tier = dataset.strip().split("/")[3]
+        # Tier = NANOAOD[SIM] for regular samples, USER for private samples
+
+        if Tier=="NANOAOD":
+            # This is for the case for Data. 
+            # In this case we want datasetname to be formed from the first two parts (in order to distinguish years/Eras)
             dsname = dataset.strip().split("/")[1] + "_" + dataset.split("/")[2]
         instance = "prod/global"
         if Tier == "USER":
@@ -107,7 +109,7 @@ def getFilesFromPath(args, lim=None):
 def getRootFilesFromPath(d, lim=None):
     import subprocess
 
-    if "xrootd" in d:
+    if "root://" in d:
         sp = d.split("/")
         siteIP = "/".join(sp[0:4])
         pathToFiles = "/".join(sp[3:]) + "/"

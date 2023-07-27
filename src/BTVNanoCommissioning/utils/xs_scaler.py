@@ -60,8 +60,12 @@ def scaleSumW(output, lumi):
                                 / scaled[files][sample]["sumw"]
                             )
                         else:
-                            if not (("data" in sample) or ("Run" in sample) or 
-                                    ("Double" in sample) ):
+                            if not (
+                                ("data" in sample)
+                                or ("Run" in sample)
+                                or ("Double" in sample)
+                            ):
+
                                 raise KeyError(sample, "is not founded in xsection.py")
                             else:
                                 h = h
@@ -87,32 +91,26 @@ def scaleSumW(output, lumi):
 
 
 ## Additional rescale for MC
-def additional_scale(output, scale, sample_to_scale):
+def additional_scale(output, samples_and_scales):
     scaled = {}
-    for files in output.keys():
-        scaled[files] = {}
-        if "sumw" not in output[files].keys():
-            for sample, accu in output[files].items():
-                scaled[files][sample] = {}
-                for key, h_obj in accu.items():
-                    if isinstance(h_obj, hist.Hist):
-                        h = copy.deepcopy(h_obj)
-                        if sample in sample_to_scale:
-                            h = h * scale
-                        else:
-                            h = h
-                        scaled[files][sample][key] = h
-        else:
-            for sample, accu in output.items():
-                scaled[sample] = {}
-                for key, h_obj in accu.items():
-                    if isinstance(h_obj, hist.Hist):
-                        h = copy.deepcopy(h_obj)
-                        if sample in sample_to_scale:
-                            h = h * scale
-                        else:
-                            h = h
-                        scaled[sample][key] = h
+    # print('output.keys():', output.keys())
+    # print("samples_and_scales:", samples_and_scales)
+
+    for merged_output_label in output.keys():
+        scaled[merged_output_label] = {}
+        # print(merged_output_label, output[merged_output_label].keys())
+
+        for sample, accu in output.items():
+            scaled[sample] = {}
+            for key, h_obj in accu.items():
+                if isinstance(h_obj, hist.Hist):
+                    h = copy.deepcopy(h_obj)
+                    if sample in samples_and_scales.keys():
+                        scale = samples_and_scales[sample]
+                        h = h * scale
+                    else:
+                        h = h
+                    scaled[sample][key] = h
     return scaled
 
 
@@ -120,12 +118,14 @@ def collate(output, mergemap):
     out = {}
     merged = {}
     merged_output = accumulate([output[f] for f in output.keys()])
-    for files in merged_output.keys():
-        if "sumw" not in merged_output[files].keys():
-            for m in output[files].keys():
-                merged[m] = dict(merged_output[files][m].items())
+    for merged_output_label in merged_output.keys():
+        if "sumw" not in merged_output[merged_output_label].keys():
+            for m in output[merged_output_label].keys():
+                merged[m] = dict(merged_output[merged_output_label][m].items())
         else:
-            merged[files] = dict(merged_output[files].items())
+            merged[merged_output_label] = dict(
+                merged_output[merged_output_label].items()
+            )
 
     for group, names in mergemap.items():
         out[group] = accumulate(
